@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -41,6 +41,7 @@ Observação: [PagSeguro](https://pagseguro.uol.com.br/) é um método de pagame
  
 Todas as compras são processadas utilizando o checkout transparente:
 - **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
+
 
 ### PagSeguro Pix (PREMIUM) ###
 * Confirmação automática do pagamento, semelhante a cartão de crédito; 
@@ -241,3 +242,5 @@ Nenhuma atualização disponível
 * Tradução do plugin para pt-BR.
 = 1.0.2 2022-08-04 =
 * Atualizando documentação.
+= 1.1.0 2022-09-02 =
+* Valor mínimo e início dos juros por parcela.

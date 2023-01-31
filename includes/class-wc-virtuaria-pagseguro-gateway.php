@@ -39,6 +39,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->debug           = $this->get_option( 'debug' );
 		$this->installments    = $this->get_option( 'installments' );
 		$this->tax             = $this->get_option( 'tax' );
+		$this->min_installment = $this->get_option( 'min_installment' );
+		$this->fee_from        = $this->get_option( 'fee_from' );
 		$this->soft_descriptor = $this->get_option( 'soft_descriptor' );
 		$this->tiket_validate  = $this->get_option( 'tiket_validate' );
 		$this->debug           = $this->get_option( 'debug' );
@@ -184,10 +186,41 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => 12,
 			),
+			'min_installment' => array(
+				'title'             => __( 'Valor mínimo da parcela (R$)', 'virtuaria-pagseguro' ),
+				'type'              => 'number',
+				'description'       => __( 'Define o valor mínimo que uma parcela pode receber.', 'virtuaria-pagseguro' ),
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => 'any',
+				),
+			),
 			'tax'             => array(
-				'title'       => __( 'Taxa de juros (%)', 'virtuaria-pagseguro' ),
-				'type'        => 'number',
-				'description' => __( 'Define o percentual de juros aplicado ao parcelamento.', 'virtuaria-pagseguro' ),
+				'title'             => __( 'Taxa de juros (%)', 'virtuaria-pagseguro' ),
+				'type'              => 'number',
+				'description'       => __( 'Define o percentual de juros aplicado ao parcelamento.', 'virtuaria-pagseguro' ),
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => '0.01',
+				),
+			),
+			'fee_from'        => array(
+				'title'       => __( 'Parcelamento com juros ', 'virtuaria-pagseguro' ),
+				'type'        => 'select',
+				'description' => __( 'Define a partir de qual parcela os juros serão aplicados.', 'virtuaria-pagseguro' ),
+				'options'     => array(
+					'2'  => '2x',
+					'3'  => '3x',
+					'4'  => '4x',
+					'5'  => '5x',
+					'6'  => '6x',
+					'7'  => '7x',
+					'8'  => '8x',
+					'9'  => '9x',
+					'10' => '10x',
+					'11' => '11x',
+					'12' => '12x',
+				),
 			),
 			'soft_descriptor' => array(
 				'title'       => __( 'Nome na fatura', 'virtuaria-pagseguro' ),
@@ -213,10 +246,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'description' => '',
 			),
 			'tiket_validate'  => array(
-				'title'       => 'Validade',
-				'type'        => 'number',
-				'description' => 'Define o limite de dias onde o boleto pode ser pago.',
-				'default'     => '5',
+				'title'             => 'Validade',
+				'type'              => 'number',
+				'description'       => 'Define o limite de dias onde o boleto pode ser pago.',
+				'default'           => '5',
+				'custom_attributes' => array(
+					'min' => 1,
+				),
 			),
 		);
 
@@ -276,7 +312,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					$charge_amount = get_post_meta( $order_id, '_charge_amount', true );
 					$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 					$order->add_order_note( 'PagSeguro: cobrança recebida R$' . number_format( $charge_amount / 100, 2, ',', '.' ) );
-					if ( $this->tax ) {
+					if ( $this->tax && ( ( $charge_amount / 100 ) - $order->get_total() ) > 0 ) {
 						$fee = new WC_Order_Item_Fee();
 						$fee->set_name( __( 'Parcelamento pagseguro', 'virtuaria-pagseguro' ) );
 						$fee->set_total( ( $charge_amount / 100 ) - $order->get_total() );
@@ -566,7 +602,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		$combo_installments = array();
 		foreach ( range( 1, $this->installments ) as $installment ) {
-			if ( 1 === $installment ) {
+			if ( $this->fee_from > $installment ) {
 				$combo_installments[] = $cart_total;
 				continue;
 			}
@@ -580,10 +616,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		wc_get_template(
 			'transparent-checkout.php',
 			array(
-				'cart_total'   => $cart_total,
-				'flag'         => plugins_url( 'assets/images/brazilian-flag.png', plugin_dir_path( __FILE__ ) ),
-				'installments' => $combo_installments,
-				'has_tax'      => floatval( $this->tax ) > 0,
+				'cart_total'      => $cart_total,
+				'flag'            => plugins_url( 'assets/images/brazilian-flag.png', plugin_dir_path( __FILE__ ) ),
+				'installments'    => $combo_installments,
+				'has_tax'         => floatval( $this->tax ) > 0,
+				'min_installment' => floatval( $this->min_installment ),
+				'fee_from'        => $this->fee_from,
 			),
 			'woocommerce/pagseguro/',
 			Virtuaria_Pagseguro::get_templates_path()

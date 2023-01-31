@@ -60,6 +60,7 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 				<?php
 				foreach ( $installments as $index => $installment ) {
 					if ( 0 !== $index && $installment < 5 ) {
+						// Mínimo de 5 reais por parcela.
 						break;
 					}
 					$aux = $index + 1;
@@ -70,13 +71,13 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 							esc_attr( $aux ),
 							wp_kses_post( wc_price( $installment ) )
 						);
-					} else {
+					} elseif ( ( $installment / $aux ) > $min_installment ) {
 						printf(
 							'<option value="%d">%dx de %s %s</option>',
 							esc_attr( $aux ),
 							esc_attr( $aux ),
 							wp_kses_post( wc_price( $installment / $aux ) ),
-							$has_tax ? '(' . wp_kses_post( wc_price( $installment ) ) . ')' : ' sem juros'
+							$has_tax && $fee_from <= $aux ? '(' . wp_kses_post( wc_price( $installment ) ) . ')' : ' sem juros'
 						);
 					}
 				}

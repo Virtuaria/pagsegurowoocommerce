@@ -51,7 +51,7 @@ class WC_PagSeguro_API {
 	 * @param array    $posted the data to charge.
 	 */
 	public function new_charge( $order, $posted ) {
-		if ( ( 'credit' === $posted['payment_mode'] && 1 === intval( $posted['pagseguro_installments'] ) )
+		if ( ( 'credit' === $posted['payment_mode'] && $this->gateway->fee_from > intval( $posted['pagseguro_installments'] ) )
 			|| 'ticket' === $posted['payment_mode'] ) {
 			$total = $order->get_total();
 		} else {
@@ -163,7 +163,7 @@ class WC_PagSeguro_API {
 		if ( $this->debug_on ) {
 			$this->gateway->log->add(
 				$this->tag,
-				'Resposta do servidor ao tentar criar novo pedidos: ' . wp_json_encode( $request ),
+				'Resposta do servidor ao tentar criar novo pedido: ' . wp_json_encode( $request ),
 				WC_Log_Levels::INFO
 			);
 		}
