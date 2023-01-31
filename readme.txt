@@ -3,12 +3,12 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Adds Pagseguro as a payment method for Woocommerce
+Adiciona o Pagseguro como método de pagamento para o Woocommerce.
 
 == Description ==
 
@@ -21,34 +21,45 @@ Utilizando a API mais nova (4.0) de cobrança disponibilizada pelo pagseguro, es
 * Link de segunda via do boleto na tela de confirmação e no e-mail com os detalhes do pedido;
 * Cobrança extra;
 * Reembolso (total e parcial);
-* Opção de salvar dados de pagamento (sem armazenar o número do cartão do cliente);
-* Checkout Transparente;
-* Debug para gerenciamento de erros;
+* Opção do cliente salvar método de pagamento (sem armazenar o número do cartão do cliente);
+* Checkout Transparente, onde faz o pagamento sem sair do site;
+* Relatório (log) para consulta a detalhes de transações, incluindo erros;
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
-* Webhook de retorno de dados automático dos status (aprovado, negado, cancelado, etc);
+* Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
+* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
 * PagSeguro Pix (PREMIUM);
 
 Com este plugin você poderá fazer reembolsos totais e parciais através da página de gerenciamento do pedido em sua loja.
 
-É disponibilizado ao lojista a opção “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
+É disponibilizado ao lojista uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
 
-O plugin conta com a funcionalidade Cobrança Extra, necessário que a função de armazenar dados do pagamento esteja ativa, que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. 
+O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. Para realizar cobranças extras, é necessário que a função de armazenar dados do pagamento esteja ativa,
 
-[PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
+[youtube https://www.youtube.com/watch?v=jNu_qX2Od5E]
+
+Observação: [PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
  
 Todas as compras são processadas utilizando o checkout transparente:
 - **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
 
 ### PagSeguro Pix (PREMIUM) ###
 * Confirmação automática do pagamento, semelhante a cartão de crédito; 
+* Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
 * Reembolso total e parcial;
 * Tempo limite para pagamento configurável;
 * Nova cobrança Pix, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
 * Pagamento por QR code ou link de pagamento;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
-* Webhook sobre mudanças no status do pagamento(aprovado, cancelado).
+* Para mais informações, entre em contato via **tecnologia@virtuaria.com.br**.
 
-Para mais informações, entre em contato via ** tecnologia@virtuaria.com.br.**
+**Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde.
+
+**Para mais informações, acesse**  [virtuaria.com.br/pagseguro-woocommerce-plugin](https://virtuaria.com.br/pagseguro-woocommerce-plugin).
+
+= Compatibilidade =
+
+Este plugin é compatível com o [WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/), desta forma é possível enviar os campos de "CPF", "número do endereço" e "bairro".
+Compatível com Woocommerce 5.8.0 ou superior
 
 ### Descrição em Inglês: ###
 
@@ -68,16 +79,6 @@ Using the newest collection API (4.0) made available by pagseguro, this plugin h
 * Webhook for automatic return of status data (approved, denied, cancelled, etc.);
 * PagSeguro Pix (PREMIUM).
 
-**Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando simplificar o uso em lojas virtuais, por isto o fundo verde.
-
-**Para mais informações, acesse**  [virtuaria.com.br/plugin-pagseguro](https://virtuaria.com.br/plugin-pagseguro)
-
-= Compatibilidade =
-
-Este plugin é compatível com o [WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/), desta forma é possível enviar os campos de "CPF", "número do endereço" e "bairro".
-Compatível com Woocommerce 5.8.0 ou superior
-Compatível com Wordpress 5.8.2
-
 == Installation ==
 
 = Instalação do plugin: =
@@ -85,6 +86,8 @@ Compatível com Wordpress 5.8.2
 * Envie os arquivos do plugin para a pasta wp-content/plugins, ou instale usando o instalador de plugins do WordPress.
 * Ative o plugin.
 * Navegue para Woocommerce -> Configurações -> Pagamentos, escolha o “Pagseguro” e defina Token e E-mail.
+
+[youtube https://www.youtube.com/watch?v=X1fF3aP34zk]
 
 ### Instalação e configuração em Inglês: ###
 
@@ -236,5 +239,5 @@ Nenhuma atualização disponível
 * Versão inicial.
 = 1.0.1 2022-07-29 =
 * Tradução do plugin para pt-BR.
-
-
+= 1.0.2 2022-08-04 =
+* Atualizando documentação.
