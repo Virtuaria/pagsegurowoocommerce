@@ -97,15 +97,21 @@ class WC_PagSeguro_API {
 			if ( isset( $pagseguro_card_info['token'] ) && ! $posted['pagseguro_use_other_card'] && $posted['pagseguro_save_hash_card'] ) {
 				$data['body']['payment_method']['card']['id'] = $pagseguro_card_info['token'];
 			} else {
-				$data['body']['payment_method']['card'] = array(
-					'number'        => preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $posted['pagseguro_card_number'] ) ) ),
-					'exp_month'     => $exp_month,
-					'exp_year'      => $exp_year,
-					'security_code' => preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $posted['pagseguro_card_cvc'] ) ) ),
-					'holder'        => array(
-						'name' => sanitize_text_field( wp_unslash( $posted['pagseguro_holder_name'] ) ),
-					),
-				);
+				if ( isset( $posted['pagseguro_encrypted_card'] ) && ! empty( $posted['pagseguro_encrypted_card'] ) ) {
+					$data['body']['payment_method']['card'] = array(
+						'encrypted' => sanitize_text_field( wp_unslash( $posted['pagseguro_encrypted_card'] ) ),
+					);
+				} else {
+					$data['body']['payment_method']['card'] = array(
+						'number'        => preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $posted['pagseguro_card_number'] ) ) ),
+						'exp_month'     => $exp_month,
+						'exp_year'      => $exp_year,
+						'security_code' => preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $posted['pagseguro_card_cvc'] ) ) ),
+						'holder'        => array(
+							'name' => sanitize_text_field( wp_unslash( $posted['pagseguro_holder_name'] ) ),
+						),
+					);
+				}
 
 				if ( $posted['pagseguro_save_hash_card'] ) {
 					$data['body']['payment_method']['card']['store'] = true;
@@ -293,5 +299,44 @@ class WC_PagSeguro_API {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get public key using client token.
+	 */
+	public function get_public_key() {
+		$request = wp_remote_get(
+			$this->endpoint . 'public-keys/card',
+			array(
+				'headers' => array(
+					'Authorization' => $this->gateway->token,
+					'Content-Type'  => 'application/json',
+				),
+			)
+		);
+
+		if ( is_wp_error( $request ) ) {
+			if ( $this->debug_on ) {
+				$this->gateway->log->add(
+					$this->tag,
+					'Falha ao obter chave pública: ' . $request->get_error_message(),
+					WC_Log_Levels::ERROR
+				);
+			}
+		}
+
+		if ( $this->debug_on ) {
+			$this->gateway->log->add(
+				$this->tag,
+				'Resposta do servidor ao tentar obter chave pública: ' . wp_json_encode( $request ),
+				WC_Log_Levels::INFO
+			);
+		}
+
+		if ( 200 !== wp_remote_retrieve_response_code( $request ) ) {
+			return false;
+		}
+
+		return json_decode( wp_remote_retrieve_body( $request ) )->public_key;
 	}
 }

@@ -22,6 +22,21 @@ jQuery(document).ready(function($){
 			$('#pagseguro-card-installments-field').removeClass('card-loaded');
 		}
 	});
+
+    $(document).on('click', '#place_order', function() {
+        if ( encriptation && $('#credit-card').prop('checked') && ! $('#pagseguro-card-number-field').hasClass('card-loaded') ) {
+            var expire = $('#pagseguro-card-expiry').val().split(' / ');
+            var card = PagSeguro.encryptCard({
+                publicKey: encriptation.pub_key,
+                holder: $('#pagseguro-card-holder-name').val(),
+                number: $('#pagseguro-card-number').val().replace(/ /g, ''),
+                expMonth: expire[0],
+                expYear: expire[1],
+                securityCode: $('#pagseguro-card-cvc').val()
+            });
+            $('#pagseguro_encrypted_card').val(card.encryptedCard);
+        }
+    });
 });
 
 function displayPaymentMethod() {

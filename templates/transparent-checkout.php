@@ -141,6 +141,7 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 			<?php
 		endif;
 		?>
+		<input type="hidden" name="pagseguro_encrypted_card" id="pagseguro_encrypted_card" />
 	</div>
 	<div id="pagseguro-banking-ticket-form" class="pagseguro-method-form">
 		<p>

@@ -108,6 +108,23 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'',
 				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/checkout.css' )
 			);
+
+			wp_enqueue_script(
+				'pagseguro-sdk',
+				'https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js',
+				array(),
+				'1.1.1',
+				true
+			);
+
+			$pub_key = $this->api->get_public_key();
+			if ( $pub_key ) {
+				wp_localize_script(
+					'pagseguro-virt',
+					'encriptation',
+					array( 'pub_key' => $pub_key )
+				);
+			}
 		}
 	}
 

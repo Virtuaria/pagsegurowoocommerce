@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -90,12 +90,9 @@ Using the newest collection API (4.0) made available by pagseguro, this plugin h
 
 [youtube https://www.youtube.com/watch?v=X1fF3aP34zk]
 
-### Instalação e configuração em Inglês: ###
+Para utilizar nosso plugin em produção, é preciso solicitar homologação junto a equipe do pagseguro conforme vídeo abaixo:
 
-* Upload plugin files to your plugins folder, or install using WordPress built-in Add New Plugin installer;
-* Activate the plugin;
-* Navigate to WooCommerce -> Settings -> Payment Gateways, choose PagSeguro and fill in your PagSeguro Email and Token.
-
+[youtube https://www.youtube.com/watch?v=L0iqvf1LL7g]
 
 = Requerimentos: =
 
@@ -126,6 +123,13 @@ O token e e-mail devem ser obtidos em seu painel do Pagseguro utilizando o segui
 2 - Adicione o seu e-mail e o token do PagSeguro. 
 
 Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
+
+### Instalação e configuração em Inglês: ###
+
+* Upload plugin files to your plugins folder, or install using WordPress built-in Add New Plugin installer;
+* Activate the plugin;
+* Navigate to WooCommerce -> Settings -> Payment Gateways, choose PagSeguro and fill in your PagSeguro Email and Token.
+
 
 == Frequently Asked Questions ==
 
@@ -196,6 +200,11 @@ Não é necessário configurar qualquer URL para "Notificação de transação" 
 
 Sim, você pode reembolsar pedidos com status processando indo direto a página do pedido no woocommerce e clicar em Reembolso -> Reembolso via Pagseguro e setar o valor seja ele total ou parcial.
 
+= Erro 403 ao utilizar o plugin em produção =
+
+Para utilizar o plugin em produção é preciso solicitar liberação feita pela equipe do PagSeguro. O processo é simples e pode ser feito via "[Solicitar Homologação](https://dev.pagseguro.uol.com.br/reference/request-approval)".
+
+
 = Quais valores meus clientes podem pagar com este plugin?  =
 
 Não há valores máximos para as vendas, porém existem valores mínimo a serem transacionados com o pagseguro, segue lista:
@@ -244,3 +253,5 @@ Nenhuma atualização disponível
 * Atualizando documentação.
 = 1.1.0 2022-09-02 =
 * Valor mínimo e início dos juros por parcela.
+= 1.1.1 2022-09-08 =
+* Criptografia RSA para função crédito.
