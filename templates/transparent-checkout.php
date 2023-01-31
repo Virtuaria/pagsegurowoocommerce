@@ -15,11 +15,13 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 		$card_loaded = true;
 	}
 }
+
+$class_card_loaded = $card_loaded ? 'card-loaded' : '';
 ?>
 <span class="pagseguro-info">
 	Na área "Detalhes de Faturamento", recomendamos inserir os dados do titular do cartão. Caso a compra seja para outra pessoa, escolha "Entregar para um endereço diferente".
 </span>
-<fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>">
+<fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>" class="<?php echo esc_attr( $class_card_loaded ); ?>">
 	<ul id="pagseguro-payment-methods">
 		<?php
 		if ( $methods_enabled['credit'] ) :
@@ -51,9 +53,7 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 		endif;
 		?>
 	</ul>
-	<div class="clear"></div>
-
-	<?php $class_card_loaded = $card_loaded ? 'card-loaded' : ''; ?>
+	<div class="clear"></div>	
 	<div id="pagseguro-credit-card-form" class="pagseguro-method-form">
 		<p id="pagseguro-card-holder-name-field" class="form-row form-row-first <?php echo esc_attr( $class_card_loaded ); ?>">
 			<label for="pagseguro-card-holder-name"><?php esc_html_e( 'Titular', 'virtuaria-pagseguro' ); ?> <small>(<?php esc_html_e( 'como no cartão', 'virtuaria-pagseguro' ); ?>)</small> <span class="required">*</span></label>

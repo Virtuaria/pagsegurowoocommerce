@@ -53,7 +53,7 @@ label[for="payment_method_virt_pagseguro"] img {
   display: block;
   margin-bottom: 10px;
   line-height: 20px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   font-style: italic;
   margin-top: -2px;
 }
@@ -82,16 +82,18 @@ label[for="payment_method_virt_pagseguro"] img {
 }
 .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li,
 .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li {
-  border-color: transparent transparent #bbb;
-  border-radius: 4px 4px 0 0;
-  -webkit-border-radius: 4px 4px 0 0;
-  border-style: solid;
-  border-width: 1px;
-  display: block;
   float: left;
   list-style: none;
-  margin: 0;
-  padding: 0;
+  margin-right: 5px;
+}
+.woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li:after,
+.woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li:after {
+  content: "";
+  height: 2px;
+  width: 0;
+  display: block;
+  max-width: 150px;
+  transition: .2s width linear;
 }
 .woocommerce
   #payment
@@ -120,14 +122,22 @@ label[for="payment_method_virt_pagseguro"] img {
   display: block;
   font-weight: bold;
   margin: 0;
-  padding: 5px 10px;
+  padding: 5px 5px;
+  min-width: 100px;
+  text-align: center;
 }
 #pagseguro-icon-ticket,
 #pagseguro-icon-pix {
   display: block;
   float: left;
-  height: 51px;
   margin: 0 10px 5px 0;
+}
+#pagseguro-icon-pix {
+  height: 71px;
+  width: 71px;
+}
+#pagseguro-icon-ticket {
+  height: 51px;
   width: 51px;
 }
 #pagseguro-icon-pix {
@@ -138,24 +148,27 @@ label[for="payment_method_virt_pagseguro"] img {
   background: transparent url("../images/codigo-de-barras.png") no-repeat top
     right;
 }
-.woocommerce
-  #payment
-  ul.payment_methods
-  li
-  #pagseguro-payment-methods
-  li.active,
-.woocommerce-page
-  #payment
-  ul.payment_methods
-  li
-  #pagseguro-payment-methods
-  li.active {
-  border-color: #bbb #bbb transparent;
-  border-style: solid;
-  border-width: 1px;
+.woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li.active:after,
+.woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li.active:after {
+  background-color: #898989;
+  width: 100%;
+}
+#pagseguro-payment-methods li.active {
+  background-color: #ffffff5c;
+}
+#pagseguro-payment-methods {
+  border-bottom: 1px solid #ccc;
 }
 .pagseguro-method-form {
   display: none;
+  min-height: 319px;
+  margin-top: 15px;
+}
+.card-loaded .pagseguro-method-form {
+  min-height: 160px;
+}
+#pagseguro-payment {
+  display: block;
 }
 .card-loaded {
   display: none;
@@ -182,12 +195,13 @@ input#pagseguro-save-hash-card {
 .card-in-use {
   font-size: 16px;
   margin-left: 30px;
-  display: inline-block;
   background: linear-gradient(to bottom, #000, #282828);
   padding: 10px 25px;
   border-radius: 10px;
   color: #fff;
   width: 130px;
+  float: right;
+  margin-right: 20px;
 }
 .card-in-use > span {
   display: block;
@@ -201,6 +215,11 @@ input#pagseguro-save-hash-card {
 .card-in-use .holder {
   font-size: 14px;
 }
+@media only screen and (min-width: 1024px) and (max-width: 1299px) {
+  .card-in-use {
+    margin-right: 0;
+  }
+}
 @media only screen and (max-width: 767px) {
   #pagseguro-card-installments-field {
       width: 100%;
@@ -208,10 +227,22 @@ input#pagseguro-save-hash-card {
   .card-in-use {
       margin-left: 0;
   }
+  .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods label,
+  .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods label {
+    min-width: 80px;
+  }
 }
 @media only screen and (max-width: 479px) {
   #pagseguro-load-card {
     text-align: right;
     margin-top: 15px;
+  }
+  .card-in-use {
+      float: none;
+      display: table;
+  }
+  .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods label,
+  .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods label {
+    min-width: 50px;
   }
 }

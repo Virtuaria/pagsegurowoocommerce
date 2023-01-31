@@ -18,10 +18,12 @@ jQuery(document).ready(function ($) {
 		if ($(this).prop("checked")) {
 			$("#pagseguro-credit-card-form .form-row").removeClass("card-loaded");
 			$(".card-in-use").hide("fast");
+			$("#pagseguro-payment").removeClass("card-loaded");
 		} else {
 			$("#pagseguro-credit-card-form .form-row").addClass("card-loaded");
 			$(".card-in-use").show("fast");
 			$("#pagseguro-card-installments-field").removeClass("card-loaded");
+			$("#pagseguro-payment").addClass("card-loaded");
 		}
 	});
 

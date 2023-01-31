@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -272,3 +272,5 @@ Nenhuma atualização disponível
 * Melhorias no histórico de notas e logs do pedido.
 = 2.0.1 2023-01-24 =
 * Correção na exibição das abas do checkout.
+= 2.0.2 2023-01-26 =
+* Melhorando exibição dos meios de pagamento do checkout.
