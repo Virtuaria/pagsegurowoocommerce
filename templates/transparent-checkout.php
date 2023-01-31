@@ -22,7 +22,7 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 <fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>">
 	<ul id="pagseguro-payment-methods">
 		<?php
-		if ( $methods_enabled['pix'] ) :
+		if ( $methods_enabled['credit'] ) :
 			?>
 			<li class="active">
 				<label>
@@ -31,7 +31,7 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 			</li>	
 				<?php
 		endif;
-		if ( $methods_enabled['credit'] ) :
+		if ( $methods_enabled['pix'] ) :
 			?>
 			<li>
 				<label>

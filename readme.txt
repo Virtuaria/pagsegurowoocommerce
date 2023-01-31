@@ -1,32 +1,34 @@
 === Virtuaria - Pagseguro para Woocommerce ===
 Contributors: tecnologiavirtuaria
-Tags: payment, payment method, pagseguro, woocommerce, gateway
+Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Adiciona o Pagseguro como método de pagamento para o Woocommerce.
+Adiciona o PagSeguro como método de pagamento para o Woocommerce.
 
 == Description ==
 
-Utilizando a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, este plugin permite que sua loja aceite pagamentos parcelados em até 18x no crédito, além de boleto bancário e Pix.
+Utilizando a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, este plugin permite que sua loja aceite pagamentos no cartão de crédito, além de boleto bancário e Pix.
+
+**Atenção:** Esta atualização necessita de uma nova autenticação junto ao PagSeguro. O processo está muito mais simples. Favor consultar a aba "Instalação" logo acima para mais detalhes.
 
 * Fácil de instalar e configurar;
-* Suporte a crédito, Pix e boleto bancário;
+* Suporte a Crédito, Pix e Boleto Bancário;
 * Opção de parcelamento com ou sem juros (configurável no plugin);
 * Boleto com prazo de validade configurável;
 * Link de segunda via do boleto na tela de confirmação e no e-mail com os detalhes do pedido;
 * Disparo de cobrança extra;
 * Reembolso (total e parcial);
-* Modo de processamento (síncrono ou Assíncrono) do checkout;
+* Modo de processamento (síncrono ou assíncrono) do checkout;
 * Opção do cliente salvar método de pagamento (sem armazenar o número do cartão do cliente);
 * Checkout Transparente (permite fazer o pagamento sem sair do site);
 * Relatório (log) para consulta a detalhes de transações, incluindo erros;
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
-* Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
+* Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no PagSeguro;
 * Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados).
 
 ### Pix ###
@@ -34,7 +36,7 @@ Utilizando a API mais moderna Order/Connect de cobrança disponibilizada pelo pa
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
 * Reembolso total e parcial;
 * Tempo limite para pagamento configurável;
-* Nova cobrança Pix, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
+* “Nova Cobrança Pix”, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
 * Pagamento por QR code ou link de pagamento;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido.
 
@@ -48,20 +50,18 @@ O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um 
 
 Uma novidade desta versão é o modo de processamento do pedido. Com ele a mudança de status do pedido pode ser realizada em background(Assíncrono), o que confere muito mais rapidez ao checkout.
 
-Observação: [PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
+Observação: [PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0 ) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
  
 Todas as compras são processadas utilizando o checkout transparente:
 - **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
 
-**Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde.
+**Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde, mas o plugin é 100% compatível com o painel padrão do Wordpress.
 
 **Para mais informações, acesse** [virtuaria.com.br - desenvolvimento de plugins, criação e hospedagem de lojas virtuais](https://virtuaria.com.br/) ou envie um email para tecnologia@virtuaria.com.br
 
-**Atenção:** Esta atualização necessita de uma nova autenticação junto ao PagSeguro. O processo está muito mais simples. Favor consultar a aba "Instalação" logo acima para mais detalhes.
-
 = Compatibilidade =
 
-Este plugin é compatível com o [WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/), desta forma é possível enviar os campos de "CPF", "número do endereço" e "bairro".
+Este plugin necessita do [WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/) para funcionar corretamente.
 Compatível com Woocommerce 5.8.0 ou superior
 
 ### Descrição em Inglês: ###
@@ -101,11 +101,11 @@ Pronto, o plugin está pronto para uso.
 
 = Configurações no PagSeguro: =
 
-Obs: Para vendas com Pix, é preciso cadastrar uma chave na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
+Atenção: Para vendas com Pix, é preciso cadastrar uma chave na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
 **Apenas com isso já é possível receber os pagamentos e fazer o retorno automático de dados.**
 
-<blockquote>Atenção: Não é necessário configurar qualquer URL em "Página de redirecionamento" ou "Notificação de transação", pois o plugin é capaz de comunicar o PagSeguro pela API quais URLs devem ser utilizadas para cada situação.</blockquote>
+<blockquote>Atenção: Não é necessário configurar qualquer URL em "Página de redirecionamento" ou "Notificação de transação", pois o plugin trabalha diretamente com a API do PagSeguro.</blockquote>
 
 = Configurações do Plugin: =
 
@@ -125,7 +125,7 @@ Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
 
 = Qual é a licença do plugin? =
 
-Este plugin está licenciado como GPLv3.
+Este plugin está licenciado como GPLv3. O código é 100% aberto (Open Source). Não disponibilizamos versões PRO com funcionalidades extras.
 
 = O que eu preciso para utilizar este plugin? =
 
@@ -156,7 +156,7 @@ Sim é possível, basta utilizar o plugin "[WooCommerce Extra Checkout Fields fo
 
 = O pedido foi pago e ficou com o status de "processando" e não como "concluído", isto está certo? =
 
-Sim, por padrão em compras pagas o status do pedido muda automaticamente para processando, significa que pode enviar sua encomenda. Porém, definir o status como "concluído" é atribuição do lojista ao final do processo de venda.
+Sim, por padrão em compras pagas o status do pedido muda automaticamente para processando, significa que pode enviar sua encomenda. Porém, definir o status como "concluído" é atribuição do lojista ao final do processo de venda e entrega.
 
 Para produtos baixáveis a configuração padrão do WooCommerce é permitir o acesso apenas quando o pedido tem o status "Concluído", entretanto nas configurações do WooCommerce na aba *Produtos* é possível ativar a opção **"Conceder acesso para download do produto após o pagamento"** e assim liberar o download quando o status do pedido está como "processando".
 
@@ -270,3 +270,5 @@ Nenhuma atualização disponível
 * Pagamento com PIX;
 * Modo de processamento Assíncrono;
 * Melhorias no histórico de notas e logs do pedido.
+= 2.0.1 2023-01-24 =
+* Correção na exibição das abas do checkout.
