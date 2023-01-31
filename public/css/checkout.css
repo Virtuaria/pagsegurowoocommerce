@@ -1,0 +1,183 @@
+/* CSS default */
+#pagseguro-payment-form label {
+    font-size: 14px;
+}
+.woocommerce-checkout #payment div.payment_method_virt_pagseguro {
+    padding: 1em;
+    margin: 1em 0;
+    font-size: 15px;
+}
+.payment_method_virt_pagseguro > p {
+    margin: 0 0 5px;
+    line-height: 23px;
+}
+.woocommerce-checkout #payment div.payment_method_virt_pagseguro::before {
+    content: "";
+    display: block;
+    top: -0.75em;
+    margin: -1em 0 0 2em;
+}
+#pagseguro-payment {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+#pagseguro-payment p {
+    margin-bottom: 5px;
+    line-height: 23px;
+    margin-top: 0;
+}
+#pagseguro-card-installments,
+#pagseguro-payment .input-text {
+    font-size: inherit !important;
+    min-height: 44px;
+}
+#pagseguro-payment .form-row {
+    min-height: 82px;
+}
+#pagseguro-payment .clear {
+    clear: both;
+}
+label[for="payment_method_virt_pagseguro"] img {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+#pagseguro-payment small {
+    font-size: 11px;
+}
+.woocommerce-checkout #payment div.payment_method_virt_pagseguro .pagseguro-info {
+    display: block;
+    margin-bottom: 10px;
+    line-height: 20px;
+    font-size: 0.9em;
+	font-style: italic;
+    margin-top: -2px;
+}
+
+#pagseguro-payment-methods:before,
+#pagseguro-payment-methods:after,
+#pagseguro-bank-transfer-form ul:before,
+#pagseguro-bank-transfer-form ul:after {
+	content: " ";
+	display: table;
+}
+#pagseguro-payment-methods:after,
+#pagseguro-bank-transfer-form ul:after {
+	clear: both;
+}
+#pagseguro-payment-methods,
+#pagseguro-bank-transfer-form ul {
+	list-style: none;
+	margin: 0 0 10px;
+	padding: 0;
+	*zoom: 1;
+}
+#pagseguro-payment-methods input[type="radio"],
+#pagseguro-bank-transfer-form ul input[type="radio"] {
+	display: none;
+}
+.woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li,
+.woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li {
+	border-color: transparent transparent #bbb;
+	border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	border-style: solid;
+	border-width: 1px;
+	display: block;
+	float: left;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.woocommerce #payment ul.payment_methods li .woocommerce-pagseguro-form-storefront #pagseguro-payment-methods li,
+.woocommerce-page #payment ul.payment_methods li .woocommerce-pagseguro-form-storefront #pagseguro-payment-methods li {
+	padding: 5px !important;
+}
+.woocommerce #payment ul.payment_methods li #pagseguro-payment-methods label,
+.woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods label {
+	cursor: pointer;
+	display: block;
+	font-weight: bold;
+	margin: 0;
+	padding: 5px 10px;
+}
+#pagseguro-icon-ticket {
+	background: transparent url("../images/codigo-de-barras.png") no-repeat top right;
+	display: block;
+	float: left;
+	height: 51px;
+	margin: 0 10px 5px 0;
+	width: 51px;
+}
+.woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li.active,
+.woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li.active {
+	border-color: #bbb #bbb transparent;
+	border-style: solid;
+	border-width: 1px;
+}
+.pagseguro-method-form {
+    display: none;
+}
+.card-loaded {
+	display: none;
+}
+input#pagseguro-save-hash-card {
+	font-size: 5px;
+	width: 16px;
+	height: 16px;
+}
+#pagseguro-payment label[for=pagseguro-save-hash-card] {
+    font-size: 12px;
+    line-height: 18px;
+    display: inline-block;
+}
+#pagseguro-payment #pagseguro-card-holder-name-field small {
+    font-weight: bold;
+    color: #000;
+}
+.payment_method_pagseguro .pagseguro-info {
+	font-size: 14px;
+	display: block;
+	margin: 0px 0 20px;
+}
+.card-in-use {
+	font-size: 16px;
+    margin-left: 30px;
+    display: inline-block;
+    background: linear-gradient(to bottom, #000, #282828);;
+    padding: 10px 25px;
+    border-radius: 10px;
+    color: #fff;
+	width: 130px;
+}
+.card-in-use > span {
+    display: block;
+}
+.fa-credit-card-alt {
+    margin-right: 10px;
+}
+.card-in-use .number {
+    margin: 10px 0px;
+}
+.card-in-use .holder {
+    font-size: 14px;
+}
+@media only screen and (max-width: 767px) {
+	.card-in-use {
+		margin-left: 10px;
+	}
+}
+@media only screen and (max-width: 479px) {
+	.card-in-use {
+		margin: 0px auto;
+		display: block;
+	}
+	#pagseguro-load-card {
+		text-align: right;
+		margin-top: 15px;
+	}
+	#pagseguro-card-installments-field {
+		max-width: 100%;
+	}
+}
