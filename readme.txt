@@ -2,7 +2,7 @@
 Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
-Tested up to: 6.0.1
+Tested up to: 6.1.1
 Stable tag: 2.0.2
 Requires PHP: 7.3
 License: GPLv3 or later
@@ -120,6 +120,9 @@ Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
 * Activate the plugin;
 * Navigate to WooCommerce -> Settings -> Payment Gateways, choose PagSeguro and fill in your PagSeguro Email and click connect.
 
+= Contribuição =
+
+Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request no [Github](https://github.com/Virtuaria/pagsegurowoocommerce).
 
 == Frequently Asked Questions ==
 
