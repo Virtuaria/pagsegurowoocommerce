@@ -1,10 +1,9 @@
 === Virtuaria - Pagseguro para Woocommerce ===
 Contributors: tecnologiavirtuaria
-Donate link: https://virtuaria.com.br/
 Tags: payment, payment method, pagseguro, woocommerce, gateway
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 1.0
+Stable tag: 1.0.1
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -15,7 +14,6 @@ Adds Pagseguro as a payment method for Woocommerce
 
 Utilizando a API mais nova (4.0) de cobrança disponibilizada pelo pagseguro, este plugin tem alta performance para processar seu pagamento e agilizar suas vendas.
 
-Detalhes:
 * Fácil de instalar e configurar;
 * Suporte a crédito e boleto bancário;
 * Opção de parcelamento com ou sem juros (configurável no plugin);
@@ -36,25 +34,26 @@ Com este plugin você poderá fazer reembolsos totais e parciais através da pá
 
 O plugin conta com a funcionalidade Cobrança Extra, necessário que a função de armazenar dados do pagamento esteja ativa, que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. 
 
-"[PagSeguro](https://pagseguro.uol.com .br/)" é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da "[documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge)" e utiliza a última versão ( 4.0) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
+[PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
  
 Todas as compras são processadas utilizando o checkout transparente:
 - **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
 
 ### PagSeguro Pix (PREMIUM) ###
 * Confirmação automática do pagamento, semelhante a cartão de crédito; 
-* Reembolsos totais e parciais;
+* Reembolso total e parcial;
 * Tempo limite para pagamento configurável;
 * Nova cobrança Pix, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
 * Pagamento por QR code ou link de pagamento;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
 * Webhook sobre mudanças no status do pagamento(aprovado, cancelado).
 
+Para mais informações, entre em contato via ** tecnologia@virtuaria.com.br.**
+
 ### Descrição em Inglês: ###
 
 Using the newest collection API (4.0) made available by pagseguro, this plugin has high performance to process your payment and speed up your sales.
 
-Details:
 * Easy to install and configure;
 * Credit and bank slip support;
 * Option to pay in installments with or without interest (configurable in the plugin);
@@ -71,18 +70,13 @@ Details:
 
 **Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando simplificar o uso em lojas virtuais, por isto o fundo verde.
 
+**Para mais informações, acesse**  [virtuaria.com.br/plugin-pagseguro](https://virtuaria.com.br/plugin-pagseguro)
+
 = Compatibilidade =
 
-Este plugin é compatível com o "[WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/)", desta forma é possível enviar os campos de "CPF", "número do endereço" e "bairro".
+Este plugin é compatível com o [WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/), desta forma é possível enviar os campos de "CPF", "número do endereço" e "bairro".
 Compatível com Woocommerce 5.8.0 ou superior
 Compatível com Wordpress 5.8.2
-
-= Doação =
-
-Sinta-se livre para contribuir com o desenvolvimento deste plugin através de uma doação.
-
-Nossa chave Pix: 30.857.534/0001-08
-Razão Social: Msv Mega Shopping Virtual Ltda 
 
 == Installation ==
 
@@ -101,8 +95,8 @@ Razão Social: Msv Mega Shopping Virtual Ltda
 
 = Requerimentos: =
 
-1- Conta no "[PagSeguro](http://pagseguro.uol.com.br/) e ter instalado o [WooCommerce](http://wordpress.org/plugins/woocommerce/)";
-2 - Plugin "[WooCommerce Extra Checkout Fields for Brazil] (http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/)".
+1- Conta no [PagSeguro](http://pagseguro.uol.com.br/) e ter instalado o [WooCommerce](http://wordpress.org/plugins/woocommerce/);
+2 - Plugin [WooCommerce Extra Checkout Fields for Brazil] (http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/).
 
 = Configurações no PagSeguro: =
 
@@ -152,9 +146,9 @@ Configuramos o plugin para receber pagamentos apenas de usuários que selecionar
 
 São aceitos pagamentos com cartão de crédito e boleto bancário, entretanto você precisa ativá-los na sua conta.
 
-Confira os "[meios de pagamento e parcelamento](https://pagseguro.uol.com.br/para_voce/meios_de_pagamento_e_parcelamento.jhtml#rmcl)".
+Confira os [meios de pagamento e parcelamento](https://pagseguro.uol.com.br/para_voce/meios_de_pagamento_e_parcelamento.jhtml#rmcl).
 
-= Como que plugin faz integração com PagSeguro? =
+= Como que o plugin faz integração com PagSeguro? =
 
 Fazemos a integração baseada na documentação oficial do PagSeguro que pode ser encontrada nos "[guias de integração](https://dev.pagseguro.uol.com.br/reference/intro-charge)" utilizando a última versão da API de pagamentos.
 
@@ -174,7 +168,7 @@ Se você tem certeza que o Token e E-mail estão corretos você deve acessar a p
 
 Por último é possível ativar a opção de **Log de depuração** nas configurações do plugin e tentar novamente fechar um pedido (você deve tentar fechar um pedido para que o log grave o erro). Com o log é possível saber exatamente o que está dando errado com a sua instalação.
 
-Caso você não entenda o conteúdo do log não tem problema, você pode me abrir um "[tópico no fórum do plugin](https://wordpress.org/support/plugin/virtuaria-pagseguro-para-woocommerce#postform)" com o link do log (utilize o [pastebin.com](http://pastebin.com).
+Caso você não entenda o conteúdo do log não tem problema, você pode me abrir um "[tópico no fórum do plugin](https://wordpress.org/support/plugin/virtuaria-pagseguro#postform)" com o link do log (utilize o [pastebin.com](http://pastebin.com).
 
 = O status do pedido não é alterado automaticamente? =
 
@@ -194,7 +188,7 @@ Sim, funciona e basta você ativar isso nas opções do plugin, além de configu
 
 Não é necessário configurar qualquer URL para "Notificação de transação" ou para "Página de redirecionamento", o plugin já diz para o PagSeguro quais URLs serão utilizadas.
 
-= Este plugin permite o reembolso total e parcial da venda =
+= Este plugin permite o reembolso total e parcial da venda? =
 
 Sim, você pode reembolsar pedidos com status processando indo direto a página do pedido no woocommerce e clicar em Reembolso -> Reembolso via Pagseguro e setar o valor seja ele total ou parcial.
 
@@ -204,11 +198,11 @@ Não há valores máximos para as vendas, porém existem valores mínimo a serem
 
 
 Método   |   Bandeira   |  Valor Mínimo (R$)  |  Parcela Mínima (R$) 
-Crédito         Visa              1,00                           5,00
-Crédito         Mastercard        0,20                           5,00
-Crédito         American Express  0,20                           5,00
-Crédito         Demais bandeiras  0,20                           5,00
-Boleto          –                 0,20                           –
+Crédito  |  Visa              | 1,00          | 5,00
+Crédito  |  Mastercard        | 0,20          | 5,00
+Crédito  |  American Express  | 0,20          | 5,00
+Crédito  |  Demais bandeiras  | 0,20          | 5,00
+Boleto   |  –                 | 0,20          | –
 
 ### FAQ em Inglês: ###
 
@@ -219,7 +213,7 @@ Boleto          –                 0,20                           –
 = What is needed to use this plugin? =
 
 * WooCommerce version 4.5 or later installed and active.
-* Only one account on "[PagSeguro](http://pagseguro.uol.com.br/)".
+* Only one account on [PagSeguro](http://pagseguro.uol.com.br/).
 
 == Screenshots ==
 
@@ -239,4 +233,8 @@ Nenhuma atualização disponível
 
 == Changelog ==
 = 1.0 2022-07-28 =
+* Versão inicial.
+= 1.0.1 2022-07-29 =
+* Tradução do plugin para pt-BR.
+
 

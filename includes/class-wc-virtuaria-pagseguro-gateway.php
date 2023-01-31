@@ -236,7 +236,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			);
 		}
 
-		$this->form_fields['testing'] = array(
+		$this->form_fields['tecvirtuaria'] = array(
 			'title'       => __( 'Tecnologia Virtuaria', 'virtuaria-pagseguro' ),
 			'type'        => 'title',
 			'description' => '',
