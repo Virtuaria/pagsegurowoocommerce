@@ -102,6 +102,17 @@ class WC_PagSeguro_API {
 						'encrypted' => sanitize_text_field( wp_unslash( $posted['pagseguro_encrypted_card'] ) ),
 					);
 				} else {
+					if ( $this->debug_on ) {
+						$this->gateway->log->add(
+							$this->tag,
+							'Não foi possível encriptar o cartão de crédito.',
+							WC_Log_Levels::ERROR
+						);
+					}
+
+					return array( 'error' => 'Dados do cartão inválidos, verifique os dados informados e tente novamente.' );
+
+					/*
 					$data['body']['payment_method']['card'] = array(
 						'number'        => preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $posted['pagseguro_card_number'] ) ) ),
 						'exp_month'     => $exp_month,
@@ -111,6 +122,7 @@ class WC_PagSeguro_API {
 							'name' => sanitize_text_field( wp_unslash( $posted['pagseguro_holder_name'] ) ),
 						),
 					);
+					*/
 				}
 
 				if ( $posted['pagseguro_save_hash_card'] ) {

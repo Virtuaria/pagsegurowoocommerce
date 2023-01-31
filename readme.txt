@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -27,7 +27,7 @@ Utilizando a API mais nova (4.0) de cobrança disponibilizada pelo pagseguro, es
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
 * Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
-* PagSeguro Pix (PREMIUM);
+* PagSeguro Pix;
 
 Com este plugin você poderá fazer reembolsos totais e parciais através da página de gerenciamento do pedido em sua loja.
 
@@ -43,7 +43,7 @@ Todas as compras são processadas utilizando o checkout transparente:
 - **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
 
 
-### PagSeguro Pix (PREMIUM) ###
+### PagSeguro Pix ###
 * Confirmação automática do pagamento, semelhante a cartão de crédito; 
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
 * Reembolso total e parcial;
@@ -53,9 +53,11 @@ Todas as compras são processadas utilizando o checkout transparente:
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
 * Para mais informações, entre em contato via **tecnologia@virtuaria.com.br**.
 
+[Download Virtuaria PagSeguro pix](https://wordpress.org/plugins/virtuaria-pagseguro-pix/)
+
 **Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde.
 
-**Para mais informações, acesse**  [virtuaria.com.br/pagseguro-woocommerce-plugin](https://virtuaria.com.br/pagseguro-woocommerce-plugin).
+**Para mais informações, acesse** [virtuaria.com.br - desenvolvimento de plugins, criação e hospedagem de lojas virtuais](https://virtuaria.com.br/) ou envie um email para tecnologia@virtuaria.com.br
 
 = Compatibilidade =
 
@@ -78,7 +80,7 @@ Using the newest collection API (4.0) made available by pagseguro, this plugin h
 * Debug for error handling;
 * Identification on the invoice for payments via card (display on the invoice);
 * Webhook for automatic return of status data (approved, denied, cancelled, etc.);
-* PagSeguro Pix (PREMIUM).
+* PagSeguro Pix.
 
 == Installation ==
 
@@ -93,6 +95,10 @@ Using the newest collection API (4.0) made available by pagseguro, this plugin h
 Para utilizar nosso plugin em produção, é preciso solicitar homologação junto a equipe do pagseguro conforme vídeo abaixo:
 
 [youtube https://www.youtube.com/watch?v=L0iqvf1LL7g]
+
+[Formulário de solicitação de homologação](https://app.pipefy.com/public/form/2e56YZLK)
+
+[youtube https://www.youtube.com/watch?v=BuLa9v-rFvs]
 
 = Requerimentos: =
 
@@ -257,3 +263,5 @@ Nenhuma atualização disponível
 * Criptografia RSA para função crédito.
 = 1.1.2 2022-09-13 =
 * Máscara para data de validade do cartão.
+= 1.1.3 2022-09-15 =
+* Validação de campos do crédito.
