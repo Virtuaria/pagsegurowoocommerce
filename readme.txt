@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 1.1.3
+Stable tag: 2.0.0
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -12,52 +12,52 @@ Adiciona o Pagseguro como método de pagamento para o Woocommerce.
 
 == Description ==
 
-Utilizando a API mais nova (4.0) de cobrança disponibilizada pelo pagseguro, este plugin tem alta performance para processar seu pagamento e agilizar suas vendas.
+Utilizando a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, este plugin permite que sua loja aceite pagamentos parcelados em até 18x no crédito, além de boleto bancário e Pix.
 
 * Fácil de instalar e configurar;
-* Suporte a crédito e boleto bancário;
+* Suporte a crédito, Pix e boleto bancário;
 * Opção de parcelamento com ou sem juros (configurável no plugin);
 * Boleto com prazo de validade configurável;
 * Link de segunda via do boleto na tela de confirmação e no e-mail com os detalhes do pedido;
-* Cobrança extra;
+* Disparo de cobrança extra;
 * Reembolso (total e parcial);
+* Modo de processamento (síncrono ou Assíncrono) do checkout;
 * Opção do cliente salvar método de pagamento (sem armazenar o número do cartão do cliente);
-* Checkout Transparente, onde faz o pagamento sem sair do site;
+* Checkout Transparente (permite fazer o pagamento sem sair do site);
 * Relatório (log) para consulta a detalhes de transações, incluindo erros;
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
-* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
-* PagSeguro Pix;
+* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados).
 
-Com este plugin você poderá fazer reembolsos totais e parciais através da página de gerenciamento do pedido em sua loja.
-
-É disponibilizado ao lojista uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
-
-O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. Para realizar cobranças extras, é necessário que a função de armazenar dados do pagamento esteja ativa,
-
-[youtube https://www.youtube.com/watch?v=jNu_qX2Od5E]
-
-Observação: [PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
- 
-Todas as compras são processadas utilizando o checkout transparente:
-- **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
-
-
-### PagSeguro Pix ###
+### Pix ###
 * Confirmação automática do pagamento, semelhante a cartão de crédito; 
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
 * Reembolso total e parcial;
 * Tempo limite para pagamento configurável;
 * Nova cobrança Pix, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
 * Pagamento por QR code ou link de pagamento;
-* Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
-* Para mais informações, entre em contato via **tecnologia@virtuaria.com.br**.
+* Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido.
 
-[Download Virtuaria PagSeguro pix](https://wordpress.org/plugins/virtuaria-pagseguro-pix/)
+Com este plugin, você poderá fazer reembolsos totais e parciais através da página de gerenciamento do pedido em sua loja. 
+
+É disponibilizado ao lojista uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
+
+O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. Para realizar cobranças extras, é necessário que a função de armazenar dados do pagamento esteja ativa.
+
+[youtube https://www.youtube.com/watch?v=jNu_qX2Od5E]
+
+Uma novidade desta versão é o modo de processamento do pedido. Com ele a mudança de status do pedido pode ser realizada em background(Assíncrono), o que confere muito mais rapidez ao checkout.
+
+Observação: [PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
+ 
+Todas as compras são processadas utilizando o checkout transparente:
+- **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
 
 **Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde.
 
 **Para mais informações, acesse** [virtuaria.com.br - desenvolvimento de plugins, criação e hospedagem de lojas virtuais](https://virtuaria.com.br/) ou envie um email para tecnologia@virtuaria.com.br
+
+**Atenção:** Esta atualização necessita de uma nova autenticação junto ao PagSeguro. O processo está muito mais simples. Favor consultar a aba "Instalação" logo acima para mais detalhes.
 
 = Compatibilidade =
 
@@ -66,21 +66,22 @@ Compatível com Woocommerce 5.8.0 ou superior
 
 ### Descrição em Inglês: ###
 
-Using the newest collection API (4.0) made available by pagseguro, this plugin has high performance to process your payment and speed up your sales.
+Using the newest Order/Connect billing API made available by pagseguro, this plugin has high performance to process your payment and streamline your sales.
 
 * Easy to install and configure;
-* Credit and bank slip support;
-* Option to pay in installments with or without interest (configurable in the plugin);
-* Boleto with configurable expiration date;
-* Link to the second copy of the ticket on the confirmation screen and in the email with the order details;
+* Credit support, Pix and bank slip;
+* Installment option with or without interest (configurable in the plugin);
+* Billet with configurable expiry date;
+* Link to a copy of the bank slip on the confirmation screen and in the e-mail with the order details;
 * Extra charge;
-* Reimbursement (full and partial);
-* Save payment method;
-* Transparent Checkout;
-* Debug for error handling;
+* Reimbursement (total and partial);
+* Customer option to save payment method (without storing customer card number);
+* Transparent Checkout, where you make the payment without leaving the site;
+* Report (log) to consult transaction details, including errors;
 * Identification on the invoice for payments via card (display on the invoice);
-* Webhook for automatic return of status data (approved, denied, cancelled, etc.);
-* PagSeguro Pix.
+* Automatic change of order status (approved, denied, cancelled, etc.) via Webhook to return status data in Pagseguro;
+* Detailing in the order notes of the operations that occurred during communication with PagSeguro (refunds, installments, changes in status and amounts received/charged).
+
 
 == Installation ==
 
@@ -88,17 +89,10 @@ Using the newest collection API (4.0) made available by pagseguro, this plugin h
 
 * Envie os arquivos do plugin para a pasta wp-content/plugins, ou instale usando o instalador de plugins do WordPress.
 * Ative o plugin.
-* Navegue para Woocommerce -> Configurações -> Pagamentos, escolha o “Pagseguro” e defina Token e E-mail.
+* Navegue para Woocommerce -> Configurações -> Pagamentos, escolha o “Pagseguro” e defina o E-mail da conta pagseguro e clique em conectar.
+* Conceda as permissões.
 
-[youtube https://www.youtube.com/watch?v=X1fF3aP34zk]
-
-Para utilizar nosso plugin em produção, é preciso solicitar homologação junto a equipe do pagseguro conforme vídeo abaixo:
-
-[youtube https://www.youtube.com/watch?v=L0iqvf1LL7g]
-
-[Formulário de solicitação de homologação](https://app.pipefy.com/public/form/2e56YZLK)
-
-[youtube https://www.youtube.com/watch?v=BuLa9v-rFvs]
+Pronto, o plugin está pronto para uso.
 
 = Requerimentos: =
 
@@ -107,17 +101,7 @@ Para utilizar nosso plugin em produção, é preciso solicitar homologação jun
 
 = Configurações no PagSeguro: =
 
-O token e e-mail devem ser obtidos em seu painel do Pagseguro utilizando o seguinte procedimento:
-
-**Como obter seu token de acesso em Sandbox:**
-1. Acesse sua conta de de Sandbox;
-2. Localize o menu Perfis de Integração;
-3. Clique em Vendedor. O token de sandbox estará disponível na seção Credenciais.
-**Como obter seu token de acesso em Produção:**
-1. Acesse a sua conta PagSeguro;
-2. No menu lateral, selecione Venda online;
-3. Vá na opção Integrações;
-4. E pressione o botão Gerar Token.
+Obs: Para vendas com Pix, é preciso cadastrar uma chave na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
 **Apenas com isso já é possível receber os pagamentos e fazer o retorno automático de dados.**
 
@@ -126,7 +110,7 @@ O token e e-mail devem ser obtidos em seu painel do Pagseguro utilizando o segui
 = Configurações do Plugin: =
 
 1 - Com o plugin instalado acesse o admin do WordPress e entre em "WooCommerce" > "Configurações" > "Pagamentos" > "PagSeguro".
-2 - Adicione o seu e-mail e o token do PagSeguro. 
+2 - Adicione o seu e-mail e clique em conectar para conceder permissões ao plugin.
 
 Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
 
@@ -134,7 +118,7 @@ Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
 
 * Upload plugin files to your plugins folder, or install using WordPress built-in Add New Plugin installer;
 * Activate the plugin;
-* Navigate to WooCommerce -> Settings -> Payment Gateways, choose PagSeguro and fill in your PagSeguro Email and Token.
+* Navigate to WooCommerce -> Settings -> Payment Gateways, choose PagSeguro and fill in your PagSeguro Email and click connect.
 
 
 == Frequently Asked Questions ==
@@ -148,7 +132,7 @@ Este plugin está licenciado como GPLv3.
 * Ter instalado uma versão atual do plugin WooCommerce.
 * Ter instalado uma versão atual do plugin WooCommerce Extra Checkout Fields for Brazil.
 * Possuir uma conta no PagSeguro.
-* Gerar um token de segurança no PagSeguro.
+* Caso deseje utilizar pagamentos com Pix, é preciso cadastrar uma chave aleatória em seu painel de vendedor no PagSeguro.
 
 = PagSeguro recebe pagamentos de quais países? =
 
@@ -158,13 +142,13 @@ Configuramos o plugin para receber pagamentos apenas de usuários que selecionar
 
 = Quais são os meios de pagamento que o plugin aceita? =
 
-São aceitos pagamentos com cartão de crédito e boleto bancário, entretanto você precisa ativá-los na sua conta.
+São aceitos pagamentos com cartão de crédito, pix e boleto bancário, entretanto você precisa ativá-los na sua conta.
 
 Confira os [meios de pagamento e parcelamento](https://pagseguro.uol.com.br/para_voce/meios_de_pagamento_e_parcelamento.jhtml#rmcl).
 
 = Como que o plugin faz integração com PagSeguro? =
 
-Fazemos a integração baseada na documentação oficial do PagSeguro que pode ser encontrada nos "[guias de integração](https://dev.pagseguro.uol.com.br/reference/intro-charge)" utilizando a última versão da API de pagamentos.
+Fazemos a integração baseada na documentação oficial do PagSeguro que pode ser encontrada nos "[guias de integração](https://dev.pagseguro.uol.com.br/reference/order-intro)" utilizando a última versão da API de pagamentos.
 
 = É possível enviar os dados de "Número", "Bairro" e "CPF" para o PagSeguro? =
 
@@ -176,9 +160,9 @@ Sim, por padrão em compras pagas o status do pedido muda automaticamente para p
 
 Para produtos baixáveis a configuração padrão do WooCommerce é permitir o acesso apenas quando o pedido tem o status "Concluído", entretanto nas configurações do WooCommerce na aba *Produtos* é possível ativar a opção **"Conceder acesso para download do produto após o pagamento"** e assim liberar o download quando o status do pedido está como "processando".
 
-Note que caso você esteja utilizando a opção de **sandbox**, é necessário usar um e-mail e token de testes que podem ser encontrados em "[PagSeguro Sandbox > Dados de Teste](https://sandbox.pagseguro.uol.com.br/vendedor/configuracoes.html)".
+Note que caso você esteja utilizando a opção de **sandbox**, é necessário usar um e-mail de teste que pode ser encontrado em "[PagSeguro Sandbox > Dados de Teste](https://sandbox.pagseguro.uol.com.br/vendedor/configuracoes.html)".
 
-Se você tem certeza que o Token e E-mail estão corretos você deve acessar a página "WooCommerce > Status do Sistema" e verificar se **fsockopen** e **cURL** estão ativos. É necessário procurar ajuda do seu provedor de hospedagem caso você tenha o **fsockopen** e/ou o **cURL** desativados.
+Se você tem certeza que o E-mail estão corretos você deve acessar a página "WooCommerce > Status do Sistema" e verificar se **fsockopen** e **cURL** estão ativos. É necessário procurar ajuda do seu provedor de hospedagem caso você tenha o **fsockopen** e/ou o **cURL** desativados.
 
 Por último é possível ativar a opção de **Log de depuração** nas configurações do plugin e tentar novamente fechar um pedido (você deve tentar fechar um pedido para que o log grave o erro). Com o log é possível saber exatamente o que está dando errado com a sua instalação.
 
@@ -196,7 +180,7 @@ A seguir uma lista de ferramentas que podem estar bloqueando as notificações d
 
 = Funciona com o Sandbox do PagSeguro? =
 
-Sim, funciona e basta você ativar isso nas opções do plugin, além de configurar o seu "[e-mail e token de testes](https://sandbox.pagseguro.uol.com.br/vendedor/configuracoes.html)".
+Sim, funciona e basta você ativar isso nas opções do plugin, além de configurar o seu "[e-mail de testes](https://sandbox.pagseguro.uol.com.br/vendedor/configuracoes.html)".
 
 = Quais URLs eu devo usar para configurar "Notificação de transação" e "Página de redirecionamento"? =
 
@@ -206,9 +190,19 @@ Não é necessário configurar qualquer URL para "Notificação de transação" 
 
 Sim, você pode reembolsar pedidos com status processando indo direto a página do pedido no woocommerce e clicar em Reembolso -> Reembolso via Pagseguro e setar o valor seja ele total ou parcial.
 
-= Erro 403 ao utilizar o plugin em produção =
+= Dificuldades ao usar a Sandbox =
 
-Para utilizar o plugin em produção é preciso solicitar liberação feita pela equipe do PagSeguro. O processo é simples e pode ser feito via "[Solicitar Homologação](https://dev.pagseguro.uol.com.br/reference/request-approval)".
+Em conversa com a equipe de integração do PagSeguro, nos foi informado que a API Orders não é 100% atualizada com a Sandbox. Portanto, é possível que algum dos problemas abaixo aconteça:
+
+* Transação não aparece no painel sandbox apesar de retorno da API correto;
+* Notificações de mudança de status não chegam à loja;
+* Falha ao reembolsar;
+* Dificuldades ao fazer login no painel da sandbox;
+* Internal Server Error;
+* Transaction is not found;
+* Operation timed out;
+* Bad Gateway;
+* External service error.
 
 
 = Quais valores meus clientes podem pagar com este plugin?  =
@@ -239,12 +233,15 @@ Boleto   |  –                 | 0,20          | –
 1. Configurações do plugin;
 2. Checkout transparente com crédito;
 3. Checkout transparente com boleto;
-4. Reembolso;
-5. Reembolso bem sucedido;
-6. Armazenamento dos dados de pagamento;
-7. Cobrança adicional;
-8. Boleto bancário;
-9. Boleto bancário no e-mail de novo pedido.
+4. Checkout transparente com pix;
+5. Reembolso;
+6. Reembolso bem sucedido;
+7. Armazenamento dos dados de pagamento;
+8. Cobrança adicional;
+9. Boleto bancário;
+10. Boleto bancário no e-mail de novo pedido;
+11. Pagamento com Pix;
+12. Segunda via do Pix no e-mail de novo pedido.
 
 
 == Upgrade Notice ==
@@ -265,3 +262,11 @@ Nenhuma atualização disponível
 * Máscara para data de validade do cartão.
 = 1.1.3 2022-09-15 =
 * Validação de campos do crédito.
+= 1.2.0 2022-11-10 =
+* Arquivo de homologação gerado automaticamente.
+= 2.0.0 2023-01-23 =
+* Suporte a API Orders;
+* Suporte a API Connect;
+* Pagamento com PIX;
+* Modo de processamento Assíncrono;
+* Melhorias no histórico de notas e logs do pedido.

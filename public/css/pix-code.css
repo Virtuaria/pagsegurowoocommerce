@@ -1,0 +1,11 @@
+.pix {
+    word-break:break-all;
+}
+#copy-qr {
+    float: right;
+    margin-top: 5px;
+}
+.note_content > p {
+    display: table;
+    width: 100%;
+}

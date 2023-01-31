@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 
 $settings = get_option( 'woocommerce_virt_pagseguro_settings' );
 if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
-	$pagseguro_card_info = get_user_meta( get_current_user_id(), '_pagseguro_credit_info', true );
+	$pagseguro_card_info = get_user_meta( get_current_user_id(), '_pagseguro_credit_info_store_' . get_current_blog_id(), true );
 	if ( isset( $pagseguro_card_info['token'] ) ) {
 		$card_loaded = true;
 	}
@@ -21,16 +21,35 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 </span>
 <fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>">
 	<ul id="pagseguro-payment-methods">
-		<li class="active">
-			<label>
-				<input id="credit-card" type="radio" name="payment_mode" value="credit" <?php echo 'ticket' !== $_POST['payment_mode'] ? 'checked' : ''; ?> /> <?php esc_html_e( 'Cartão de Crédito', 'virtuaria-pagseguro' ); ?>
-			</label>
-		</li>
-		<li>
-			<label>
-				<input id="banking-ticket" type="radio" name="payment_mode" value="ticket" <?php echo 'ticket' === $_POST['payment_mode'] ? 'checked' : ''; ?>/> <?php esc_html_e( 'Boleto', 'virtuaria-pagseguro' ); ?>
-			</label>
-		</li>
+		<?php
+		if ( $methods_enabled['pix'] ) :
+			?>
+			<li class="active">
+				<label>
+					<input id="credit-card" type="radio" name="payment_mode" value="credit" <?php echo 'credit' === $_POST['payment_mode'] ? 'checked' : ''; ?> /> <?php esc_html_e( 'Cartão de Crédito', 'virtuaria-pagseguro' ); ?>
+				</label>
+			</li>	
+				<?php
+		endif;
+		if ( $methods_enabled['credit'] ) :
+			?>
+			<li>
+				<label>
+					<input id="pix" type="radio" name="payment_mode" value="pix" <?php echo 'pix' === $_POST['payment_mode'] ? 'checked' : ''; ?>/> <?php esc_html_e( 'PIX', 'virtuaria-pagseguro' ); ?>
+				</label>
+			</li>
+			<?php
+		endif;
+		if ( $methods_enabled['ticket'] ) :
+			?>
+			<li>
+				<label>
+					<input id="banking-ticket" type="radio" name="payment_mode" value="ticket" <?php echo 'ticket' === $_POST['payment_mode'] ? 'checked' : ''; ?>/> <?php esc_html_e( 'Boleto', 'virtuaria-pagseguro' ); ?>
+				</label>
+			</li>
+			<?php
+		endif;
+		?>
 	</ul>
 	<div class="clear"></div>
 
@@ -38,7 +57,7 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 	<div id="pagseguro-credit-card-form" class="pagseguro-method-form">
 		<p id="pagseguro-card-holder-name-field" class="form-row form-row-first <?php echo esc_attr( $class_card_loaded ); ?>">
 			<label for="pagseguro-card-holder-name"><?php esc_html_e( 'Titular', 'virtuaria-pagseguro' ); ?> <small>(<?php esc_html_e( 'como no cartão', 'virtuaria-pagseguro' ); ?>)</small> <span class="required">*</span></label>
-			<input id="pagseguro-card-holder-name" name="pagseguro_holder_name" class="input-text" type="text" autocomplete="off" style="font-size: 1.5em; padding: 8px;" value="<?php echo isset( $_POST['pagseguro_holder_name'] ) ? esc_html( $_POST['pagseguro_holder_name'] ) : ''; ?>"/>
+			<input id="pagseguro-card-holder-name" name="pagseguro_card_holder_name" class="input-text" type="text" autocomplete="off" style="font-size: 1.5em; padding: 8px;" value="<?php echo isset( $_POST['pagseguro_holder_name'] ) ? esc_html( $_POST['pagseguro_holder_name'] ) : ''; ?>"/>
 		</p>
 		<p id="pagseguro-card-number-field" class="form-row form-row-last <?php echo esc_attr( $class_card_loaded ); ?>">
 			<label for="pagseguro-card-number"><?php esc_html_e( 'Número do cartão', 'virtuaria-pagseguro' ); ?> <span class="required">*</span></label>
@@ -142,6 +161,24 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 		endif;
 		?>
 		<input type="hidden" name="pagseguro_encrypted_card" id="pagseguro_encrypted_card" />
+	</div>
+	<div id="pagseguro-banking-pix-form" class="pagseguro-method-form">
+		<p>
+			<i id="pagseguro-icon-pix"></i>
+			<?php esc_html_e( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ); ?>
+		</p>
+		<p>
+			<?php
+			echo esc_html(
+				sprintf(
+					/* translators: %s: pix validate */
+					__( 'Pague com PIX. O código de pagamento tem validade de %s.', 'virtuaria-pagseguro' ),
+					$pix_validate
+				)
+			);
+			?>
+		</p>
+		<div class="clear"></div>
 	</div>
 	<div id="pagseguro-banking-ticket-form" class="pagseguro-method-form">
 		<p>

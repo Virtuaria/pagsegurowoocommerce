@@ -13,6 +13,20 @@ defined( 'ABSPATH' ) || exit;
  */
 class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	/**
+	 * APP ID
+	 *
+	 * @var int
+	 */
+	private $app_id;
+
+	/**
+	 * APP url
+	 *
+	 * @var string
+	 */
+	private $app_url;
+
+	/**
 	 * Constructor for the gateway.
 	 */
 	public function __construct() {
@@ -34,7 +48,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->title           = $this->get_option( 'title' );
 		$this->description     = $this->get_option( 'description' );
 		$this->environment     = $this->get_option( 'environment' );
-		$this->token           = $this->get_option( 'token' );
 		$this->email           = $this->get_option( 'email' );
 		$this->debug           = $this->get_option( 'debug' );
 		$this->installments    = $this->get_option( 'installments' );
@@ -42,7 +55,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->min_installment = $this->get_option( 'min_installment' );
 		$this->fee_from        = $this->get_option( 'fee_from' );
 		$this->soft_descriptor = $this->get_option( 'soft_descriptor' );
-		$this->tiket_validate  = $this->get_option( 'tiket_validate' );
+		$this->ticket_validate = $this->get_option( 'ticket_validate' );
+		$this->pix_validate    = $this->get_option( 'pix_validate' );
+		$this->pix_enable      = $this->get_option( 'pix_enable' );
+		$this->ticket_enable   = $this->get_option( 'ticket_enable' );
+		$this->credit_enable   = $this->get_option( 'credit_enable' );
+		$this->process_mode    = $this->get_option( 'process_mode' );
 		$this->debug           = $this->get_option( 'debug' );
 
 		// Active logs.
@@ -54,14 +72,26 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			}
 		}
 
+		if ( 'sandbox' === $this->environment ) {
+			$this->app_id     = 'a2c55b69-d66f-4bf0-80f9-21d504ebf559';
+			$this->app_url    = 'pagseguro.virtuaria.com.br/auth/pagseguro-sandbox';
+			$this->app_revoke = 'https://pagseguro.virtuaria.com.br/revoke/pagseguro-sandbox';
+			$this->token      = $this->get_option( 'token_sanbox' );
+		} else {
+			$this->app_id     = '7acbe665-76c3-4312-afd5-29c263e8fb93';
+			$this->app_url    = 'pagseguro.virtuaria.com.br/auth/pagseguro';
+			$this->app_revoke = 'https://pagseguro.virtuaria.com.br/revoke/pagseguro';
+			$this->token      = $this->get_option( 'token_production' );
+		}
+
 		// Set the API.
-		$this->api = new WC_PagSeguro_API( $this );
+		$this->api = new WC_Virtuaria_PagSeguro_API( $this );
 
 		// // Main actions.
 		add_action( 'woocommerce_api_wc_virtuaria_pagseguro_gateway', array( $this, 'ipn_handler' ) );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 
-		// Transparent checkout actions.
+		// Transparent checkout actions. Pix code in mail and thankyou page.
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'email_instructions' ), 10, 3 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'checkout_scripts' ) );
@@ -69,6 +99,19 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		// Additional charge.
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'additional_charge_metabox' ), 10 );
 		add_action( 'save_post_shop_order', array( $this, 'do_additional_charge' ) );
+
+		// Pix.
+		add_action( 'pagseguro_pix_check_payment', array( $this, 'check_order_paid' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_checkout_scripts' ) );
+
+		// Simulate Pix payment.
+		add_action( 'add_meta_boxes_shop_order', array( $this, 'pix_payment_metabox' ), 10 );
+		add_action( 'save_post_shop_order', array( $this, 'make_pix_payment' ) );
+
+		add_action( 'pagseguro_process_update_order_status', array( $this, 'process_order_status' ), 10, 2 );
+
+		add_action( 'admin_init', array( $this, 'save_store_token' ) );
+		add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_not_authorized' ) );
 	}
 
 	/**
@@ -165,12 +208,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'sandbox'    => 'Sandbox',
 					'production' => 'Produção',
 				),
-			),
-			'token'           => array(
-				'title'       => __( 'Token', 'virtuaria-pagseguro' ),
-				'type'        => 'text',
-				'description' => __( 'Informe seu token do Pagseguro. Isto é necessário para o processamento do pagamento.', 'virtuaria-pagseguro' ),
-				'default'     => '',
+				'default'     => 'sandbox',
 			),
 			'email'           => array(
 				'title'       => __( 'E-mail', 'virtuaria-pagseguro' ),
@@ -178,10 +216,32 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'description' => __( 'Informe seu e-mail utilizado na conta do Pagseguro. Isto é necessário para a confirmação do pagamento.', 'virtuaria-pagseguro' ),
 				'default'     => '',
 			),
+			'autorization'    => array(
+				'title'       => __( 'Autorização', 'virtuaria-pagseguro' ),
+				'type'        => 'auth',
+				'description' => __( 'Autorize o plugin a processar compras e reembolsos junto ao PagSeguro.', 'virtuaria-pagseguro' ),
+				'default'     => '',
+			),
+			'process_mode'    => array(
+				'title'       => __( 'Modo de processamento', 'virtuaria-pagseguro' ),
+				'type'        => 'select',
+				'description' => __( 'Define como os dados de retorno da API serão tratados. Se for assíncrono, o processamento do checkout será mais veloz, porém a mudança de status do pedido será feita via agendamento (cron).', 'virtuaria-pagseguro' ),
+				'options'     => array(
+					'sync'  => __( 'Síncrono', 'virtuaria-pagseguro' ),
+					'async' => __( 'Assíncrono', 'virtuaria-pagseguro' ),
+				),
+				'default'     => 'sync',
+			),
 			'credit'          => array(
 				'title'       => __( 'Cartão de crédito', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
 				'description' => '',
+			),
+			'credit_enable'   => array(
+				'title'       => __( 'Habilitar', 'virtuaria-pagseguro' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Define se a opção de pagamento Crédito deve estar disponível durante o checkout.', 'virtuaria-pagseguro' ),
+				'default'     => 'yes',
 			),
 			'installments'    => array(
 				'title'       => __( 'Número de parcelas', 'virtuaria-pagseguro' ),
@@ -257,20 +317,51 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'always_store'     => __( 'Sempre memorizar', 'woocommerce-pagseguro' ),
 				),
 			),
-			'tiket'           => array(
+			'ticket'          => array(
 				'title'       => __( 'Boleto', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
 				'description' => '',
 			),
-			'tiket_validate'  => array(
-				'title'             => 'Validade',
+			'ticket_enable'   => array(
+				'title'       => __( 'Habilitar', 'virtuaria-pagseguro' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Define se a opção de pagamento Boleto deve estar disponível durante o checkout.', 'virtuaria-pagseguro' ),
+				'default'     => 'yes',
+			),
+			'ticket_validate' => array(
+				'title'             => __( 'Validade', 'virtuaria-pagseguro' ),
 				'type'              => 'number',
-				'description'       => 'Define o limite de dias onde o boleto pode ser pago.',
+				'description'       => __( 'Define o limite de dias onde o boleto pode ser pago.', 'virtuaria-pagseguro' ),
 				'default'           => '5',
 				'custom_attributes' => array(
 					'min' => 1,
 				),
 			),
+			'pix'             => array(
+				'title' => __( 'PIX', 'virtuaria-pagseguro' ),
+				'type'  => 'title',
+			),
+			'pix_enable'      => array(
+				'title'       => __( 'Habilitar', 'virtuaria-pagseguro' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Define se a opção de pagamento Pix deve estar disponível durante o checkout.', 'virtuaria-pagseguro' ),
+				'default'     => 'yes',
+			),
+			'pix_validate'    => array(
+				'title'       => __( 'Validade do Código PIX', 'virtuaria-pagseguro' ),
+				'type'        => 'select',
+				'description' => __( 'Define o limite de tempo para aceitar pagamentos com PIX.', 'virtuaria-pagseguro' ),
+				'options'     => array(
+					'1800'  => '30 Minutos',
+					'3600'  => '1 hora',
+					'5400'  => '1 hora e 30 minutos',
+					'7200'  => '2 horas',
+					'9000'  => '2 horas e 30 minutos',
+					'10800' => '3 horas',
+				),
+				'default'     => '1800',
+			),
+
 		);
 
 		if ( current_user_can( 'install_themes' ) ) {
@@ -290,9 +381,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		}
 
 		$this->form_fields['tecvirtuaria'] = array(
-			'title'       => __( 'Tecnologia Virtuaria', 'virtuaria-pagseguro' ),
-			'type'        => 'title',
-			'description' => '',
+			'title' => __( 'Tecnologia Virtuaria', 'virtuaria-pagseguro' ),
+			'type'  => 'title',
 		);
 	}
 
@@ -323,11 +413,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			$paid = $this->api->new_charge( $order, $_POST );
 
 			if ( ! isset( $paid['error'] ) ) {
-				$charge_id = get_post_meta( $order_id, '_charge_id', true );
-				$order->set_transaction_id( $charge_id );
 				if ( $paid ) {
 					$charge_amount = get_post_meta( $order_id, '_charge_amount', true );
-					$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 					$order->add_order_note( 'PagSeguro: cobrança recebida R$' . number_format( $charge_amount / 100, 2, ',', '.' ) );
 					if ( $this->tax && ( ( $charge_amount / 100 ) - $order->get_total() ) > 0 ) {
 						$fee = new WC_Order_Item_Fee();
@@ -338,8 +425,44 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						$order->calculate_totals();
 						$order->save();
 					}
+					if ( 'async' !== $this->process_mode ) {
+						$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+					} else {
+						$args = array( $order_id, 'processing' );
+						if ( ! wp_next_scheduled( 'pagseguro_process_update_order_status', $args ) ) {
+							wp_schedule_single_event(
+								strtotime( 'now' ) + 60,
+								'pagseguro_process_update_order_status',
+								$args
+							);
+						}
+					}
 				} else {
-					$order->update_status( 'on-hold', __( 'PagSeguro: Aguardando confirmação de pagamento.', 'virtuaria-pagseguro' ) );
+					$qr_code = $order->get_meta( '_pagseguro_qrcode' );
+					if ( $qr_code ) {
+						$this->add_qrcode_in_note( $order, $qr_code );
+
+						$args = array( $order_id );
+						if ( ! wp_next_scheduled( 'pagseguro_pix_check_payment', $args ) ) {
+							wp_schedule_single_event(
+								strtotime( 'now' ) + $this->pix_validate + 1800,
+								'pagseguro_pix_check_payment',
+								$args
+							);
+						}
+					}
+					if ( 'async' !== $this->process_mode ) {
+						$order->update_status( 'on-hold', __( 'PagSeguro: Aguardando confirmação de pagamento.', 'virtuaria-pagseguro' ) );
+					} else {
+						$args = array( $order_id, 'on-hold' );
+						if ( ! wp_next_scheduled( 'pagseguro_process_update_order_status', $args ) ) {
+							wp_schedule_single_event(
+								strtotime( 'now' ) + 60,
+								'pagseguro_process_update_order_status',
+								$args
+							);
+						}
+					}
 				}
 
 				wc_reduce_stock_levels( $order_id );
@@ -386,14 +509,81 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$body = $this->get_raw_data();
 
 		$this->log->add( $this->id, 'IPN request...', WC_Log_Levels::INFO );
-		$request = array();
-		parse_str( $body, $request );
+		$request = json_decode( $body, true );
 		$this->log->add(
 			$this->id,
 			'Request to order ' . $body,
 			WC_Log_Levels::INFO
 		);
-		if ( 'transaction' === $request['notificationType'] && isset( $request['notificationCode'] ) ) {
+
+		if ( isset( $request['charges'] ) && isset( $request['reference_id'] ) ) {
+			$this->log->add( $this->id, 'IPN valid', WC_Log_Levels::INFO );
+
+			$order = wc_get_order( sanitize_text_field( wp_unslash( $request['reference_id'] ) ) );
+
+			$is_additional_charge = false;
+			if ( $order->get_transaction_id() !== $request['id'] ) {
+				$is_additional_charge = true;
+			}
+
+			if ( $order
+				&& isset( $request['charges'][0]['id'] )
+				&& isset( $request['charges'][0]['status'] ) ) {
+
+				if ( ! get_post_meta( $order->get_id(), '_charge_id', true ) && ! $is_additional_charge ) {
+					update_post_meta( $order->get_id(), '_charge_id', $request['charges'][0]['id'] );
+				}
+
+				switch ( $request['charges'][0]['status'] ) {
+					case 'CANCELED':
+						if ( $is_additional_charge ) {
+							$order->add_order_note( __( 'PagSeguro: Cobrança adicional cancelada.', 'virtuaria-pagseguro' ) );
+						} else {
+							$order->add_order_note( __( 'PagSeguro: Transação cancelada.', 'virtuaria-pagseguro' ) );
+						}
+
+						if ( ! $is_additional_charge && ! $order->has_status( 'refunded' ) ) {
+							$order->update_status( 'refunded' );
+						}
+						break;
+					case 'IN_ANALYSIS':
+						$order->add_order_note( __( 'PagSeguro: O PagSeguro está analisando o risco da transação.', 'virtuaria-pagseguro' ) );
+						break;
+					case 'DECLINED':
+						$order->add_order_note( __( 'PagSeguro: Compra não autorizada.', 'virtuaria-pagseguro' ) );
+						if ( ! $is_additional_charge ) {
+							$order->update_status( 'cancelled', __( 'PagSeguro: Pagamento não aprovado.', 'virtuaria-pagseguro' ) );
+						}
+						break;
+					case 'PAID':
+						if ( 0 == $request['charges'][0]['amount']['summary']['refunded'] ) {
+							$order->add_order_note(
+								sprintf(
+									/* translators: %s: amount */
+									__( 'PagSeguro: Cobrança recebida R$ %s.', 'virtuaria-pagseguro' ),
+									// phpcs:ignore
+									number_format( (string) $request['charges'][0]['amount']['value'] / 100, 2, ',', '.' )
+								)
+							);
+
+							if ( ! $order->has_status( 'processing' ) ) {
+								$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+							}
+
+							if ( $is_additional_charge ) {
+								$adittionals = get_post_meta( $order->get_id(), '_additionals_charge_id', true );
+								if ( ! $adittionals ) {
+									$adittionals = array();
+								}
+								$adittionals[] = $request['charges'][0]['id'];
+								update_post_meta( $order->get_id(), '_additionals_charge_id', $adittionals );
+							}
+						}
+						break;
+				}
+			}
+			return;
+		} elseif ( 'transaction' === $request['notificationType'] && isset( $request['notificationCode'] ) ) {
 			$this->log->add( $this->id, 'IPN valid', WC_Log_Levels::INFO );
 			$sandbox = 'sandbox' === $this->environment ? 'sandbox.' : '';
 			$url     = 'https://ws.' . $sandbox . 'pagseguro.uol.com.br/v3/transactions/notifications/';
@@ -417,7 +607,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			$order = wc_get_order( (string) $transaction->reference );
 
 			$is_additional_charge = false;
-			if ( false === strpos( $order->get_transaction_id(), (string) $transaction->code ) ) {
+			if ( false === strpos( $order->get_meta( '_charge_id' ), (string) $transaction->code ) ) {
 				$is_additional_charge = true;
 			}
 			if ( $order ) {
@@ -489,8 +679,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						);
 						break;
 				}
-
-				// $order->save();
 			}
 			return;
 		} else {
@@ -518,6 +706,14 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		if ( 'BOLETO' === $type ) {
 			$this->get_ticket_info( $order_id );
+		} elseif ( 'PIX' === $type ) {
+			$qr_code     = get_post_meta( $order_id, '_pagseguro_qrcode', true );
+			$qr_code_png = get_post_meta( $order_id, '_pagseguro_qrcode_png', true );
+
+			if ( $qr_code && $qr_code_png ) {
+				$validate = $this->format_pix_validate( $this->pix_validate );
+				require_once plugin_dir_path( __FILE__ ) . '../templates/payment-instructions.php';
+			}
 		}
 	}
 
@@ -527,7 +723,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 * @param int $order_id the order id.
 	 */
 	private function get_ticket_info( $order_id ) {
-		echo '<div class="tiket-info">';
+		echo '<div class="ticket-info">';
 		echo '<h3 style="margin: 0;">' . esc_html_e( 'Utilize o código de barras abaixo para efetuar o pagamento em lotéricas, instituições financeiras ou internet banking.', 'virtuaria-pagseguro' ) . '</h3>';
 		echo '<strong style="display:block;margin: 15px 0;">' . esc_html( get_post_meta( $order_id, '_formatted_barcode', true ) ) . '</strong>';
 		echo '<a class="pdf-link" target="_blank" href="' . esc_url( get_post_meta( $order_id, '_pdf_link', true ) ) . '">';
@@ -535,12 +731,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		echo 'Imprimir Boleto Bancário</a>';
 		echo '</div>';
 		echo '<style>
-		.tiket-info {
+		.ticket-info {
 			border: 1px solid #ddd;
 			padding: 20px;
 			max-width: 600px;
 		}
-		.tiket-info > .pdf-link {
+		.ticket-info > .pdf-link {
 			background-color: green;
 			color: #fff;
 			padding: 5px 15px;
@@ -550,11 +746,11 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			transition: filter .2s;
 			text-decoration: none;
 		}
-		div.tiket-info > .pdf-link:hover {
+		div.ticket-info > .pdf-link:hover {
 			color: #fff;
 			filter: brightness(1.3);
 		}
-		.tiket-info > .pdf-link .barcode-icon {
+		.ticket-info > .pdf-link .barcode-icon {
 			display: inline-block;
 			vertical-align: middle;
 			margin-right: 5px;
@@ -580,6 +776,14 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		if ( 'BOLETO' === $type ) {
 			$this->get_ticket_info( $order->get_id() );
+		} elseif ( 'PIX' === $type ) {
+			$qr_code     = get_post_meta( $order->get_id(), '_pagseguro_qrcode', true );
+			$qr_code_png = get_post_meta( $order->get_id(), '_pagseguro_qrcode_png', true );
+
+			if ( $qr_code && $qr_code_png ) {
+				$validate = $this->format_pix_validate( $this->pix_validate );
+				require_once plugin_dir_path( __FILE__ ) . '../templates/payment-instructions.php';
+			}
 		}
 	}
 
@@ -599,9 +803,9 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				$order->add_order_note( 'PagSeguro: Reembolso de R$' . $amount . ' bem sucedido.', 0, true );
 				return true;
 			}
-		} else {
-			$order->add_order_note( 'PagSeguro: Não foi possível reembolsar R$' . $amount . '. Verifique o status da transação e o valor a ser reembolsado e tente novamente.', 0, true );
 		}
+
+		$order->add_order_note( 'PagSeguro: Não foi possível reembolsar R$' . $amount . '. Verifique o status da transação e o valor a ser reembolsado e tente novamente.', 0, true );
 
 		return false;
 	}
@@ -639,10 +843,47 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'has_tax'         => floatval( $this->tax ) > 0,
 				'min_installment' => floatval( $this->min_installment ),
 				'fee_from'        => $this->fee_from,
+				'pix_validate'    => $this->format_pix_validate( $this->pix_validate ),
+				'methods_enabled' => array(
+					'pix'    => 'yes' === $this->pix_enable,
+					'ticket' => 'yes' === $this->ticket_enable,
+					'credit' => 'yes' === $this->credit_enable,
+				),
 			),
 			'woocommerce/pagseguro/',
 			Virtuaria_Pagseguro::get_templates_path()
 		);
+	}
+
+	/**
+	 * Formatter pix validate
+	 *
+	 * @param string $validate the time of pix validate.
+	 * @return string
+	 */
+	private function format_pix_validate( $validate ) {
+		$format = $validate / 3600;
+		switch ( $format ) {
+			case 0.5:
+				$format = '30 minutos';
+				break;
+			case 1:
+				$format = '1 hora';
+				break;
+			case 1.5:
+				$format = '1 hora e 30 minutos';
+				break;
+			case 2:
+				$format = '2 horas';
+				break;
+			case 2.5:
+				$format = '2 horas e 30 minutos';
+				break;
+			default:
+				$format = '3 horas';
+				break;
+		}
+		return $format;
 	}
 
 	/**
@@ -670,7 +911,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function additional_charge_metabox( $post ) {
 		$options = get_option( 'woocommerce_virt_pagseguro_settings' );
 		$order   = wc_get_order( sanitize_text_field( wp_unslash( $post->ID ) ) );
-		$credit  = get_user_meta( $order->get_customer_id(), '_pagseguro_credit_info', true );
+		$credit  = get_user_meta( $order->get_customer_id(), '_pagseguro_credit_info_store_' . get_current_blog_id(), true );
 
 		if ( ! $order
 			|| 'processing' !== $order->get_status()
@@ -732,132 +973,327 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			&& isset( $_POST['additional_charge_nonce'] )
 			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['additional_charge_nonce'] ) ), 'do_additional_charge' )
 			&& floatval( $_POST['additional_value'] ) > 0 ) {
-			$amount = number_format( sanitize_text_field( wp_unslash( $_POST['additional_value'] ) ), 2, '.', '' );
-
-			if ( $amount <= 0 ) {
-				if ( 'yes' === $this->debug ) {
-					$order->add_order_note( 'PagSeguro: Cobrança Adicional com valor da inválido.', 0, true );
-					$this->log->add( $this->id, 'Valor inválido ou pedido não encontrado para cobrança adicional.', WC_Log_Levels::ERROR );
-				}
-				return;
-			}
-
-			$pagseguro_card_info = get_user_meta( $order->get_customer_id(), '_pagseguro_credit_info', true );
-
-			if ( ! $pagseguro_card_info || ! isset( $pagseguro_card_info['token'] ) ) {
-				if ( 'yes' === $this->debug ) {
-					$order->add_order_note( 'PagSeguro: Cobrança Adicional, método de pagamento do cliente ausente.', 0, true );
-					$this->log->add( $this->id, 'Cobrança Adicional: método de pagamento do cliente ausente', WC_Log_Levels::ERROR );
-				}
-				return;
-			}
-			$data = array(
-				'headers' => array(
-					'Authorization' => $this->token,
-					'Content-Type'  => 'application/json',
-				),
-				'body'    => array(
-					'reference_id'      => strval( $order->get_id() ),
-					'description'       => substr( get_bloginfo( 'name' ), 0, 63 ),
-					'amount'            => array(
-						'value'    => $amount * 100,
-						'currency' => 'BRL',
-					),
-					'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
-					'payment_method'    => array( 'type' => 'CREDIT_CARD' ),
-				),
-				'timeout' => 120,
+			$amount = number_format(
+				sanitize_text_field( wp_unslash( $_POST['additional_value'] ) ),
+				2,
+				'.',
+				''
 			);
 
-			$data['body']['payment_method']['installments']    = 1;
-			$data['body']['payment_method']['capture']         = true;
-			$data['body']['payment_method']['soft_descriptor'] = $this->soft_descriptor;
-			$data['body']['payment_method']['card']['id']      = $pagseguro_card_info['token'];
+			$this->api->additional_charge(
+				$order,
+				$amount * 100,
+				isset( $_POST['credit_charge_reason'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_charge_reason'] ) ) : ''
+			);
+		}
+	}
 
+	/**
+	 * Add QR Code in order note.
+	 *
+	 * @param wc_order $order   the order.
+	 * @param string   $qr_code the qr code.
+	 */
+	private function add_qrcode_in_note( $order, $qr_code ) {
+		remove_filter( 'woocommerce_new_order_note_data', '\\order\\limit_characters_order_note' );
+		$order->add_order_note( 'PagSeguro Pix Copia e Cola: <div class="pix">' . $qr_code . '</div><a href="#" id="copy-qr" class="button button-primary">Copiar</a>' );
+		add_filter( 'woocommerce_new_order_note_data', '\\order\\limit_characters_order_note' );
+	}
+
+	/**
+	 * Check status from order. If unpaid cancel order.
+	 *
+	 * @param int $order_id the args.
+	 */
+	public function check_order_paid( $order_id ) {
+		$order = wc_get_order( $order_id );
+
+		if ( $order && ! get_post_meta( $order_id, '_charge_id', true ) ) {
+			$order->add_order_note( 'Pagseguro PIX: o limite de tempo para pagamento deste pedido expirou.' );
+			$order->update_status( 'cancelled' );
 			if ( 'yes' === $this->debug ) {
-				$this->log->add( $this->id, 'Send new additional charge: ' . wp_json_encode( $data ), WC_Log_Levels::ERROR );
+				$this->log->add( $this->tag, 'Pedido #' . $order->get_order_number() . ' mudou para o status cancelado.', WC_Log_Levels::INFO );
 			}
-			$data['body'] = wp_json_encode( $data['body'] );
+		}
+	}
 
-			if ( 'sandbox' === $this->environment ) {
-				$endpoint = 'https://sandbox.api.pagseguro.com/';
+	/**
+	 * Add scripts to dash.
+	 */
+	public function admin_checkout_scripts() {
+		if ( isset( $_GET['post'] ) && 'shop_order' === get_post_type( sanitize_text_field( wp_unslash( $_GET['post'] ) ) ) ) {
+			wp_enqueue_script(
+				'copy-qr',
+				VIRTUARIA_PAGSEGURO_URL . 'public/js/copy-code.js',
+				array( 'jquery' ),
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/js/copy-code.js' ),
+				true
+			);
+
+			wp_enqueue_style(
+				'copy-qr',
+				VIRTUARIA_PAGSEGURO_URL . 'public/css/pix-code.css',
+				array(),
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/pix-code.css' )
+			);
+		}
+	}
+
+	/**
+	 * Add meta box.
+	 *
+	 * @param wp_post $post the post.
+	 */
+	public function pix_payment_metabox( $post ) {
+		$order = wc_get_order( $post->ID );
+		if ( $order
+			&& 'sandbox' === $this->environment
+			&& 'PIX' === $order->get_meta( '_payment_mode' )
+			&& $order->get_meta( '_qrcode_id' )
+			&& $order->has_status( 'on-hold' ) ) {
+			add_meta_box(
+				'pix-payment',
+				'Pagamento Pix',
+				array( $this, 'pix_payment_content' ),
+				'shop_order',
+				'side'
+			);
+		}
+	}
+
+	/**
+	 * Meta box content.
+	 */
+	public function pix_payment_content() {
+		?>
+		<button class="button make_payment button-primary">Simular pagamento do pix</button>
+		<input type="hidden" name="pix_button_clicked" class="pix_input"/>
+		<script>
+			jQuery(document).ready(function($) {
+				$('.make_payment').on('click', function() {
+					$('.pix_input').val('yes');
+				});
+			});
+		</script>
+		<?php
+		wp_nonce_field(
+			'pix-payment',
+			'pix_nonce'
+		);
+	}
+
+	/**
+	 * Do pix payment.
+	 *
+	 * @param int $order_id the order id.
+	 */
+	public function make_pix_payment( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order || 'on-hold' !== $order->get_status() ) {
+			return;
+		}
+
+		if ( isset( $_POST['pix_nonce'] )
+			&& isset( $_POST['pix_button_clicked'] )
+			&& 'yes' === $_POST['pix_button_clicked']
+			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['pix_nonce'] ) ), 'pix-payment' ) ) {
+
+			$paid = $this->api->simulate_payment(
+				$order->get_meta( '_qrcode_id' )
+			);
+
+			if ( $paid ) {
+				$order->add_order_note(
+					__( 'PagSeguro: Simulação de pagamento Pix realizada com sucesso.', 'virtuaria-pagseguro' ),
+					0,
+					true
+				);
 			} else {
-				$endpoint = 'https://api.pagseguro.com/';
-			}
-
-			$request = wp_remote_post(
-				$endpoint . 'charges',
-				$data
-			);
-
-			if ( is_wp_error( $request ) ) {
-				if ( 'yes' === $this->debug ) {
-					$this->log->add(
-						$this->id,
-						'New charge error: ' . $request->get_error_message(),
-						WC_Log_Levels::ERROR
-					);
-				}
-				$order->add_order_note( 'PagSeguro: Não foi possível criar cobrança adicional.', 0, true );
-				return;
-			}
-
-			if ( 'yes' === $this->debug ) {
-				$this->log->add(
-					$this->id,
-					'Server response in additional charge: ' . wp_json_encode( $request ),
-					WC_Log_Levels::INFO
+				$order->add_order_note(
+					__( 'PagSeguro: A simulação de pagamento Pix falhou.', 'virtuaria-pagseguro' ),
+					0,
+					true
 				);
 			}
+		}
+	}
 
-			$response  = json_decode( wp_remote_retrieve_body( $request ), true );
-			$resp_code = intval( wp_remote_retrieve_response_code( $request ) );
-			$note_resp = '';
-			if ( 201 !== $resp_code ) {
-				if ( 401 === $resp_code ) {
-					$note_resp = __( 'Pagamento não autorizado.', 'virtuaria-pagseguro' );
-				} elseif ( in_array( $resp_code, array( 400, 409 ), true ) ) {
-					$msg = $response['error_messages'][0]['description'];
-					if ( 'invalid_parameter' === $response['error_messages'][0]['description'] ) {
-						$msg = 'Verifique os dados enviados e tente novamente.';
-					}
-					$note_resp = $msg;
+	/**
+	 * Process schedule order status.
+	 *
+	 * @param int    $order_id the order id.
+	 * @param string $status the status scheduled.
+	 */
+	public function process_order_status( $order_id, $status ) {
+		$order = wc_get_order( $order_id );
+
+		if ( $order ) {
+			if ( 'on-hold' === $status ) {
+				if ( $order->has_status( 'pending' ) ) {
+					$order->update_status( 'on-hold', __( 'PagSeguro: Aguardando confirmação de pagamento.', 'virtuaria-pagseguro' ) );
+				}
+			} else {
+				$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+			}
+		}
+	}
+
+	/**
+	 * Display auth field.
+	 *
+	 * @param string $key  the name from field.
+	 * @param array  $data the data.
+	 */
+	public function generate_auth_html( $key, $data ) {
+		$field_key = $this->get_field_key( $key );
+		$defaults  = array(
+			'title'             => '',
+			'disabled'          => false,
+			'class'             => '',
+			'css'               => '',
+			'placeholder'       => '',
+			'type'              => 'text',
+			'desc_tip'          => false,
+			'description'       => '',
+			'custom_attributes' => array(),
+		);
+
+		$data = wp_parse_args( $data, $defaults );
+
+		$data['id']    = 'woocommerce_' . $this->id . '_autorization';
+		$data['value'] = $this->get_option( 'autorization' );
+
+		ob_start();
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr( $data['id'] ); ?>">
+					<?php echo esc_html( $data['title'] ); ?>
+					<span class="woocommerce-help-tip" data-tip="<?php echo esc_html( $data['description'] ); ?>"></span>
+				</label>
+			</th>
+			<td class="forminp forminp-<?php echo esc_attr( $data['type'] ); ?>">
+				<?php
+				$token = null;
+				$auth  = '';
+				if ( 'sandbox' === $this->environment ) {
+					$token = $this->get_option( 'token_sanbox' );
+					$auth  = 'sandbox.';
 				} else {
-					$note_resp = __( 'Não foi possível processar a sua cobrança. Por favor, tente novamente mais tarde.', 'virtuaria-pagseguro' );
+					$token = $this->get_option( 'token_production' );
 				}
-			}
 
-			if ( $note_resp ) {
-				$order->add_order_note( 'PagSeguro: ' . $note_resp, 0, true );
-				return;
-			}
+				$origin = str_replace( array( 'https://', 'http://' ), '', home_url() );
 
-			if ( isset( $_POST['credit_charge_reason'] ) && ! empty( $_POST['credit_charge_reason'] ) ) {
-				$reason = '<br>Motivo: ' . sanitize_text_field( wp_unslash( $_POST['credit_charge_reason'] ) ) . '.';
-			}
-			$order->add_order_note( 'PagSeguro: Nova cobrança enviada R$' . number_format( $amount, 2, ',', '.' ) . '.' . $reason, 0, true );
+				$auth  = 'https://connect.' . $auth . 'pagseguro.uol.com.br/oauth2/authorize';
+				$auth .= '?response_type=code&client_id=' . $this->app_id . '&redirect_uri=' . $this->app_url;
+				$auth .= '&scope=payments.read+payments.create+payments.refund+accounts.read&state=' . $origin;
 
-			if ( 'PAID' === $response['status'] ) {
-				$order->add_order_note(
-					sprintf(
-						/* translators: %s: amount value */
-						__( 'PagSeguro: Cobrança recebida R$ %s', 'virtuaria-pagseguro' ),
-						number_format( $response['amount']['value'] / 100, 2, ',', '.' )
-					),
-					0,
-					true
-				);
-			} elseif ( 'DECLINED' === $response['status'] ) {
-				$order->add_order_note(
-					sprintf(
-						/* translators: %s: payment response */
-						__( 'PagSeguro: Não autorizado, %s.', 'virtuaria-pagseguro' ),
-						$response['payment_response']['message']
-					),
-					0,
-					true
-				);
+				if ( $token ) {
+					echo '<span><strong>Status:</strong> Conectado.</span>';
+					echo '<a href="' . esc_url( $this->app_revoke ) . '?state=' . $origin . '" class="auth button-primary">Desconectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectado.svg" alt="Desconectar" /></a>';
+					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
+				} else {
+					echo '<span><strong>Status:</strong> Desconectado.</span>';
+					echo '<a href="' . esc_url( $auth ) . '" class="auth button-primary">Conectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectar.png" alt="Conectar" /></a>';
+					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
+				}
+				?>
+				<style>
+					.auth img {
+						display: inline-block;
+						vertical-align: middle;
+						max-width: 30px;
+					}
+					.forminp-auth .auth {
+						margin-left: 10px;
+						padding: 4px 10px;
+					}
+					.expire-info {
+						display: block;
+						margin-top: 5px;
+					}
+				</style>
+			</td>
+		</tr>  
+
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Save store token.
+	 */
+	public function save_store_token() {
+		if ( isset( $_GET['section'] )
+			&& 'virt_pagseguro' === $_GET['section'] ) {
+			if ( isset( $_GET['token'] ) ) {
+				if ( 'sandbox' === $this->environment ) {
+					$this->update_option( 'token_sanbox', sanitize_text_field( wp_unslash( $_GET['token'] ) ) );
+				} else {
+					$this->update_option( 'token_production', sanitize_text_field( wp_unslash( $_GET['token'] ) ) );
+				}
+				add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_connected' ) );
+				delete_option( 'virtuaria_pagseguro_not_authorized' );
+			} elseif ( isset( $_GET['access_revoked'] ) && 'success' === $_GET['access_revoked'] ) {
+				if ( 'sandbox' === $this->environment ) {
+					$this->update_option( 'token_sanbox', null );
+				} else {
+					$this->update_option( 'token_production', null );
+				}
+				add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_disconnected' ) );
+				delete_option( 'virtuaria_pagseguro_not_authorized' );
+			} elseif ( isset( $_GET['proccess'] ) && 'failed' === $_GET['proccess'] ) {
+				add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_failed' ) );
 			}
+		}
+	}
+
+	/**
+	 * Message from token generate success.
+	 */
+	public function virtuaria_pagseguro_connected() {
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php esc_attr_e( 'Virtuaria PagSeguro Conectado!', 'virtuaria-pagseguro' ); ?></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Message from token revoked success.
+	 */
+	public function virtuaria_pagseguro_disconnected() {
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php esc_attr_e( 'Virtuaria PagSeguro Desconectado!', 'virtuaria-pagseguro' ); ?></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Message from fail.
+	 */
+	public function virtuaria_pagseguro_failed() {
+		?>
+		<div class="notice notice-error is-dismissible">
+			<p><?php esc_attr_e( 'Virtuaria PagSeguro - Falha ao processar operação!', 'virtuaria-pagseguro' ); ?></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Message from fail.
+	 */
+	public function virtuaria_pagseguro_not_authorized() {
+		if ( get_option( 'virtuaria_pagseguro_not_authorized' ) ) {
+			?>
+			<div class="notice notice-warning is-dismissible">
+				<p>
+					Virtuaria PagSeguro - Sua conexão com a API do PagSeguro está sendo negada, impedindo a concretização das transações (pagamento, reembolso, etc). Tente reconectar o plugin via página de <a href="<?php echo esc_url( admin_url( 'admin.php?page=wc-settings&tab=checkout&section=virt_pagseguro' ) ); ?>">configuração</a> para renovar a autorização. Para mais detalhes, consulte o log do plugin.
+				</p>
+			</div>
+			<?php
 		}
 	}
 }

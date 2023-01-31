@@ -5,7 +5,7 @@
  * Description: Adiciona o método de pagamento PagSeguro a sua loja virtual.
  * Author: Virtuaria
  * Author URI: https://virtuaria.com.br/
- * Version: 1.1.3
+ * Version: 2.0.0
  * License: GPLv2 or later
  *
  * @package virtuaria
@@ -43,6 +43,8 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 
 		/**
 		 * Singleton constructor.
+		 *
+		 * @throws Exception Corrupted plugin.
 		 */
 		private function __construct() {
 			if ( class_exists( 'WC_PagSeguro' ) ) {
@@ -55,6 +57,9 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 				$this->load_dependecys();
 				add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateway' ) );
 				add_action( 'admin_menu', array( $this, 'add_submenu_pagseguro' ) );
+				add_action( 'init', array( $this, 'register_endpoint' ) );
+				add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
+				add_action( 'template_include', array( $this, 'redirect_to_homolog_page' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'missing_dependency' ) );
 			}
@@ -88,6 +93,9 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		private function load_dependecys() {
 			require_once 'includes/class-wc-virtuaria-pagseguro-gateway.php';
 			require_once 'includes/class-wc-virtuaria-pagseguro-api.php';
+
+			$plugin_data = get_plugin_data( __FILE__ );
+			require_once 'includes/integrity-check.php';
 		}
 
 		/**
@@ -127,6 +135,38 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		 */
 		public function load_plugin_textdomain() {
 			load_plugin_textdomain( 'virtuaria-pagseguro', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		}
+
+		/**
+		 * Endpoint to homolog file.
+		 */
+		public function register_endpoint() {
+			add_rewrite_rule( 'virtuaria-pagseguro(/)?', 'index.php?virtuaria-pagseguro=sim', 'top' );
+		}
+
+		/**
+		 * Add query vars.
+		 *
+		 * @param array $query_vars the query vars.
+		 * @return array
+		 */
+		public function add_query_vars( $query_vars ) {
+			$query_vars[] = 'virtuaria-pagseguro';
+			return $query_vars;
+		}
+
+		/**
+		 * Redirect access to confirm page.
+		 *
+		 * @param string $template the template path.
+		 * @return string
+		 */
+		public function redirect_to_homolog_page( $template ) {
+			if ( false == get_query_var( 'virtuaria-pagseguro' ) ) {
+				return $template;
+			}
+
+			return plugin_dir_path( __FILE__ ) . '/includes/endpoint-homolog.php';
 		}
 	}
 

@@ -15,11 +15,10 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 	$card     = sanitize_text_field( wp_unslash( $_POST['encriptation_card'] ) );
 	$card2    = sanitize_text_field( wp_unslash( $_POST['encriptation_card2'] ) );
 
+	$endpoint = 'https://sandbox.api.pagseguro.com/';
+
 	$count = intval( get_option( 'homolog_number', 0 ) ) + 1;
 
-	fwrite( $output, ">>>>BOLETO<<<<\r\n" );
-	fwrite( $output, "\r\n" );
-	fwrite( $output, "REQUEST\r\n" );
 	$data = array(
 		'headers' => array(
 			'Authorization' => $token,
@@ -27,36 +26,75 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 		),
 		'body'    => array(
 			'reference_id'      => 'teste0' . $count,
-			'description'       => substr( get_bloginfo( 'name' ), 0, 63 ),
-			'amount'            => array(
-				'value'    => 100000,
-				'currency' => 'BRL',
+			'customer'          => array(
+				'name'   => 'João da Silva',
+				'email'  => 'joaosilva@virtuaria.com.br',
+				'tax_id' => '95749391035',
+				'phone'  => array(
+					'country' => '55',
+					'area'    => '011',
+					'number'  => '999999999',
+					'type'    => 'CELLPHONE',
+				),
+			),
+			'items'             => array(
+				array(
+					'name'        => 'teste',
+					'quantity'    => 1,
+					'unit_amount' => 100000,
+				),
+			),
+			'shipping'          => array(
+				'address' => array(
+					'street'      => 'Rua A Conjunto Z',
+					'number'      => '12',
+					'complement'  => 'Casa',
+					'locality'    => 'Centro',
+					'city'        => 'Sao Paulo',
+					'region'      => 'SP',
+					'region_code' => 'SP',
+					'country'     => 'BRA',
+					'postal_code' => '17560246',
+				),
 			),
 			'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
-			'payment_method'    => array(
-				'type'   => 'BOLETO',
-				'boleto' => array(
-					'due_date' => wp_date( 'Y-m-d', strtotime( '+1 day' ) ),
-					'holder'   => array(
-						'name'    => 'Joao da Silva',
-						'tax_id'  => '95749391035',
-						'email'   => 'teste@gmail.com',
-						'address' => array(
-							'street'      => 'Rua A Conjunto Z',
-							'number'      => '12',
-							'complement'  => 'Casa',
-							'locality'    => 'Centro',
-							'city'        => 'Sao Paulo',
-							'region'      => 'SP',
-							'region_code' => 'SP',
-							'country'     => 'BR',
-							'postal_code' => '17560246',
-						),
+		),
+		'timeout' => 12,
+	);
+
+	fwrite( $output, ">>>>BOLETO<<<<\r\n" );
+	fwrite( $output, "\r\n" );
+	fwrite( $output, "REQUEST\r\n" );
+	$data['body']['charges'][] = array(
+		'reference_id'      => 'teste0' . $count,
+		'description'       => substr( get_bloginfo( 'name' ), 0, 63 ),
+		'amount'            => array(
+			'value'    => 100000,
+			'currency' => 'BRL',
+		),
+		'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
+		'payment_method'    => array(
+			'type'   => 'BOLETO',
+			'boleto' => array(
+				'due_date' => wp_date( 'Y-m-d', strtotime( '+1 day' ) ),
+				'holder'   => array(
+					'name'    => 'Joao da Silva',
+					'tax_id'  => '95749391035',
+					'email'   => 'joaosilva@virtuaria.com.br',
+					'address' => array(
+						'street'      => 'Rua A Conjunto Z',
+						'number'      => '12',
+						'complement'  => 'Casa',
+						'locality'    => 'Centro',
+						'city'        => 'Sao Paulo',
+						'region'      => 'SP',
+						'region_code' => 'SP',
+						'country'     => 'BR',
+						'postal_code' => '17560246',
 					),
 				),
 			),
 		),
-		'timeout' => 12,
 	);
 
 	fwrite( $output, wp_json_encode( $data ) . "\r\n" );
@@ -65,7 +103,7 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 
 	$data['body'] = wp_json_encode( $data['body'] );
 	$response     = wp_remote_post(
-		'https://sandbox.api.pagseguro.com/charges',
+		$endpoint . 'orders',
 		$data
 	);
 
@@ -80,14 +118,15 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 
 	$data['body'] = json_decode( $data['body'], true );
 	$count++;
-	$data['body']['reference_id']                      = 'teste0' . $count;
-	$data['body']['payment_method']['installments']    = 1;
-	$data['body']['payment_method']['capture']         = true;
-	$data['body']['payment_method']['soft_descriptor'] = 'VIRTUARIA';
+	$data['body']['charges'][0]['reference_id']                      = 'teste0' . $count;
+	$data['body']['reference_id']                                    = 'teste0' . $count;
+	$data['body']['charges'][0]['payment_method']['installments']    = 1;
+	$data['body']['charges'][0]['payment_method']['capture']         = true;
+	$data['body']['charges'][0]['payment_method']['soft_descriptor'] = 'VIRTUARIA';
 
-	unset( $data['body']['payment_method']['boleto'] );
-	$data['body']['payment_method']['type'] = 'CREDIT_CARD';
-	$data['body']['payment_method']['card'] = array(
+	unset( $data['body']['charges'][0]['payment_method']['boleto'] );
+	$data['body']['charges'][0]['payment_method']['type'] = 'CREDIT_CARD';
+	$data['body']['charges'][0]['payment_method']['card'] = array(
 		'encrypted' => $card,
 	);
 
@@ -98,7 +137,7 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 	$data['body'] = wp_json_encode( $data['body'] );
 
 	$response = wp_remote_post(
-		'https://sandbox.api.pagseguro.com/charges',
+		$endpoint . 'orders',
 		$data
 	);
 
@@ -122,7 +161,7 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 		),
 		'body'    => array(
 			'amount' => array(
-				'value' => '10000',
+				'value' => '100000',
 			),
 		),
 		'timeout' => 12,
@@ -132,7 +171,7 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 
 	$refund['body'] = wp_json_encode( $refund['body'] );
 	$request        = wp_remote_post(
-		'https://sandbox.api.pagseguro.com/charges/' . $response['id'] . '/cancel',
+		'https://sandbox.api.pagseguro.com/charges/' . $response['charges'][0]['id'] . '/cancel',
 		$refund
 	);
 
@@ -142,15 +181,16 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 	// New order to new refund partial.
 	$data['body'] = json_decode( $data['body'], true );
 
-	$data['body']['reference_id']           = 'teste0' . $count;
-	$data['body']['payment_method']['card'] = array(
+	$data['body']['reference_id']                         = 'teste0' . $count;
+	$data['body']['charges'][0]['reference_id']           = 'teste0' . $count;
+	$data['body']['charges'][0]['payment_method']['card'] = array(
 		'encrypted' => $card2,
 	);
 
 	$data['body'] = wp_json_encode( $data['body'] );
 
 	$response = wp_remote_post(
-		'https://sandbox.api.pagseguro.com/charges',
+		$endpoint . 'orders',
 		$data
 	);
 
@@ -173,12 +213,54 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 		$response = json_decode( wp_remote_retrieve_body( $response ), true );
 	}
 	$request = wp_remote_post(
-		'https://sandbox.api.pagseguro.com/charges/' . $response['id'] . '/cancel',
+		'https://sandbox.api.pagseguro.com/charges/' . $response['charges'][0]['id'] . '/cancel',
 		$refund
 	);
 
 	fwrite( $output, "RESPONSE\r\n" );
 	fwrite( $output, wp_json_encode( $request ) . "\r\n" );
+	fwrite( $output, "\r\n" );
+	fwrite( $output, ">>>>PIX<<<<\r\n" );
+	fwrite( $output, "\r\n" );
+	fwrite( $output, "REQUEST\r\n" );
+
+	$data['body'] = json_decode( $data['body'], true );
+	unset( $data['body']['charges'] );
+
+	update_option( 'homolog_number', ++$count );
+	$expiration = new DateTime(
+		wp_date(
+			'Y-m-d H:i:s',
+			strtotime( '+1800 seconds' )
+		),
+		new DateTimeZone( 'America/Sao_Paulo' )
+	);
+
+	$data['body']['qr_codes'][] = array(
+		'amount'          => array(
+			'value' => '100000',
+		),
+		'expiration_date' => $expiration->format( 'c' ),
+	);
+
+	$data['body']['reference_id'] = 'teste0' . $count;
+
+	fwrite( $output, wp_json_encode( $data ) . "\r\n" );
+	fwrite( $output, "\r\n" );
+	fwrite( $output, "RESPONSE\r\n" );
+
+	$data['body'] = wp_json_encode( $data['body'] );
+
+	$response = wp_remote_post(
+		$endpoint . 'orders',
+		$data
+	);
+
+	fwrite( $output, wp_json_encode( $response ) . "\r\n" );
+	if ( ! is_wp_error( $response ) ) {
+		$response = json_decode( wp_remote_retrieve_body( $response ), true );
+	}
+	fwrite( $output, "\r\n" );
 
 	ob_get_clean();
 	header( 'Content-Type: text/csv; charset=utf-8' );
@@ -280,7 +362,9 @@ if ( isset( $_POST['encriptation_card'] ) && ! empty( $_POST['encriptation_card'
 	<ul>
 		<li>Internal Server Error;</li>
 		<li>Transaction is not found;</li>
-		<li>Operation timed out.</li>
+		<li>Operation timed out;</li>
+		<li>Bad Gateway;</li>
+		<li>External service error.</li>
 	</ul>
 
 	<a style="margin: 20px auto;display:table;" target="_blank" href="https://wordpress.org/plugins/virtuaria-pagseguro">
