@@ -181,7 +181,7 @@ class WC_PagSeguro_API {
 				return array( 'error' => 'Pagamento não autorizado.' );
 			} elseif ( in_array( $resp_code, array( 400, 409 ), true ) ) {
 				$msg = $response['error_messages'][0]['description'];
-				if ( 'invalid_parameter' === $response['error_messages'][0]['description'] ) {
+				if ( in_array( $response['error_messages'][0]['description'], array( 'invalid_parameter', 'required_parameter' ), true ) ) {
 					$msg = 'Verifique os dados digitados e tente novamente.';
 				}
 				return array( 'error' => $msg );

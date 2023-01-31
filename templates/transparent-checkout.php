@@ -46,8 +46,8 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 		</p>
 		<div class="clear"></div>
 		<p id="pagseguro-card-expiry-field" class="form-row form-row-first <?php echo esc_attr( $class_card_loaded ); ?>">
-			<label for="pagseguro-card-expiry"><?php esc_html_e( 'Validade (MM/AAAA)', 'virtuaria-pagseguro' ); ?> <span class="required">*</span></label>
-			<input id="pagseguro-card-expiry" name="pagseguro_card_validate" class="input-text wc-credit-card-form-card-expiry" type="tel" autocomplete="off" placeholder="<?php esc_html_e( 'MM / AAAA', 'virtuaria-pagseguro' ); ?>" style="font-size: 1.5em; padding: 8px;"  value="<?php echo isset( $_POST['pagseguro_card_validate'] ) ? esc_html( $_POST['pagseguro_card_validate'] ) : ''; ?>"/>
+			<label for="pagseguro-card-expiry"><?php esc_html_e( 'Validade (MM / AAAA)', 'virtuaria-pagseguro' ); ?> <span class="required">*</span></label>
+			<input id="pagseguro-card-expiry" name="pagseguro_card_validate" class="input-text wc-credit-card-form-card-expiry" type="tel" autocomplete="off" placeholder="<?php esc_html_e( 'MM / AAAA', 'virtuaria-pagseguro' ); ?>" style="font-size: 1.5em; padding: 8px;"  value="<?php echo isset( $_POST['pagseguro_card_validate'] ) ? esc_html( $_POST['pagseguro_card_validate'] ) : ''; ?>" maxlength="9"/>
 		</p>
 		<p id="pagseguro-card-cvc-field" class="form-row form-row-last <?php echo esc_attr( $class_card_loaded ); ?>">
 			<label for="pagseguro-card-cvc"><?php esc_html_e( 'Código de segurança', 'virtuaria-pagseguro' ); ?> <span class="required">*</span></label>

@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway
 Requires at least: 4.7
 Tested up to: 6.0.1
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -255,3 +255,5 @@ Nenhuma atualização disponível
 * Valor mínimo e início dos juros por parcela.
 = 1.1.1 2022-09-08 =
 * Criptografia RSA para função crédito.
+= 1.1.2 2022-09-13 =
+* Máscara para data de validade do cartão.

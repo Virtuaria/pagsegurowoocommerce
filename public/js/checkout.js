@@ -23,6 +23,14 @@ jQuery(document).ready(function($){
 		}
 	});
 
+    $(document).on('keyup', "#pagseguro-card-expiry", function() {
+        var v=$(this).val().replace(/\D/g,"");
+     
+        v=v.replace(/(\d{2})(\d)/,"$1 / $2") ;
+     
+        $(this).val(v);
+    });
+
     $(document).on('click', '#place_order', function() {
         if ( encriptation && $('#credit-card').prop('checked') && ! $('#pagseguro-card-number-field').hasClass('card-loaded') ) {
             var expire = $('#pagseguro-card-expiry').val().split(' / ');
