@@ -81,6 +81,9 @@ Using the newest Order/Connect billing API made available by pagseguro, this plu
 * Identification on the invoice for payments via card (display on the invoice);
 * Automatic change of order status (approved, denied, cancelled, etc.) via Webhook to return status data in Pagseguro;
 * Detailing in the order notes of the operations that occurred during communication with PagSeguro (refunds, installments, changes in status and amounts received/charged).
+= Contribuição =
+
+Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request no [Github](https://github.com/Virtuaria/pagsegurowoocommerce).
 
 
 == Installation ==
@@ -119,10 +122,6 @@ Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
 * Upload plugin files to your plugins folder, or install using WordPress built-in Add New Plugin installer;
 * Activate the plugin;
 * Navigate to WooCommerce -> Settings -> Payment Gateways, choose PagSeguro and fill in your PagSeguro Email and click connect.
-
-= Contribuição =
-
-Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request no [Github](https://github.com/Virtuaria/pagsegurowoocommerce).
 
 == Frequently Asked Questions ==
 
