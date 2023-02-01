@@ -74,7 +74,29 @@ $class_card_loaded = $card_loaded ? 'card-loaded' : '';
 		</p>
 		<div class="clear"></div>
 		<p id="pagseguro-card-installments-field" class="form-row form-row-first">
-			<label for="pagseguro-card-installments"><?php esc_html_e( 'Parcelas', 'virtuaria-pagseguro' ); ?> <small>(<?php esc_html_e( 'mínimo de R$ 5,00', 'virtuaria-pagseguro' ); ?>)</small> <span class="required">*</span></label>
+			<label for="pagseguro-card-installments">
+				<?php
+				esc_html_e( 'Parcelas', 'virtuaria-pagseguro' );
+
+				if ( $min_installment ) :
+					?>
+					<small>(
+						<?php
+						echo esc_html(
+							sprintf(
+								/* translators: %s: amount */
+								__( 'mínima de R$ %s', 'virtuaria-pagseguro' ),
+								number_format( $min_installment, 2, ',', '.' )
+							)
+						);
+						?>
+						)
+					</small>
+					<?php
+				endif;
+				?>
+				<span class="required">*</span>
+			</label>
 			<select id="pagseguro-card-installments" name="pagseguro_installments" style="font-size: 1.5em; padding: 4px; width: 100%;">
 				<?php
 				foreach ( $installments as $index => $installment ) {
