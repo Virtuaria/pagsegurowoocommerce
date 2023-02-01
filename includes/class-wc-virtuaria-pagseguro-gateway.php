@@ -195,6 +195,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'description' => __( 'Controla a descrição exibida ao usuário durante o checkout.', 'virtuaria-pagseguro' ),
 				'default'     => __( 'Pague com PagSeguro.', 'virtuaria-pagseguro' ),
 			),
+			'comments'        => array(
+				'title'       => __( 'Observações', 'virtuaria-pagseguro' ),
+				'type'        => 'textarea',
+				'description' => __( 'Exibe suas observações logo abaixo da descrição na tela de finalização da compra.', 'virtuaria-pagseguro' ),
+				'default'     => __( 'Na área "Detalhes de Faturamento", recomendamos inserir os dados do titular do cartão. Caso a compra seja para outra pessoa, escolha "Entregar para um endereço diferente".', 'virtuaria-pagseguro' ),
+			),
 			'integration'     => array(
 				'title'       => __( 'Integração', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
@@ -817,6 +823,11 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$description = $this->get_description();
 		if ( $description ) {
 			echo wp_kses_post( wpautop( wptexturize( $description ) ) );
+		}
+
+		$comments = $this->get_option( 'comments' );
+		if ( $comments ) {
+			echo '<span class="pagseguro-info">' . wp_kses_post( $comments ) . '</span>';
 		}
 
 		$cart_total = $this->get_order_total();

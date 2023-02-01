@@ -278,3 +278,4 @@ Nenhuma atualização disponível
 * Melhorando exibição dos meios de pagamento do checkout.
 = 2.0.3 2023-02-01 =
 * Correção na exibição do valor mínimo da parcela.
+* Novo campo "Observações" para exibir informações extras abaixo da descrição do método de pagamento.

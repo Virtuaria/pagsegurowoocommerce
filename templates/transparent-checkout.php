@@ -18,9 +18,6 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 
 $class_card_loaded = $card_loaded ? 'card-loaded' : '';
 ?>
-<span class="pagseguro-info">
-	Na área "Detalhes de Faturamento", recomendamos inserir os dados do titular do cartão. Caso a compra seja para outra pessoa, escolha "Entregar para um endereço diferente".
-</span>
 <fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>" class="<?php echo esc_attr( $class_card_loaded ); ?>">
 	<ul id="pagseguro-payment-methods">
 		<?php
