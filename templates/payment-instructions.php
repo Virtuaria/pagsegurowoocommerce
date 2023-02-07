@@ -33,10 +33,9 @@ $is_android = ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 'com.virtuaria.sup
 		<?php
 	else :
 		?>
-		<a id="pix-code" href="#">
+		<div id="pix-code">
 			<span class="pix"><?php echo esc_html( $qr_code ); ?></span>
-			<span class="copy">Copiar</span>
-		</a>
+		</div>
 		<button class="copy-pix">Copiar código</button>
 		<div class="pix-copied" style="color:green;"></div>
 		<?php
@@ -45,7 +44,7 @@ $is_android = ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 'com.virtuaria.sup
 </div>
 <style>
 	.code-area {
-		margin-top: 20px;
+		margin: 20px 0;
 	}
 </style>
 <?php
@@ -85,9 +84,8 @@ if ( $order ) {
 			vertical-align: middle;
 		}
 		#pix-code .pix {
-			max-width: calc(100% - 100px);
-			margin-right: 30px;
 			word-break: break-all;
+			display: block;
 		}
 		#pix-code .copy {
 			font-size: 20px;
@@ -117,6 +115,7 @@ if ( $order ) {
 			margin-bottom: 10px;
 			margin-left: 30px;
 		}
+
 		@media only screen and (max-width: 479px) {
 			#pix-code .copy {
 				display: none;
@@ -144,11 +143,11 @@ if ( $is_android ) {
 	?>
 	<script>
 		jQuery(document).ready(function($) {
-		$('#pix-code').on('click', function(e) {
-			e.preventDefault();
-			navigator.clipboard.writeText($(this).find('.pix').html());
-			$('.pix-copied').html( 'Código copiado!' );
-		});
+		// $('#pix-code').on('click', function(e) {
+		// 	e.preventDefault();
+		// 	navigator.clipboard.writeText($(this).find('.pix').html());
+		// 	$('.pix-copied').html( 'Código copiado!' );
+		// });
 		$('.copy-pix').on('click', function(e) {
 			e.preventDefault();
 			navigator.clipboard.writeText($('#pix-code .pix').html());

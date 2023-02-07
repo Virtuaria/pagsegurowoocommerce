@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -45,8 +45,6 @@ Com este plugin, você poderá fazer reembolsos totais e parciais através da p�
 É disponibilizado ao lojista uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
 
 O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. Para realizar cobranças extras, é necessário que a função de armazenar dados do pagamento esteja ativa.
-
-[youtube https://www.youtube.com/watch?v=jNu_qX2Od5E]
 
 Uma novidade desta versão é o modo de processamento do pedido. Com ele a mudança de status do pedido pode ser realizada em background(Assíncrono), o que confere muito mais rapidez ao checkout.
 
@@ -279,3 +277,10 @@ Nenhuma atualização disponível
 = 2.0.3 2023-02-01 =
 * Correção na exibição do valor mínimo da parcela.
 * Novo campo "Observações" para exibir informações extras abaixo da descrição do método de pagamento.
+= 2.0.4 2023-02-07 =
+* Correção de problema de compatibilidade com php 8.2.
+* Compatibilidade com venda para pessoa jurídica(PJ).
+* Melhoria no espaçamento do e-mail com pedidos via Pix.
+* Campo Bairro (billing_neighborhood) obrigatório.
+* Melhoria visual na apresentação do QR code na página de agradecimento do pedido.
+* Melhorias visuais no checkout transparente.

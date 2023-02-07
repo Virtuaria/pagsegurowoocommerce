@@ -112,6 +112,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		add_action( 'admin_init', array( $this, 'save_store_token' ) );
 		add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_not_authorized' ) );
+
+		add_filter( 'woocommerce_billing_fields', array( $this, 'billing_neighborhood_required' ), 9999 );
 	}
 
 	/**
@@ -1006,9 +1008,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 * @param string   $qr_code the qr code.
 	 */
 	private function add_qrcode_in_note( $order, $qr_code ) {
-		remove_filter( 'woocommerce_new_order_note_data', '\\order\\limit_characters_order_note' );
-		$order->add_order_note( 'PagSeguro Pix Copia e Cola: <div class="pix">' . $qr_code . '</div><a href="#" id="copy-qr" class="button button-primary">Copiar</a>' );
-		add_filter( 'woocommerce_new_order_note_data', '\\order\\limit_characters_order_note' );
+		if ( function_exists( '\\order\\limit_characters_order_note' ) ) {
+			remove_filter( 'woocommerce_new_order_note_data', '\\order\\limit_characters_order_note' );
+			$order->add_order_note( 'PagSeguro Pix Copia e Cola: <div class="pix">' . $qr_code . '</div><a href="#" id="copy-qr" class="button button-primary">Copiar</a>' );
+			add_filter( 'woocommerce_new_order_note_data', '\\order\\limit_characters_order_note' );
+		} else {
+			$order->add_order_note( 'PagSeguro Pix Copia e Cola: <div class="pix">' . $qr_code . '</div><a href="#" id="copy-qr" class="button button-primary">Copiar</a>' );
+		}
 	}
 
 	/**
@@ -1306,5 +1312,17 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			</div>
 			<?php
 		}
+	}
+
+	/**
+	 * Required billing_neighborhood.
+	 *
+	 * @param array $fields the fields.
+	 */
+	public function billing_neighborhood_required( $fields ) {
+		if ( isset( $fields['billing_neighborhood']['required'] ) ) {
+			$fields['billing_neighborhood']['required'] = true;
+		}
+		return $fields;
 	}
 }

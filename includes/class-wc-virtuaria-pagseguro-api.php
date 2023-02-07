@@ -112,6 +112,14 @@ class WC_Virtuaria_PagSeguro_API {
 			unset( $data['body']['shipping']['address']['complement'] );
 		}
 
+		if ( ! $order->get_meta( '_billing_neighborhood' ) ) {
+			return array( 'error' => __( 'o campo <b>Bairro</b> é obrigatório!', 'virtuaria-pagseguro' ) );
+		}
+
+		if ( ! $order->get_meta( '_billing_cpf' ) || 2 == $order->get_meta( '_billing_persontype' ) ) {
+			$data['body']['customer']['tax_id'] = preg_replace( '/\D/', '', $order->get_meta( '_billing_cnpj' ) );
+		}
+
 		foreach ( $order->get_items() as $item ) {
 			$data['body']['items'][] = array(
 				'name'        => $item->get_name(),

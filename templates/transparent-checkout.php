@@ -131,7 +131,9 @@ $class_card_loaded = $card_loaded ? 'card-loaded' : '';
 					if ( $pagseguro_card_info['card_last'] ) {
 						echo wp_kses_post(
 							sprintf(
-								__( '<span class="card-brand"><i class="fa fa-credit-card-alt" aria-hidden="true"></i>%1$s</span><span class="number">**** **** **** %2$s</span><span class="holder">%3$s</span>', 'virtuaria-pagseguro' ),
+								/* translators: %s: card itens */
+								__( '<span class="card-brand"><img src="%1$s" alt="Cartão" /></i>%2$s</span><span class="number">**** **** **** %3$s</span><span class="holder">%4$s</span>', 'virtuaria-pagseguro' ),
+								esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/card.png',
 								ucwords( $pagseguro_card_info['card_brand'] ),
 								$pagseguro_card_info['card_last'],
 								$pagseguro_card_info['name']
@@ -144,7 +146,7 @@ $class_card_loaded = $card_loaded ? 'card-loaded' : '';
 			endif;
 			?>
 		</p>
-		<div class="clear"></div>
+		<div class="clear after-installments"></div>
 		<?php
 		if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) :
 			if ( $card_loaded ) :
