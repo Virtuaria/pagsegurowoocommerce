@@ -1320,7 +1320,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 * @param array $fields the fields.
 	 */
 	public function billing_neighborhood_required( $fields ) {
-		if ( isset( $fields['billing_neighborhood']['required'] ) ) {
+		if ( isset( $fields['billing_neighborhood'] ) ) {
 			$fields['billing_neighborhood']['required'] = true;
 		}
 		return $fields;
