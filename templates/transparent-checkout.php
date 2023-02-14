@@ -16,9 +16,28 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 	}
 }
 
-$class_card_loaded = $card_loaded ? 'card-loaded' : '';
+/**
+ * Get form class.
+ *
+ * @param boolean $card_loaded true if card is loaded.
+ * @param boolean $full_width  true if one column.
+ * @param string  $default default class.
+ */
+function pagseguro_form_class( $card_loaded, $full_width, $default ) {
+	$class = '';
+	if ( $card_loaded ) {
+		$class .= ' card-loaded';
+	}
+	if ( $full_width ) {
+		$class .= ' form-row-wide';
+	} else {
+		$class .= ' ' . $default;
+	}
+
+	return $class;
+}
 ?>
-<fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>" class="<?php echo esc_attr( $class_card_loaded ); ?>">
+<fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>" class="<?php echo $card_loaded ? 'card-loaded' : ''; ?>">
 	<ul id="pagseguro-payment-methods">
 		<?php
 		if ( $methods_enabled['credit'] ) :
@@ -52,25 +71,25 @@ $class_card_loaded = $card_loaded ? 'card-loaded' : '';
 	</ul>
 	<div class="clear"></div>	
 	<div id="pagseguro-credit-card-form" class="pagseguro-method-form">
-		<p id="pagseguro-card-holder-name-field" class="form-row form-row-first <?php echo esc_attr( $class_card_loaded ); ?>">
+		<p id="pagseguro-card-holder-name-field" class="form-row <?php echo esc_attr( pagseguro_form_class( $card_loaded, $full_width, 'form-row-first' ) ); ?>">
 			<label for="pagseguro-card-holder-name"><?php esc_html_e( 'Titular', 'virtuaria-pagseguro' ); ?> <small>(<?php esc_html_e( 'como no cartão', 'virtuaria-pagseguro' ); ?>)</small> <span class="required">*</span></label>
 			<input id="pagseguro-card-holder-name" name="pagseguro_card_holder_name" class="input-text" type="text" autocomplete="off" style="font-size: 1.5em; padding: 8px;" value="<?php echo isset( $_POST['pagseguro_holder_name'] ) ? esc_html( $_POST['pagseguro_holder_name'] ) : ''; ?>"/>
 		</p>
-		<p id="pagseguro-card-number-field" class="form-row form-row-last <?php echo esc_attr( $class_card_loaded ); ?>">
+		<p id="pagseguro-card-number-field" class="form-row <?php echo esc_attr( pagseguro_form_class( $card_loaded, $full_width, 'form-row-last' ) ); ?>">
 			<label for="pagseguro-card-number"><?php esc_html_e( 'Número do cartão', 'virtuaria-pagseguro' ); ?> <span class="required">*</span></label>
 			<input id="pagseguro-card-number" name="pagseguro_card_number" maxlength="16" class="input-text wc-credit-card-form-card-number" type="tel" maxlength="20" autocomplete="off" placeholder="&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull;" style="font-size: 1.5em; padding: 8px;"  value="<?php echo isset( $_POST['pagseguro_card_number'] ) ? esc_html( $_POST['pagseguro_card_number'] ) : ''; ?>"/>
 		</p>
 		<div class="clear"></div>
-		<p id="pagseguro-card-expiry-field" class="form-row form-row-first <?php echo esc_attr( $class_card_loaded ); ?>">
+		<p id="pagseguro-card-expiry-field" class="form-row <?php echo esc_attr( pagseguro_form_class( $card_loaded, $full_width, 'form-row-first' ) ); ?>">
 			<label for="pagseguro-card-expiry"><?php esc_html_e( 'Validade (MM / AAAA)', 'virtuaria-pagseguro' ); ?> <span class="required">*</span></label>
 			<input id="pagseguro-card-expiry" name="pagseguro_card_validate" class="input-text wc-credit-card-form-card-expiry" type="tel" autocomplete="off" placeholder="<?php esc_html_e( 'MM / AAAA', 'virtuaria-pagseguro' ); ?>" style="font-size: 1.5em; padding: 8px;"  value="<?php echo isset( $_POST['pagseguro_card_validate'] ) ? esc_html( $_POST['pagseguro_card_validate'] ) : ''; ?>" maxlength="9"/>
 		</p>
-		<p id="pagseguro-card-cvc-field" class="form-row form-row-last <?php echo esc_attr( $class_card_loaded ); ?>">
+		<p id="pagseguro-card-cvc-field" class="form-row <?php echo esc_attr( pagseguro_form_class( $card_loaded, $full_width, 'form-row-last' ) ); ?>">
 			<label for="pagseguro-card-cvc"><?php esc_html_e( 'Código de segurança', 'virtuaria-pagseguro' ); ?> <span class="required">*</span></label>
 			<input id="pagseguro-card-cvc" name="pagseguro_card_cvc" class="input-text wc-credit-card-form-card-cvc" type="tel" autocomplete="off" placeholder="<?php esc_html_e( 'CVV', 'virtuaria-pagseguro' ); ?>" style="font-size: 1.5em; padding: 8px;"  value="<?php echo isset( $_POST['pagseguro_card_cvc'] ) ? esc_html( $_POST['pagseguro_card_cvc'] ) : ''; ?>"/>
 		</p>
 		<div class="clear"></div>
-		<p id="pagseguro-card-installments-field" class="form-row form-row-first">
+		<p id="pagseguro-card-installments-field" class="form-row <?php echo $full_width ? 'form-row-wide' : 'form-row-first'; ?>">
 			<label for="pagseguro-card-installments">
 				<?php
 				esc_html_e( 'Parcelas', 'virtuaria-pagseguro' );

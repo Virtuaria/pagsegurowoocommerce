@@ -170,6 +170,15 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					array( 'pub_key' => $pub_key )
 				);
 			}
+
+			if ( 'one' === $this->get_option( 'display' ) ) {
+				wp_enqueue_style(
+					'checkout-fields',
+					VIRTUARIA_PAGSEGURO_URL . 'public/css/full-width.css',
+					'',
+					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/full-width.css' )
+				);
+			}
 		}
 	}
 
@@ -323,6 +332,16 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'do_not_store'     => __( 'Não memorizar (padrão)', 'woocommerce-pagseguro' ),
 					'customer_defines' => __( 'O cliente decide sobre o armazenamento', 'woocommerce-pagseguro' ),
 					'always_store'     => __( 'Sempre memorizar', 'woocommerce-pagseguro' ),
+				),
+			),
+			'display'         => array(
+				'title'       => __( 'Formulário de crédito', 'virtuaria-pagseguro' ),
+				'type'        => 'select',
+				'description' => __( 'Define como serão exibidos os campos do checkout.' ),
+				'default'     => 'two',
+				'options'     => array(
+					'one' => __( 'Uma coluna', 'virtuaria-pagseguro' ),
+					'two' => __( 'Duas colunas', 'virtuaria-pagseguro' ),
 				),
 			),
 			'ticket'          => array(
@@ -862,6 +881,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'ticket' => 'yes' === $this->ticket_enable,
 					'credit' => 'yes' === $this->credit_enable,
 				),
+				'full_width'      => 'one' === $this->get_option( 'display' ),
 			),
 			'woocommerce/pagseguro/',
 			Virtuaria_Pagseguro::get_templates_path()
@@ -1207,11 +1227,11 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				$auth .= '&scope=payments.read+payments.create+payments.refund+accounts.read&state=' . $origin;
 
 				if ( $token ) {
-					echo '<span><strong>Status:</strong> Conectado.</span>';
+					echo '<span class="connected"><strong>Status: <span class="status">Conectado.</span></strong></span>';
 					echo '<a href="' . esc_url( $this->app_revoke ) . '?state=' . $origin . '" class="auth button-primary">Desconectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectado.svg" alt="Desconectar" /></a>';
 					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
 				} else {
-					echo '<span><strong>Status:</strong> Desconectado.</span>';
+					echo '<span class="disconnected"><strong>Status: <span class="status">Desconectado.</span></strong></span>';
 					echo '<a href="' . esc_url( $auth ) . '" class="auth button-primary">Conectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectar.png" alt="Conectar" /></a>';
 					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
 				}
@@ -1221,14 +1241,23 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						display: inline-block;
 						vertical-align: middle;
 						max-width: 30px;
+						margin-left: 5px;
 					}
 					.forminp-auth .auth {
 						margin-left: 10px;
 						padding: 4px 10px;
+						box-shadow: none;
+					}
+					.wp-core-ui .auth.button-primary:hover {
+						box-shadow: none;
+						font-weight: normal;
 					}
 					.expire-info {
 						display: block;
 						margin-top: 5px;
+					}
+					.forminp-auth .connected .status{
+						color: green;
 					}
 				</style>
 			</td>

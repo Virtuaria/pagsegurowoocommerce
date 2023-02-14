@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.0.4
+Stable tag: 2.1.0
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -284,3 +284,6 @@ Nenhuma atualização disponível
 * Campo Bairro (billing_neighborhood) obrigatório.
 * Melhoria visual na apresentação do QR code na página de agradecimento do pedido.
 * Melhorias visuais no checkout transparente.
+= 2.1.0 2023-02-14 = 
+* Opção para configurar layout dos campos do checkout (crédito).
+* Melhoria no layout da configuração de autorização.

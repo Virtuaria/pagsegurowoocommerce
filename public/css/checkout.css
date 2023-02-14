@@ -258,6 +258,11 @@
     .card-loaded#pagseguro-payment #pagseguro-card-installments-field {
       max-width: 100%;
     }
+    .woocommerce-checkout .checkout #pagseguro-payment .form-row-first,
+    .woocommerce-checkout .checkout #pagseguro-payment .form-row-last {
+      width: 100%;
+      clear: both;
+    }
   }
   @media only screen and (max-width: 479px) {
     #pagseguro-load-card {
