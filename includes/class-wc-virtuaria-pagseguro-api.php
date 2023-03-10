@@ -190,11 +190,17 @@ class WC_Virtuaria_PagSeguro_API {
 					}
 				}
 			} else {
+				if ( ! $order->get_meta( '_billing_cpf' ) || 2 == $order->get_meta( '_billing_persontype' ) ) {
+					$tax_id = preg_replace( '/\D/', '', $order->get_meta( '_billing_cnpj' ) );
+				} else {
+					$tax_id = preg_replace( '/\D/', '', $order->get_meta( '_billing_cpf' ) );
+				}
+
 				$data['body']['charges'][0]['payment_method']['boleto'] = array(
 					'due_date' => wp_date( 'Y-m-d', strtotime( '+' . intval( $this->gateway->ticket_validate ) . ' day' ) ),
 					'holder'   => array(
 						'name'    => $order->get_formatted_billing_full_name(),
-						'tax_id'  => preg_replace( '/\D/', '', $order->get_meta( '_billing_cpf' ) ),
+						'tax_id'  => $tax_id,
 						'email'   => $order->get_billing_email(),
 						'address' => array(
 							'street'      => $order->get_billing_address_1(),
@@ -460,6 +466,25 @@ class WC_Virtuaria_PagSeguro_API {
 		} elseif ( 401 === $resp_code && isset( $response['error_messages'][0]['description'] )
 			&& 'Invalid credential. Review AUTHORIZATION header' === $response['error_messages'][0]['description'] ) {
 			update_option( 'virtuaria_pagseguro_not_authorized', true );
+		} elseif ( 404 === $resp_code && 'sandbox' !== $this->gateway->environment ) {
+			$request = wp_remote_post(
+				$this->endpoint . 'public-keys',
+				array(
+					'headers' => array(
+						'Authorization' => $this->gateway->token,
+						'Content-Type'  => 'application/json',
+					),
+					'body'    => '{	"type": "card" }',
+				)
+			);
+
+			if ( $this->debug_on ) {
+				$this->gateway->log->add(
+					$this->tag,
+					'Resposta do servidor ao tentar criar nova chave pública: ' . wp_json_encode( $request ),
+					WC_Log_Levels::INFO
+				);
+			}
 		}
 
 		return $response['public_key'];
@@ -475,24 +500,51 @@ class WC_Virtuaria_PagSeguro_API {
 	public function additional_charge( $order, $amount, $reason ) {
 		if ( $amount <= 0 ) {
 			if ( $this->debug_on ) {
-				$order->add_order_note( 'PagSeguro: Cobrança Adicional com valor inválido.', 0, true );
-				$this->gateway->log->add( $this->tag, 'Valor inválido ou pedido não encontrado para cobrança adicional.', WC_Log_Levels::ERROR );
+				$order->add_order_note(
+					'PagSeguro: Cobrança Adicional com valor inválido.',
+					0,
+					true
+				);
+				$this->gateway->log->add(
+					$this->tag,
+					'Valor inválido ou pedido não encontrado para cobrança adicional.',
+					WC_Log_Levels::ERROR
+				);
 			}
 			return;
 		}
 
-		$pagseguro_card_info = get_user_meta( $order->get_customer_id(), '_pagseguro_credit_info_store_' . get_current_blog_id(), true );
+		$mode                = $order->get_meta( '_payment_mode' );
+		$pagseguro_card_info = get_user_meta(
+			$order->get_customer_id(),
+			'_pagseguro_credit_info_store_' . get_current_blog_id(),
+			true
+		);
 
-		if ( ! $pagseguro_card_info || ! isset( $pagseguro_card_info['token'] ) ) {
+		if ( 'CREDIT_CARD' === $mode && ( ! $pagseguro_card_info || ! isset( $pagseguro_card_info['token'] ) ) ) {
 			if ( $this->debug_on ) {
-				$order->add_order_note( 'PagSeguro: Cobrança Adicional, método de pagamento do cliente ausente.', 0, true );
-				$this->gateway->log->add( $this->tag, 'Cobrança Adicional: método de pagamento do cliente ausente', WC_Log_Levels::ERROR );
+				$order->add_order_note(
+					'PagSeguro: Cobrança Adicional, método de pagamento do cliente ausente.',
+					0,
+					true
+				);
+				$this->gateway->log->add(
+					$this->tag,
+					'Cobrança Adicional: método de pagamento do cliente ausente',
+					WC_Log_Levels::ERROR
+				);
 			}
 			return;
 		}
 
 		$phone = $order->get_billing_phone();
 		$phone = explode( ' ', $phone );
+
+		if ( ! $order->get_meta( '_billing_cpf' ) || 2 == $order->get_meta( '_billing_persontype' ) ) {
+			$tax_id = preg_replace( '/\D/', '', $order->get_meta( '_billing_cnpj' ) );
+		} else {
+			$tax_id = preg_replace( '/\D/', '', $order->get_meta( '_billing_cpf' ) );
+		}
 
 		$data = array(
 			'headers' => array(
@@ -504,7 +556,7 @@ class WC_Virtuaria_PagSeguro_API {
 				'customer'          => array(
 					'name'   => $order->get_formatted_billing_full_name(),
 					'email'  => $order->get_billing_email(),
-					'tax_id' => preg_replace( '/\D/', '', $order->get_meta( '_billing_cpf' ) ),
+					'tax_id' => $tax_id,
 					'phone'  => array(
 						'country' => '55',
 						'area'    => preg_replace( '/\D/', '', $phone[0] ),
@@ -532,36 +584,58 @@ class WC_Virtuaria_PagSeguro_API {
 					),
 				),
 				'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
-				'charges'           => array(
-					array(
-						'reference_id'      => strval( $order->get_id() ),
-						'description'       => substr( get_bloginfo( 'name' ), 0, 63 ),
-						'amount'            => array(
-							'value'    => $amount,
-							'currency' => 'BRL',
-						),
-						'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
-						'payment_method'    => array(
-							'type'            => 'CREDIT_CARD',
-							'installments'    => 1,
-							'capture'         => true,
-							'soft_descriptor' => $this->soft_descriptor,
-							'card'            => array(
-								'id' => $pagseguro_card_info['token'],
-							),
-						),
-					),
-				),
 			),
 			'timeout' => self::TIMEOUT,
 		);
+
+		if ( 'PIX' === $mode ) {
+			$expiration = new DateTime(
+				wp_date(
+					'Y-m-d H:i:s',
+					strtotime( '+' . $this->gateway->pix_validate . ' seconds' )
+				),
+				new DateTimeZone( 'America/Sao_Paulo' )
+			);
+
+			$data['body']['qr_codes'][] = array(
+				'amount'          => array(
+					'value' => $amount,
+				),
+				'expiration_date' => $expiration->format( 'c' ),
+			);
+		} else {
+			$data['body']['charges'] = array(
+				array(
+					'reference_id'      => strval( $order->get_id() ),
+					'description'       => substr( get_bloginfo( 'name' ), 0, 63 ),
+					'amount'            => array(
+						'value'    => $amount,
+						'currency' => 'BRL',
+					),
+					'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
+					'payment_method'    => array(
+						'type'            => 'CREDIT_CARD',
+						'installments'    => 1,
+						'capture'         => true,
+						'soft_descriptor' => $this->gateway->soft_descriptor,
+						'card'            => array(
+							'id' => $pagseguro_card_info['token'],
+						),
+					),
+				),
+			);
+		}
 
 		if ( ! $order->get_billing_address_2() ) {
 			unset( $data['body']['shipping']['address']['complement'] );
 		}
 
 		if ( $this->debug_on ) {
-			$this->gateway->log->add( $this->tag, 'Enviando cobrança adicional: ' . wp_json_encode( $data ), WC_Log_Levels::INFO );
+			$this->gateway->log->add(
+				$this->tag,
+				'Enviando cobrança adicional: ' . wp_json_encode( $data ),
+				WC_Log_Levels::INFO
+			);
 		}
 		$data['body'] = wp_json_encode( $data['body'] );
 
@@ -578,7 +652,11 @@ class WC_Virtuaria_PagSeguro_API {
 					WC_Log_Levels::ERROR
 				);
 			}
-			$order->add_order_note( 'PagSeguro: Não foi possível criar cobrança adicional.', 0, true );
+			$order->add_order_note(
+				'PagSeguro: Não foi possível criar cobrança adicional.',
+				0,
+				true
+			);
 			return;
 		}
 
@@ -607,7 +685,10 @@ class WC_Virtuaria_PagSeguro_API {
 				}
 				$note_resp = $msg;
 			} else {
-				$note_resp = __( 'Não foi possível processar a sua cobrança. Por favor, tente novamente mais tarde.', 'virtuaria-pagseguro' );
+				$note_resp = __(
+					'Não foi possível processar a sua cobrança. Por favor, tente novamente mais tarde.',
+					'virtuaria-pagseguro'
+				);
 			}
 		}
 
@@ -619,29 +700,53 @@ class WC_Virtuaria_PagSeguro_API {
 		if ( $reason ) {
 			$reason = '<br>Motivo: ' . $reason . '.';
 		}
+
+		$charge_title = ( $amount / 100 ) == $order->get_total() ? 'Nova Cobrança' : 'Cobrança Extra';
 		$order->add_order_note(
-			'PagSeguro: Nova cobrança enviada R$' . number_format( $amount / 100, 2, ',', '.' ) . '.' . $reason,
+			'PagSeguro: ' . $charge_title . ' enviada R$' . number_format( $amount / 100, 2, ',', '.' ) . '.' . $reason,
 			0,
 			true
 		);
 
-		if ( 'PAID' === $response['charges'][0]['status'] ) {
-			$order->add_order_note(
-				sprintf(
-					/* translators: %s: amount value */
-					__( 'PagSeguro: Cobrança recebida R$ %s', 'virtuaria-pagseguro' ),
-					number_format( $response['charges'][0]['amount']['value'] / 100, 2, ',', '.' )
-				)
+		if ( 'PIX' !== $mode ) {
+			if ( 'DECLINED' === $response['charges'][0]['status'] ) {
+				$order->add_order_note(
+					sprintf(
+						/* translators: %s: payment response */
+						__( 'PagSeguro: Não autorizado, %s.', 'virtuaria-pagseguro' ),
+						$response['charges'][0]['payment_response']['message']
+					)
+				);
+			}
+			return 'PAID' === $response['charges'][0]['status'];
+		} elseif ( isset( $response['qr_codes'][0]['text'] ) ) {
+			update_post_meta(
+				$order->get_id(),
+				'_pagseguro_additional_order_id',
+				$response['id']
 			);
-		} elseif ( 'DECLINED' === $response['charges'][0]['status'] ) {
-			$order->add_order_note(
-				sprintf(
-					/* translators: %s: payment response */
-					__( 'PagSeguro: Não autorizado, %s.', 'virtuaria-pagseguro' ),
-					$response['charges'][0]['payment_response']['message']
-				)
+
+			update_post_meta(
+				$order->get_id(),
+				'_pagseguro_additional_qrcode',
+				$response['qr_codes'][0]['text']
 			);
+
+			update_post_meta(
+				$order->get_id(),
+				'_qrcode_additional_id',
+				$response['qr_codes'][0]['id']
+			);
+
+			update_post_meta(
+				$order->get_id(),
+				'_pagseguro_additional_qrcode_png',
+				$response['qr_codes'][0]['links'][0]['href']
+			);
+
+			return true;
 		}
+		return false;
 	}
 
 	/**

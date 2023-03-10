@@ -1,0 +1,4 @@
+.payment_box .card-loaded .pagseguro-method-form,
+.payment_box .pagseguro-method-form {
+    min-height: 125px;
+}

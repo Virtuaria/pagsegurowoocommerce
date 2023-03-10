@@ -179,6 +179,15 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/full-width.css' )
 				);
 			}
+
+			if ( 'yes' !== $this->credit_enable ) {
+				wp_enqueue_style(
+					'form-height',
+					VIRTUARIA_PAGSEGURO_URL . 'public/css/form-height.css',
+					'',
+					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/form-height.css' )
+				);
+			}
 		}
 	}
 
@@ -442,7 +451,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			if ( ! isset( $paid['error'] ) ) {
 				if ( $paid ) {
 					$charge_amount = get_post_meta( $order_id, '_charge_amount', true );
-					$order->add_order_note( 'PagSeguro: cobrança recebida R$' . number_format( $charge_amount / 100, 2, ',', '.' ) );
+					// $order->add_order_note( 'PagSeguro: cobrança recebida R$' . number_format( $charge_amount / 100, 2, ',', '.' ) );
 					if ( $this->tax && ( ( $charge_amount / 100 ) - $order->get_total() ) > 0 ) {
 						$fee = new WC_Order_Item_Fee();
 						$fee->set_name( __( 'Parcelamento pagseguro', 'virtuaria-pagseguro' ) );
@@ -491,6 +500,21 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						}
 					}
 				}
+
+				if ( 'PIX' === $order->get_meta( '_payment_mode' ) ) {
+					$order->set_payment_method_title(
+						$order->get_payment_method_title() . ' Pix'
+					);
+				} elseif ( 'CREDIT_CARD' === $order->get_meta( '_payment_mode' ) ) {
+					$order->set_payment_method_title(
+						$order->get_payment_method_title() . ' Crédito'
+					);
+				} else {
+					$order->set_payment_method_title(
+						$order->get_payment_method_title() . ' Boleto'
+					);
+				}
+				$order->save();
 
 				wc_reduce_stock_levels( $order_id );
 				// Remove cart.
@@ -549,7 +573,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			$order = wc_get_order( sanitize_text_field( wp_unslash( $request['reference_id'] ) ) );
 
 			$is_additional_charge = false;
-			if ( $order->get_transaction_id() !== $request['id'] ) {
+			if ( $order && $order->get_transaction_id() !== $request['id'] ) {
 				$is_additional_charge = true;
 			}
 
@@ -563,14 +587,27 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 				switch ( $request['charges'][0]['status'] ) {
 					case 'CANCELED':
-						if ( $is_additional_charge ) {
-							$order->add_order_note( __( 'PagSeguro: Cobrança adicional cancelada.', 'virtuaria-pagseguro' ) );
+						$old_webhook = get_post_meta( $order->get_id(), '_canceled_webhook', true );
+						if ( ! $is_additional_charge ) {
+							$old_webhook = get_post_meta( $order->get_id(), '_canceled_webhook', true );
 						} else {
-							$order->add_order_note( __( 'PagSeguro: Transação cancelada.', 'virtuaria-pagseguro' ) );
+							$old_webhook = get_post_meta( $order->get_id(), '_canceled_additional_webhook', true );
 						}
 
-						if ( ! $is_additional_charge && ! $order->has_status( 'refunded' ) ) {
-							$order->update_status( 'refunded' );
+						if ( ! $old_webhook || $body !== $old_webhook ) {
+							$order->add_order_note(
+								sprintf(
+									/* translators: %s: amount */
+									__( 'PagSeguro: R$ %s Devolvido(s).', 'virtuaria-pagseguro' ),
+									number_format( $request['charges'][0]['amount']['summary']['refunded'] / 100, 2, ',', '.' )
+								)
+							);
+
+							if ( ! $is_additional_charge ) {
+								update_post_meta( $order->get_id(), '_canceled_webhook', $body );
+							} else {
+								update_post_meta( $order->get_id(), '_canceled_additional_webhook', $body );
+							}
 						}
 						break;
 					case 'IN_ANALYSIS':
@@ -584,31 +621,50 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						break;
 					case 'PAID':
 						if ( 0 == $request['charges'][0]['amount']['summary']['refunded'] ) {
-							$order->add_order_note(
-								sprintf(
-									/* translators: %s: amount */
-									__( 'PagSeguro: Cobrança recebida R$ %s.', 'virtuaria-pagseguro' ),
-									// phpcs:ignore
-									number_format( (string) $request['charges'][0]['amount']['value'] / 100, 2, ',', '.' )
-								)
-							);
-
-							if ( ! $order->has_status( 'processing' ) ) {
-								$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+							if ( ! $is_additional_charge ) {
+								$old_webhook = get_post_meta( $order->get_id(), '_paid_webhook', true );
+							} else {
+								$old_webhook = get_post_meta( $order->get_id(), '_paid_additional_charge_webhook', true );
 							}
 
-							if ( $is_additional_charge ) {
-								$adittionals = get_post_meta( $order->get_id(), '_additionals_charge_id', true );
-								if ( ! $adittionals ) {
-									$adittionals = array();
+							if ( ! $old_webhook || $body !== $old_webhook ) {
+								$order->add_order_note(
+									sprintf(
+										/* translators: %s: amount */
+										__( 'PagSeguro: Cobrança recebida R$ %s.', 'virtuaria-pagseguro' ),
+										// phpcs:ignore
+										number_format( (string) $request['charges'][0]['amount']['value'] / 100, 2, ',', '.' )
+									)
+								);
+
+								if ( ! $order->has_status( 'processing' ) ) {
+									$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 								}
-								$adittionals[] = $request['charges'][0]['id'];
-								update_post_meta( $order->get_id(), '_additionals_charge_id', $adittionals );
+
+								if ( $is_additional_charge ) {
+									$adittionals = get_post_meta( $order->get_id(), '_additionals_charge_id', true );
+									if ( ! $adittionals ) {
+										$adittionals = array();
+									}
+									$adittionals[] = $request['charges'][0]['id'];
+									update_post_meta( $order->get_id(), '_additionals_charge_id', $adittionals );
+								}
+
+								if ( ! get_post_meta( $order->get_id(), '_charge_id', true ) ) {
+									update_post_meta( $order->get_id(), '_charge_id', $request['charges'][0]['id'] );
+								}
+
+								if ( ! $is_additional_charge ) {
+									update_post_meta( $order->get_id(), '_paid_webhook', $body );
+								} else {
+									update_post_meta( $order->get_id(), '_paid_additional_charge_webhook', $body );
+								}
 							}
 						}
 						break;
 				}
 			}
+			header( 'HTTP/1.1 200 OK' );
 			return;
 		} elseif ( 'transaction' === $request['notificationType'] && isset( $request['notificationCode'] ) ) {
 			$this->log->add( $this->id, 'IPN valid', WC_Log_Levels::INFO );
@@ -825,7 +881,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function process_refund( $order_id, $amount = null, $reason = '' ) {
 		$order = wc_get_order( $order_id );
 
-		if ( $amount && 'processing' === $order->get_status() ) {
+		if ( $amount && 'processing' === $order->get_status() && 'BOLETO' !== $order->get_meta( '_payment_mode' ) ) {
 			if ( $this->api->refund_order( $order_id, $amount ) ) {
 				$order->add_order_note( 'PagSeguro: Reembolso de R$' . $amount . ' bem sucedido.', 0, true );
 				return true;
@@ -947,16 +1003,20 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$credit  = get_user_meta( $order->get_customer_id(), '_pagseguro_credit_info_store_' . get_current_blog_id(), true );
 
 		if ( ! $order
-			|| 'processing' !== $order->get_status()
+			|| 'BOLETO' === $order->get_meta( '_payment_mode' )
+			|| ( 'CREDIT_CARD' === $order->get_meta( '_payment_mode' ) && 'processing' !== $order->get_status() )
+			|| ( 'PIX' === $order->get_meta( '_payment_mode' ) && ! in_array( $order->get_status(), array( 'on-hold', 'processing' ), true ) )
 			|| 'virt_pagseguro' !== $order->get_payment_method()
 			|| 'yes' !== $options['enabled']
-			|| ! $credit['token'] ) {
+			|| ( ! $credit['token'] && 'PIX' !== $order->get_meta( '_payment_mode' ) ) ) {
 			return;
 		}
 
+		$title = 'processing' === $order->get_status()
+			? __( 'Cobrança Adicional', 'virtuaria-pagseguro' ) : __( 'Nova Cobrança', 'virtuaria-pagseguro' );
 		add_meta_box(
 			'pagseguro-additional-charge',
-			__( 'Cobrança Adicional', 'woocommerce-pagseguro' ),
+			$title,
 			array( $this, 'display_additional_charge_content' ),
 			'shop_order',
 			'side',
@@ -1013,11 +1073,63 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				''
 			);
 
-			$this->api->additional_charge(
+			$resp = $this->api->additional_charge(
 				$order,
 				$amount * 100,
 				isset( $_POST['credit_charge_reason'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_charge_reason'] ) ) : ''
 			);
+
+			if ( 'PIX' === $order->get_meta( '_payment_mode' ) && $resp ) {
+				$qr_code     = get_post_meta( $order_id, '_pagseguro_additional_qrcode', true );
+				$qr_code_png = get_post_meta( $order_id, '_pagseguro_additional_qrcode_png', true );
+
+				if ( $qr_code && $qr_code_png ) {
+					$this->add_qrcode_in_note( $order, $qr_code );
+					$validate     = $this->format_pix_validate( $this->pix_validate );
+					$charge_title = $amount == $order->get_total() ? 'Nova Cobrança' : 'Cobrança Extra';
+					ob_start();
+					echo '<p>Olá, ' . esc_html( $order->get_billing_first_name() ) . '.</p>';
+					echo '<p><strong>Uma ' . esc_html( mb_strtolower( $charge_title ) ) . ' está disponível para seu pedido.</strong></p>';
+					remove_action(
+						'woocommerce_email_after_order_table',
+						array( $this, 'email_instructions' ),
+						10,
+						3
+					);
+					wc_get_template(
+						'emails/email-order-details.php',
+						array(
+							'order'         => $order,
+							'sent_to_admin' => false,
+							'plain_text'    => false,
+							'email'         => '',
+						)
+					);
+					add_action(
+						'woocommerce_email_after_order_table',
+						array( $this, 'email_instructions' ),
+						10,
+						3
+					);
+					if ( $amount != $order->get_total() ) {
+						echo '<p style="color:green"><strong style="display:block;">Valor da Cobrança Extra: R$ '
+						. number_format( $amount, 2, ',', '.' ) . '.</strong>';
+					}
+					if ( isset( $_POST['charge_reason'] ) && ! empty( $_POST['charge_reason'] ) ) {
+						$reason = 'Motivo: ' . esc_html( sanitize_text_field( wp_unslash( $_POST['charge_reason'] ) ) ) . '.';
+					}
+					echo wp_kses_post( $reason ) . '</p>';
+					require_once plugin_dir_path( __FILE__ ) . '../templates/payment-instructions.php';
+					$message = ob_get_clean();
+
+					$this->send_email(
+						$order->get_billing_email(),
+						'[' . get_bloginfo( 'name' ) . '] ' . $charge_title . ' PIX no Pedido #' . $order_id,
+						'Novo Código de Pagamento Disponível para seu Pedido ',
+						$message
+					);
+				}
+			}
 		}
 	}
 

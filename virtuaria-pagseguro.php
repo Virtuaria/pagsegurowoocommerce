@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: Virtuaria - Pagseguro para Woocommerce
+ * Plugin Name: Virtuaria - Pagseguro Crédito, Pix e Boleto
  * Plugin URI: https://virtuaria.com.br/virtuaria-pagseguro-plugin/
  * Description: Adiciona o método de pagamento PagSeguro a sua loja virtual.
  * Author: Virtuaria
  * Author URI: https://virtuaria.com.br/
- * Version: 2.1.0
+ * Version: 2.2.0
  * License: GPLv2 or later
  *
  * @package virtuaria
@@ -94,6 +94,10 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 			require_once 'includes/class-wc-virtuaria-pagseguro-gateway.php';
 			require_once 'includes/class-wc-virtuaria-pagseguro-api.php';
 
+			if ( ! function_exists( 'get_plugin_data' )
+				&& file_exists( ABSPATH . '/wp-admin/includes/plugin.php' ) ) {
+				require_once ABSPATH . '/wp-admin/includes/plugin.php';
+			}
 			$plugin_data = get_plugin_data( __FILE__ );
 			require_once 'includes/integrity-check.php';
 		}

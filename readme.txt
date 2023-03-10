@@ -1,9 +1,9 @@
-=== Virtuaria - Pagseguro para Woocommerce ===
+=== Virtuaria - Pagseguro Crédito, Pix e Boleto ===
 Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -12,24 +12,23 @@ Adiciona o PagSeguro como método de pagamento para o Woocommerce.
 
 == Description ==
 
-Utilizando a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, este plugin permite que sua loja aceite pagamentos no cartão de crédito, além de boleto bancário e Pix.
+Fácil de instalar e configurar, permite cobrança e reembolso total / parcial no crédito e Pix, além da realização de cobranças extras e emissão de boletos. Também permite armazenar método de pagamento para agilizar compras recorrentes. 
 
-**Atenção:** Esta atualização necessita de uma nova autenticação junto ao PagSeguro. O processo está muito mais simples. Favor consultar a aba "Instalação" logo acima para mais detalhes.
-
-* Fácil de instalar e configurar;
 * Suporte a Crédito, Pix e Boleto Bancário;
 * Opção de parcelamento com ou sem juros (configurável no plugin);
-* Boleto com prazo de validade configurável;
-* Link de segunda via do boleto na tela de confirmação e no e-mail com os detalhes do pedido;
 * Disparo de cobrança extra;
 * Reembolso (total e parcial);
 * Modo de processamento (síncrono ou assíncrono) do checkout;
 * Opção do cliente salvar método de pagamento (sem armazenar o número do cartão do cliente);
+* Boleto com prazo de validade configurável;
+* Link de segunda via do boleto na tela de confirmação e no e-mail com os detalhes do pedido;
 * Checkout Transparente (permite fazer o pagamento sem sair do site);
 * Relatório (log) para consulta a detalhes de transações, incluindo erros;
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no PagSeguro;
 * Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados).
+
+[youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
 
 ### Pix ###
 * Confirmação automática do pagamento, semelhante a cartão de crédito; 
@@ -37,48 +36,38 @@ Utilizando a API mais moderna Order/Connect de cobrança disponibilizada pelo pa
 * Reembolso total e parcial;
 * Tempo limite para pagamento configurável;
 * “Nova Cobrança Pix”, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
-* Pagamento por QR code ou link de pagamento;
+* Pagamento por QR Code ou link Copia e Cola;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido.
 
-Com este plugin, você poderá fazer reembolsos totais e parciais através da página de gerenciamento do pedido em sua loja. 
+### Ativação ###
+Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
 
+### Salvar Método de Pagamento ###
 É disponibilizado ao lojista uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
 
+### Cobrança Extra ###
 O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. Para realizar cobranças extras, é necessário que a função de armazenar dados do pagamento esteja ativa.
 
+### Processamento Assíncrono ###
 Uma novidade desta versão é o modo de processamento do pedido. Com ele a mudança de status do pedido pode ser realizada em background(Assíncrono), o que confere muito mais rapidez ao checkout.
 
-Observação: [PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0 ) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
+### Observações: ###
+[PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0 ) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
  
 Todas as compras são processadas utilizando o checkout transparente:
 - **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
 
-**Observação:** Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde, mas o plugin é 100% compatível com o painel padrão do Wordpress.
+Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde, mas o plugin é 100% compatível com o painel padrão do Wordpress.
 
 **Para mais informações, acesse** [virtuaria.com.br - desenvolvimento de plugins, criação e hospedagem de lojas virtuais](https://virtuaria.com.br/) ou envie um email para tecnologia@virtuaria.com.br
+
+Em caso de atualização a partir da versão 1.x, é necessária uma nova autenticação junto ao PagSeguro. O processo está muito mais simples. Favor consultar a aba "Instalação" logo acima para mais detalhes.
 
 = Compatibilidade =
 
 Este plugin necessita do [WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/) para funcionar corretamente.
 Compatível com Woocommerce 5.8.0 ou superior
 
-### Descrição em Inglês: ###
-
-Using the newest Order/Connect billing API made available by pagseguro, this plugin has high performance to process your payment and streamline your sales.
-
-* Easy to install and configure;
-* Credit support, Pix and bank slip;
-* Installment option with or without interest (configurable in the plugin);
-* Billet with configurable expiry date;
-* Link to a copy of the bank slip on the confirmation screen and in the e-mail with the order details;
-* Extra charge;
-* Reimbursement (total and partial);
-* Customer option to save payment method (without storing customer card number);
-* Transparent Checkout, where you make the payment without leaving the site;
-* Report (log) to consult transaction details, including errors;
-* Identification on the invoice for payments via card (display on the invoice);
-* Automatic change of order status (approved, denied, cancelled, etc.) via Webhook to return status data in Pagseguro;
-* Detailing in the order notes of the operations that occurred during communication with PagSeguro (refunds, installments, changes in status and amounts received/charged).
 = Contribuição =
 
 Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request no [Github](https://github.com/Virtuaria/pagsegurowoocommerce).
@@ -90,7 +79,8 @@ Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request
 
 * Envie os arquivos do plugin para a pasta wp-content/plugins, ou instale usando o instalador de plugins do WordPress.
 * Ative o plugin.
-* Navegue para Woocommerce -> Configurações -> Pagamentos, escolha o “Pagseguro” e defina o E-mail da conta pagseguro e clique em conectar.
+* Navegue para Woocommerce -> Configurações -> Pagamentos, escolha o “Pagseguro”,escolha o ambiente (produção ou sandbox), preencha o email da sua conta no PagSeguro e clique em salvar;
+* Clique em conectar.
 * Conceda as permissões.
 
 Pronto, o plugin está pronto para uso.
@@ -102,7 +92,7 @@ Pronto, o plugin está pronto para uso.
 
 = Configurações no PagSeguro: =
 
-Atenção: Para vendas com Pix, é preciso cadastrar uma chave na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
+Atenção: Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
 **Apenas com isso já é possível receber os pagamentos e fazer o retorno automático de dados.**
 
@@ -114,12 +104,6 @@ Atenção: Para vendas com Pix, é preciso cadastrar uma chave na conta do vende
 2 - Adicione o seu e-mail e clique em conectar para conceder permissões ao plugin.
 
 Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
-
-### Instalação e configuração em Inglês: ###
-
-* Upload plugin files to your plugins folder, or install using WordPress built-in Add New Plugin installer;
-* Activate the plugin;
-* Navigate to WooCommerce -> Settings -> Payment Gateways, choose PagSeguro and fill in your PagSeguro Email and click connect.
 
 == Frequently Asked Questions ==
 
@@ -216,6 +200,7 @@ Crédito  |  Mastercard        | 0,20          | 5,00
 Crédito  |  American Express  | 0,20          | 5,00
 Crédito  |  Demais bandeiras  | 0,20          | 5,00
 Boleto   |  –                 | 0,20          | –
+Pix      |  –                 | 1,00          | –           
 
 ### FAQ em Inglês: ###
 
@@ -287,3 +272,10 @@ Nenhuma atualização disponível
 = 2.1.0 2023-02-14 = 
 * Opção para configurar layout dos campos do checkout (crédito).
 * Melhoria no layout da configuração de autorização.
+= 2.2.0 2023-03-10 =
+* Reconhecimento de bandeira de cartão de crédito e exibição de ícone no checkout.
+* Ajuste na altura do checkout quando o crédito não está ativo.
+* Ao sair do campo “Validade”, no checkout, converter data de expiração de MM/AA para MM/AAAA.
+* Nova cobrança Pix - reembolso para primeiro pagamento efetivado e ajuste para prevenir cancelamento do pedido quando a cobrança adicional tiver sido paga.
+* Identificação da forma de pagamento na lista de pedidos.
+* Melhorias no recebimento de webhooks e notas do histórico do pedido.
