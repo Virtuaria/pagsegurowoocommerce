@@ -12,7 +12,7 @@ $is_android = ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 'com.virtuaria.sup
 <h3 class="validate-warning" style="color: green;">Pague com PIX. O código de pagamento tem validade de <?php echo esc_html( $validate ); ?>.</h3>
 
 <strong style="display: block; margin-top: 10px;">
-	Escanei este código para pagar
+	Escaneie este código para pagar
 </strong>
 <ol class="scan-instructions">
 	<li>Acesse seu internet Banking ou app de pagamentos</li>

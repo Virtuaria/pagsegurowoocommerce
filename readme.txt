@@ -1,9 +1,9 @@
-=== Virtuaria - Pagseguro Crédito, Pix e Boleto ===
+=== Virtuaria - PagSeguro Crédito, Pix e Boleto ===
 Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -12,7 +12,7 @@ Adiciona o PagSeguro como método de pagamento para o Woocommerce.
 
 == Description ==
 
-Fácil de instalar e configurar, permite cobrança e reembolso total / parcial no crédito e Pix, além da realização de cobranças extras e emissão de boletos. Também permite armazenar método de pagamento para agilizar compras recorrentes. 
+Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
 
 * Suporte a Crédito, Pix e Boleto Bancário;
 * Opção de parcelamento com ou sem juros (configurável no plugin);
@@ -26,7 +26,7 @@ Fácil de instalar e configurar, permite cobrança e reembolso total / parcial n
 * Relatório (log) para consulta a detalhes de transações, incluindo erros;
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no PagSeguro;
-* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados).
+* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
 
 [youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
 
@@ -37,7 +37,8 @@ Fácil de instalar e configurar, permite cobrança e reembolso total / parcial n
 * Tempo limite para pagamento configurável;
 * “Nova Cobrança Pix”, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
 * Pagamento por QR Code ou link Copia e Cola;
-* Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido.
+* Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
+* Desconto configurável para percentual do carrinho.
 
 ### Ativação ###
 Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
@@ -279,3 +280,6 @@ Nenhuma atualização disponível
 * Nova cobrança Pix - reembolso para primeiro pagamento efetivado e ajuste para prevenir cancelamento do pedido quando a cobrança adicional tiver sido paga.
 * Identificação da forma de pagamento na lista de pedidos.
 * Melhorias no recebimento de webhooks e notas do histórico do pedido.
+= 2.2.1 2023-03-21 =
+* Desconto em pagamentos com Pix.
+* Aviso sobre ausência do módulo Brazilian Market on WooCommerce.

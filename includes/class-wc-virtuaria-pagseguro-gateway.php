@@ -62,6 +62,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->credit_enable   = $this->get_option( 'credit_enable' );
 		$this->process_mode    = $this->get_option( 'process_mode' );
 		$this->debug           = $this->get_option( 'debug' );
+		$this->pix_discount    = $this->get_option( 'pix_discount' );
 
 		// Active logs.
 		if ( 'yes' === $this->debug ) {
@@ -168,6 +169,17 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'pagseguro-virt',
 					'encriptation',
 					array( 'pub_key' => $pub_key )
+				);
+			}
+
+			if ( $this->pix_discount > 0 ) {
+				wp_localize_script(
+					'pagseguro-virt',
+					'pix_discount',
+					array(
+						'discount' => '<span class="pix-discount">(desconto de <b>' . str_replace( '.', ',', $this->pix_discount ) . '%</b> no Pix)</span>',
+						'title'    => $this->title,
+					)
 				);
 			}
 
@@ -397,6 +409,15 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => '1800',
 			),
+			'pix_discount'    => array(
+				'title'             => __( 'Desconto (%)', 'virtuaria-pagseguro' ),
+				'type'              => 'number',
+				'description'       => __( 'Define um percentual de desconto para aplicar sob o total da venda com pix', 'virtuaria-pagseguro' ),
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => '0.01',
+				),
+			),
 
 		);
 
@@ -487,6 +508,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 							);
 						}
 					}
+
 					if ( 'async' !== $this->process_mode ) {
 						$order->update_status( 'on-hold', __( 'PagSeguro: Aguardando confirmação de pagamento.', 'virtuaria-pagseguro' ) );
 					} else {
@@ -498,6 +520,21 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 								$args
 							);
 						}
+					}
+
+					if ( 'PIX' === $order->get_meta( '_payment_mode' ) && floatval( $this->pix_discount ) > 0 ) {
+						$fee = new WC_Order_Item_Fee();
+						$fee->set_name(
+							__(
+								'Desconto do Pix',
+								'virtuaria-pagseguro'
+							)
+						);
+						$fee->set_total( - $order->get_total() * ( floatval( $this->pix_discount ) / 100 ) );
+
+						$order->add_item( $fee );
+						$order->calculate_totals();
+						$order->save();
 					}
 				}
 
@@ -938,6 +975,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'credit' => 'yes' === $this->credit_enable,
 				),
 				'full_width'      => 'one' === $this->get_option( 'display' ),
+				'pix_discount'    => $this->pix_discount ? $this->pix_discount / 100 : 0,
 			),
 			'woocommerce/pagseguro/',
 			Virtuaria_Pagseguro::get_templates_path()
@@ -1467,3 +1505,4 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		return $fields;
 	}
 }
+

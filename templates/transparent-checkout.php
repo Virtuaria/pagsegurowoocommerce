@@ -203,21 +203,24 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 		<input type="hidden" name="pagseguro_encrypted_card" id="pagseguro_encrypted_card" />
 	</div>
 	<div id="pagseguro-banking-pix-form" class="pagseguro-method-form">
-		<p>
-			<i id="pagseguro-icon-pix"></i>
-			<?php esc_html_e( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ); ?>
-		</p>
-		<p>
+		<i id="pagseguro-icon-pix"></i>
+		<div class="pix-desc">
 			<?php
-			echo esc_html(
+			echo '<span>' . esc_html( __( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ) ) . '</span>';
+			echo '<span>' . esc_html(
 				sprintf(
 					/* translators: %s: pix validate */
 					__( 'Pague com PIX. O código de pagamento tem validade de %s.', 'virtuaria-pagseguro' ),
 					$pix_validate
 				)
-			);
+			) . '</span>';
+
+			if ( $pix_discount && $pix_discount > 0 ) {
+				$discount = $cart_total * $pix_discount;
+				echo '<span>Total de desconto: <b style="color:green">R$ ' . esc_html( number_format( $discount, 2, ',', '.' ) ) . '</b>.</span>';
+			}
 			?>
-		</p>
+		</div>
 		<div class="clear"></div>
 	</div>
 	<div id="pagseguro-banking-ticket-form" class="pagseguro-method-form">

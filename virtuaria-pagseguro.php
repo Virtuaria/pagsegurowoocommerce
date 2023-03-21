@@ -5,7 +5,7 @@
  * Description: Adiciona o método de pagamento PagSeguro a sua loja virtual.
  * Author: Virtuaria
  * Author URI: https://virtuaria.com.br/
- * Version: 2.2.0
+ * Version: 2.2.1
  * License: GPLv2 or later
  *
  * @package virtuaria
@@ -52,6 +52,11 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 				return;
 			}
 
+			if ( ! class_exists( 'Extra_Checkout_Fields_For_Brazil' ) ) {
+				add_action( 'admin_notices', array( $this, 'missing_extra_checkout_fields' ) );
+				return;
+			}
+
 			add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 			if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$this->load_dependecys();
@@ -71,7 +76,7 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		public function missing_dependency() {
 			?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php esc_attr_e( 'Virtuaria Pagseguro need Woocommerce 4.0+ to work!', 'virtuaria-pagseguro' ); ?></p>
+				<p><?php esc_attr_e( 'Virtuaria PagSeguro precisa do Woocommerce 4.0+ para funcionar!', 'virtuaria-pagseguro' ); ?></p>
 			</div>
 			<?php
 		}
@@ -82,7 +87,7 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		public function conflict_module() {
 			?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php esc_attr_e( 'Virtuaria Pagseguro não pode ser usado ao mesmo tempo que "Claudio Sanches - PagSeguro for WooCommerce"', 'virtuaria-pagseguro' ); ?></p>
+				<p><?php esc_attr_e( 'Virtuaria PagSeguro não pode ser usado ao mesmo tempo que "Claudio Sanches - PagSeguro for WooCommerce"', 'virtuaria-pagseguro' ); ?></p>
 			</div>
 			<?php
 		}
@@ -172,6 +177,31 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 
 			return plugin_dir_path( __FILE__ ) . '/includes/endpoint-homolog.php';
 		}
+
+		/**
+		 * Display warning about missing dependency.
+		 */
+		public function missing_extra_checkout_fields() {
+			?>
+			<div class="notice notice-error is-dismissible">
+				<p>
+					<?php
+					echo wp_kses_post(
+						sprintf(
+							/* translators %s: plugin link */
+							__(
+								'Virtuaria PagSeguro precisa do plugin Brazilian Market on WooCommerce 3.7 ou superior para funcionar! O plugin pode ser obtido clicando <a href="%s" target="_blank">aqui</a>.',
+								'virtuaria-pagseguro'
+							),
+							'https://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/'
+						)
+					);
+					?>
+				</p>
+			</div>
+			<?php
+		}
+
 	}
 
 	add_action( 'plugins_loaded', array( 'Virtuaria_Pagseguro', 'get_instance' ) );
