@@ -78,7 +78,7 @@ class WC_Virtuaria_PagSeguro_API {
 				'Content-Type'  => 'application/json',
 			),
 			'body'    => array(
-				'reference_id'      => strval( $order->get_id() ),
+				'reference_id'      => $this->gateway->invoice_prefix . strval( $order->get_id() ),
 				'customer'          => array(
 					'name'   => $order->get_formatted_billing_full_name(),
 					'email'  => $order->get_billing_email(),
@@ -137,6 +137,10 @@ class WC_Virtuaria_PagSeguro_API {
 				new DateTimeZone( 'America/Sao_Paulo' )
 			);
 
+			if ( floatval( $this->gateway->pix_discount ) > 0 ) {
+				$total -= $total * ( floatval( $this->gateway->pix_discount ) / 100 );
+			}
+
 			$data['body']['qr_codes'][] = array(
 				'amount'          => array(
 					'value' => $total,
@@ -145,7 +149,7 @@ class WC_Virtuaria_PagSeguro_API {
 			);
 		} else {
 			$data['body']['charges'][] = array(
-				'reference_id'      => strval( $order->get_id() ),
+				'reference_id'      => $this->gateway->invoice_prefix . strval( $order->get_id() ),
 				'description'       => substr( get_bloginfo( 'name' ), 0, 63 ),
 				'amount'            => array(
 					'value'    => intval( $total ),
@@ -355,6 +359,21 @@ class WC_Virtuaria_PagSeguro_API {
 			);
 
 			$order->set_transaction_id( $response['id'] );
+
+			if ( floatval( $this->gateway->pix_discount ) > 0 ) {
+				$fee = new WC_Order_Item_Fee();
+				$fee->set_name(
+					__(
+						'Desconto do Pix',
+						'virtuaria-pagseguro'
+					)
+				);
+				$fee->set_total( - $order->get_total() * ( floatval( $this->gateway->pix_discount ) / 100 ) );
+
+				$order->add_item( $fee );
+				$order->calculate_totals();
+			}
+
 			$order->save();
 		}
 		return false;
@@ -552,7 +571,7 @@ class WC_Virtuaria_PagSeguro_API {
 				'Content-Type'  => 'application/json',
 			),
 			'body'    => array(
-				'reference_id'      => strval( $order->get_id() ),
+				'reference_id'      => $this->gateway->invoice_prefix . strval( $order->get_id() ),
 				'customer'          => array(
 					'name'   => $order->get_formatted_billing_full_name(),
 					'email'  => $order->get_billing_email(),
@@ -606,7 +625,7 @@ class WC_Virtuaria_PagSeguro_API {
 		} else {
 			$data['body']['charges'] = array(
 				array(
-					'reference_id'      => strval( $order->get_id() ),
+					'reference_id'      => $this->gateway->invoice_prefix . strval( $order->get_id() ),
 					'description'       => substr( get_bloginfo( 'name' ), 0, 63 ),
 					'amount'            => array(
 						'value'    => $amount,

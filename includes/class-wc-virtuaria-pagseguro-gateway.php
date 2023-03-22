@@ -63,6 +63,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->process_mode    = $this->get_option( 'process_mode' );
 		$this->debug           = $this->get_option( 'debug' );
 		$this->pix_discount    = $this->get_option( 'pix_discount' );
+		$this->invoice_prefix  = $this->get_option( 'invoice_prefix', 'WC-' );
 
 		// Active logs.
 		if ( 'yes' === $this->debug ) {
@@ -269,6 +270,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'async' => __( 'Assíncrono', 'virtuaria-pagseguro' ),
 				),
 				'default'     => 'sync',
+			),
+			'invoice_prefix'  => array(
+				'title'       => __( 'Prefixo da transação', 'virtuaria-pagseguro' ),
+				'type'        => 'text',
+				'description' => __( 'Defina se você usa sua conta do PagSeguro para várias lojas, certifique-se de que esse prefixo seja único, pois o PagSeguro não permitirá pedidos com o mesmo número de fatura.', 'virtuaria-pagseguro' ),
+				'default'     => 'WC-',
 			),
 			'credit'          => array(
 				'title'       => __( 'Cartão de crédito', 'virtuaria-pagseguro' ),
@@ -521,21 +528,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 							);
 						}
 					}
-
-					if ( 'PIX' === $order->get_meta( '_payment_mode' ) && floatval( $this->pix_discount ) > 0 ) {
-						$fee = new WC_Order_Item_Fee();
-						$fee->set_name(
-							__(
-								'Desconto do Pix',
-								'virtuaria-pagseguro'
-							)
-						);
-						$fee->set_total( - $order->get_total() * ( floatval( $this->pix_discount ) / 100 ) );
-
-						$order->add_item( $fee );
-						$order->calculate_totals();
-						$order->save();
-					}
 				}
 
 				if ( 'PIX' === $order->get_meta( '_payment_mode' ) ) {
@@ -607,7 +599,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		if ( isset( $request['charges'] ) && isset( $request['reference_id'] ) ) {
 			$this->log->add( $this->id, 'IPN valid', WC_Log_Levels::INFO );
 
-			$order = wc_get_order( sanitize_text_field( wp_unslash( $request['reference_id'] ) ) );
+			$order = wc_get_order(
+				sanitize_text_field(
+					wp_unslash(
+						str_replace( $this->invoice_prefix, '', $request['reference_id'] )
+					)
+				)
+			);
 
 			$is_additional_charge = false;
 			if ( $order && $order->get_transaction_id() !== $request['id'] ) {
@@ -1410,6 +1408,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						color: green;
 					}
 				</style>
+				<script>
+					jQuery(document).ready(function($) {
+						$('#woocommerce_virt_pagseguro_environment').on('change', function() {
+							$('.woocommerce-save-button').click();
+						});
+					});
+				</script>
 			</td>
 		</tr>  
 

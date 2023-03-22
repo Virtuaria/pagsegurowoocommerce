@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -26,7 +26,7 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * Relatório (log) para consulta a detalhes de transações, incluindo erros;
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no PagSeguro;
-* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
+* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados).
 
 [youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
 
@@ -38,7 +38,7 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * “Nova Cobrança Pix”, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
 * Pagamento por QR Code ou link Copia e Cola;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
-* Desconto configurável para percentual do carrinho.
+* Desconto percentual configurável para pagamento no Pix.
 
 ### Ativação ###
 Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
@@ -283,3 +283,6 @@ Nenhuma atualização disponível
 = 2.2.1 2023-03-21 =
 * Desconto em pagamentos com Pix.
 * Aviso sobre ausência do módulo Brazilian Market on WooCommerce.
+= 2.2.2 2023-03-22 =
+* Correções de bugs.
+* Prefixo para uso de transações em várias lojas com a mesma conta.
