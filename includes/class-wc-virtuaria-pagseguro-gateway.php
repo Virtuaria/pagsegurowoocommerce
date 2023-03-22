@@ -1445,6 +1445,9 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_disconnected' ) );
 				delete_option( 'virtuaria_pagseguro_not_authorized' );
 			} elseif ( isset( $_GET['proccess'] ) && 'failed' === $_GET['proccess'] ) {
+				$this->update_option( 'token_sanbox', null );
+				$this->update_option( 'token_production', null );
+				delete_option( 'virtuaria_pagseguro_not_authorized' );
 				add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_failed' ) );
 			}
 		}
