@@ -138,7 +138,9 @@ class WC_Virtuaria_PagSeguro_API {
 			);
 
 			if ( floatval( $this->gateway->pix_discount ) > 0 ) {
+				$total /= 100;
 				$total -= $total * ( floatval( $this->gateway->pix_discount ) / 100 );
+				$total  = number_format( $total, 2, '', '' );
 			}
 
 			$data['body']['qr_codes'][] = array(

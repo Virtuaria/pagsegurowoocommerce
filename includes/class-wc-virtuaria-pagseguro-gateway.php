@@ -1068,7 +1068,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function display_additional_charge_content( $post ) {
 		?>
 		<label for="additional-value">Informe o valor a ser cobrado (R$):</label>
-		<input type="number" style="width:calc(100% - 36px)" name="additional_value" id="additional-value" step="0.01"/>
+		<input type="number" style="width:calc(100% - 36px)" name="additional_value" id="additional-value" step="0.01" min="0.1"/>
 		<button id="submit-additional-charge" style="padding: 3px 4px;vertical-align:middle;color:green;cursor:pointer">
 			<span class="dashicons dashicons-money-alt"></span>
 		</button>
@@ -1105,13 +1105,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			$amount = number_format(
 				sanitize_text_field( wp_unslash( $_POST['additional_value'] ) ),
 				2,
-				'.',
+				'',
 				''
 			);
 
 			$resp = $this->api->additional_charge(
 				$order,
-				$amount * 100,
+				$amount,
 				isset( $_POST['credit_charge_reason'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_charge_reason'] ) ) : ''
 			);
 
@@ -1122,6 +1122,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				if ( $qr_code && $qr_code_png ) {
 					$this->add_qrcode_in_note( $order, $qr_code );
 					$validate     = $this->format_pix_validate( $this->pix_validate );
+					$amount      /= 100;
 					$charge_title = $amount == $order->get_total() ? 'Nova Cobrança' : 'Cobrança Extra';
 					ob_start();
 					echo '<p>Olá, ' . esc_html( $order->get_billing_first_name() ) . '.</p>';
