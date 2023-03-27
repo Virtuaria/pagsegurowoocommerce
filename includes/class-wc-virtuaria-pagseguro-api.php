@@ -124,7 +124,7 @@ class WC_Virtuaria_PagSeguro_API {
 			$data['body']['items'][] = array(
 				'name'        => $item->get_name(),
 				'quantity'    => $item->get_quantity(),
-				'unit_amount' => number_format( $item->get_total(), 2, '', '' ),
+				'unit_amount' => number_format( $item->get_total() / $item->get_quantity(), 2, '', '' ),
 			);
 		}
 

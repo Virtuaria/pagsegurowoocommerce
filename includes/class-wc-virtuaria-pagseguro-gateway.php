@@ -1043,8 +1043,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			|| ( 'CREDIT_CARD' === $order->get_meta( '_payment_mode' ) && 'processing' !== $order->get_status() )
 			|| ( 'PIX' === $order->get_meta( '_payment_mode' ) && ! in_array( $order->get_status(), array( 'on-hold', 'processing' ), true ) )
 			|| 'virt_pagseguro' !== $order->get_payment_method()
-			|| 'yes' !== $options['enabled']
-			|| ( ! $credit['token'] && 'PIX' !== $order->get_meta( '_payment_mode' ) ) ) {
+			|| ( ! isset( $options['enabled'] ) || 'yes' !== $options['enabled'] )
+			|| ( ( ! isset( $credit['token'] ) || ! $credit['token'] ) && 'PIX' !== $order->get_meta( '_payment_mode' ) ) ) {
 			return;
 		}
 

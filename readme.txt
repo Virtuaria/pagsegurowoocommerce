@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -26,7 +26,8 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * Relatório (log) para consulta a detalhes de transações, incluindo erros;
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no PagSeguro;
-* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados).
+* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
+* Permite que a mesma conta do PagSeguro seja usada em várias lojas virtuais diferentes.
 
 [youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
 
@@ -234,45 +235,19 @@ Pix      |  –                 | 1,00          | –
 Nenhuma atualização disponível
 
 == Changelog ==
-= 1.0 2022-07-28 =
-* Versão inicial.
-= 1.0.1 2022-07-29 =
-* Tradução do plugin para pt-BR.
-= 1.0.2 2022-08-04 =
-* Atualizando documentação.
-= 1.1.0 2022-09-02 =
-* Valor mínimo e início dos juros por parcela.
-= 1.1.1 2022-09-08 =
-* Criptografia RSA para função crédito.
-= 1.1.2 2022-09-13 =
-* Máscara para data de validade do cartão.
-= 1.1.3 2022-09-15 =
-* Validação de campos do crédito.
-= 1.2.0 2022-11-10 =
-* Arquivo de homologação gerado automaticamente.
-= 2.0.0 2023-01-23 =
-* Suporte a API Orders;
-* Suporte a API Connect;
-* Pagamento com PIX;
-* Modo de processamento Assíncrono;
-* Melhorias no histórico de notas e logs do pedido.
-= 2.0.1 2023-01-24 =
-* Correção na exibição das abas do checkout.
-= 2.0.2 2023-01-26 =
-* Melhorando exibição dos meios de pagamento do checkout.
-= 2.0.3 2023-02-01 =
-* Correção na exibição do valor mínimo da parcela.
-* Novo campo "Observações" para exibir informações extras abaixo da descrição do método de pagamento.
-= 2.0.4 2023-02-07 =
-* Correção de problema de compatibilidade com php 8.2.
-* Compatibilidade com venda para pessoa jurídica(PJ).
-* Melhoria no espaçamento do e-mail com pedidos via Pix.
-* Campo Bairro (billing_neighborhood) obrigatório.
-* Melhoria visual na apresentação do QR code na página de agradecimento do pedido.
-* Melhorias visuais no checkout transparente.
-= 2.1.0 2023-02-14 = 
-* Opção para configurar layout dos campos do checkout (crédito).
-* Melhoria no layout da configuração de autorização.
+= 2.2.5 2023-03-27 =
+* Correção do problema ao exibir cobrança adicional em ambientes com php 8.0.
+* Correção na apresentação do valor do item no relatório do PagSeguro.
+= 2.2.4 2023-03-23 =
+* Correção do problema “Pagseguro: must be between 100 and 999999900” em compras no Pix.
+= 2.2.3 2023-03-22 =
+* Limpar inconsistências do banco de dados quando ocorrer falha ao conectar/desconectar.
+= 2.2.2 2023-03-22 =
+* Correção na aplicação do desconto Pix no QR Code.
+* Prefixo para uso de transações em várias lojas com a mesma conta.
+= 2.2.1 2023-03-21 =
+* Desconto em pagamentos com Pix.
+* Aviso sobre ausência do módulo Brazilian Market on WooCommerce.
 = 2.2.0 2023-03-10 =
 * Reconhecimento de bandeira de cartão de crédito e exibição de ícone no checkout.
 * Ajuste na altura do checkout quando o crédito não está ativo.
@@ -280,13 +255,42 @@ Nenhuma atualização disponível
 * Nova cobrança Pix - reembolso para primeiro pagamento efetivado e ajuste para prevenir cancelamento do pedido quando a cobrança adicional tiver sido paga.
 * Identificação da forma de pagamento na lista de pedidos.
 * Melhorias no recebimento de webhooks e notas do histórico do pedido.
-= 2.2.1 2023-03-21 =
-* Desconto em pagamentos com Pix.
-* Aviso sobre ausência do módulo Brazilian Market on WooCommerce.
-= 2.2.2 2023-03-22 =
-* Correções de bugs.
-* Prefixo para uso de transações em várias lojas com a mesma conta.
-= 2.2.3 2023-03-22 =
-* Limpar inconsistências do banco de dados quando ocorrer falha ao conectar/desconectar.
-= 2.2.4 2023-03-22 =
-* Correção de bugs.
+= 2.1.0 2023-02-14 = 
+* Opção para configurar layout dos campos do checkout (crédito).
+* Melhoria no layout da configuração de autorização.
+= 2.0.4 2023-02-07 =
+* Correção de problema de compatibilidade com php 8.2.
+* Compatibilidade com venda para pessoa jurídica(PJ).
+* Melhoria no espaçamento do e-mail com pedidos via Pix.
+* Campo Bairro (billing_neighborhood) obrigatório.
+* Melhoria visual na apresentação do QR code na página de agradecimento do pedido.
+* Melhorias visuais no checkout transparente.
+= 2.0.3 2023-02-01 =
+* Correção na exibição do valor mínimo da parcela.
+* Novo campo "Observações" para exibir informações extras abaixo da descrição do método de pagamento.
+= 2.0.2 2023-01-26 =
+* Melhorando exibição dos meios de pagamento do checkout.
+= 2.0.1 2023-01-24 =
+* Correção na exibição das abas do checkout.
+= 2.0.0 2023-01-23 =
+* Suporte a API Orders;
+* Suporte a API Connect;
+* Pagamento com PIX;
+* Modo de processamento Assíncrono;
+* Melhorias no histórico de notas e logs do pedido.
+= 1.2.0 2022-11-10 =
+* Arquivo de homologação gerado automaticamente.
+= 1.1.3 2022-09-15 =
+* Validação de campos do crédito.
+= 1.1.2 2022-09-13 =
+* Máscara para data de validade do cartão.
+= 1.1.1 2022-09-08 =
+* Criptografia RSA para função crédito.
+= 1.1.0 2022-09-02 =
+* Configuração de valor mínimo e início dos juros por parcela.
+= 1.0.2 2022-08-04 =
+* Atualizando documentação.
+= 1.0.1 2022-07-29 =
+* Tradução do plugin para pt-BR.
+= 1.0 2022-07-28 =
+* Versão inicial.
