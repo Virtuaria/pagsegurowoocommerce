@@ -216,6 +216,9 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 			) . '</span>';
 
 			if ( $pix_discount && $pix_discount > 0 ) {
+				if ( isset( WC()->cart ) && WC()->cart->get_shipping_total() > 0 ) {
+					$cart_total -= WC()->cart->get_shipping_total();
+				}
 				$discount = $cart_total * $pix_discount;
 				echo '<span>Total de desconto: <b style="color:green">R$ ' . esc_html( number_format( $discount, 2, ',', '.' ) ) . '</b>.</span>';
 			}

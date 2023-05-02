@@ -93,11 +93,11 @@ class WC_Virtuaria_PagSeguro_API {
 				'items'             => array(),
 				'shipping'          => array(
 					'address' => array(
-						'street'      => $order->get_billing_address_1(),
-						'number'      => $order->get_meta( '_billing_number' ),
-						'complement'  => $order->get_billing_address_2(),
-						'locality'    => $order->get_meta( '_billing_neighborhood' ),
-						'city'        => $order->get_billing_city(),
+						'street'      => substr( $order->get_billing_address_1(), 0, 159 ),
+						'number'      => substr( $order->get_meta( '_billing_number' ), 0, 19 ),
+						'complement'  => substr( $order->get_billing_address_2(), 0, 40 ),
+						'locality'    => substr( $order->get_meta( '_billing_neighborhood' ), 0, 60 ),
+						'city'        => substr( $order->get_billing_city(), 0, 90 ),
 						'region_code' => $order->get_billing_state(),
 						'country'     => 'BRA',
 						'postal_code' => preg_replace( '/\D/', '', $order->get_billing_postcode() ),
@@ -139,6 +139,7 @@ class WC_Virtuaria_PagSeguro_API {
 
 			if ( floatval( $this->gateway->pix_discount ) > 0 ) {
 				$total /= 100;
+				$total -= $order->get_shipping_total();
 				$total -= $total * ( floatval( $this->gateway->pix_discount ) / 100 );
 				$total  = number_format( $total, 2, '', '' );
 			}
@@ -209,11 +210,11 @@ class WC_Virtuaria_PagSeguro_API {
 						'tax_id'  => $tax_id,
 						'email'   => $order->get_billing_email(),
 						'address' => array(
-							'street'      => $order->get_billing_address_1(),
-							'number'      => $order->get_meta( '_billing_number' ),
-							'complement'  => $order->get_billing_address_2(),
-							'locality'    => $order->get_meta( '_billing_neighborhood' ),
-							'city'        => $order->get_billing_city(),
+							'street'      => substr( $order->get_billing_address_1(), 0, 159 ),
+							'number'      => substr( $order->get_meta( '_billing_number' ), 0, 19 ),
+							'complement'  => substr( $order->get_billing_address_2(), 0, 40 ),
+							'locality'    => substr( $order->get_meta( '_billing_neighborhood' ), 0, 60 ),
+							'city'        => substr( $order->get_billing_city(), 0, 90 ),
 							'region'      => $order->get_billing_state(),
 							'region_code' => $order->get_billing_state(),
 							'country'     => $order->get_billing_country(),
@@ -288,10 +289,18 @@ class WC_Virtuaria_PagSeguro_API {
 				update_post_meta( $order->get_id(), '_charge_amount', $response['charges'][0]['amount']['value'] );
 				if ( 'CREDIT_CARD' === $response['charges'][0]['payment_method']['type'] ) {
 					update_post_meta( $order->get_id(), '_payment_mode', 'CREDIT_CARD' );
+
+					if ( isset( $response['charges'][0]['payment_method']['card']['holder']['name'] ) ) {
+						$card_holder = sanitize_text_field( wp_unslash( $response['charges'][0]['payment_method']['card']['holder']['name'] ) );
+					} elseif ( isset( $pagseguro_card_info['name'] ) ) {
+						$card_holder = $pagseguro_card_info['name'];
+					}
+
 					$order->add_order_note(
 						sprintf(
-							'Pago com %s<br>Parcelas: %dx<br>Total: R$ %s',
+							'Bandeira: %1$s<br>%2$s<br>Parcelas: %3$dx<br>Total: R$ %4$s',
 							strtoupper( $response['charges'][0]['payment_method']['card']['brand'] ),
+							'Titular: ' . $card_holder,
 							$response['charges'][0]['payment_method']['installments'],
 							number_format( $response['charges'][0]['amount']['value'] / 100, 2, ',', '.' )
 						)
@@ -370,7 +379,7 @@ class WC_Virtuaria_PagSeguro_API {
 						'virtuaria-pagseguro'
 					)
 				);
-				$fee->set_total( - $order->get_total() * ( floatval( $this->gateway->pix_discount ) / 100 ) );
+				$fee->set_total( - ( $order->get_total() - $order->get_shipping_total() ) * ( floatval( $this->gateway->pix_discount ) / 100 ) );
 
 				$order->add_item( $fee );
 				$order->calculate_totals();
@@ -594,11 +603,11 @@ class WC_Virtuaria_PagSeguro_API {
 				),
 				'shipping'          => array(
 					'address' => array(
-						'street'      => $order->get_billing_address_1(),
-						'number'      => $order->get_meta( '_billing_number' ),
-						'complement'  => $order->get_billing_address_2(),
-						'locality'    => $order->get_meta( '_billing_neighborhood' ),
-						'city'        => $order->get_billing_city(),
+						'street'      => substr( $order->get_billing_address_1(), 0, 159 ),
+						'number'      => substr( $order->get_meta( '_billing_number' ), 0, 19 ),
+						'complement'  => substr( $order->get_billing_address_2(), 0, 40 ),
+						'locality'    => substr( $order->get_meta( '_billing_neighborhood' ), 0, 60 ),
+						'city'        => substr( $order->get_billing_city(), 0, 90 ),
 						'region_code' => $order->get_billing_state(),
 						'country'     => 'BRA',
 						'postal_code' => preg_replace( '/\D/', '', $order->get_billing_postcode() ),

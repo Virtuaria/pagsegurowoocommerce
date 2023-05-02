@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.2.5
+Stable tag: 2.2.6
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -12,7 +12,7 @@ Adiciona o PagSeguro como método de pagamento para o Woocommerce.
 
 == Description ==
 
-Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
+Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce com confirmação automática do pagamento nos 3 métodos. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
 
 * Suporte a Crédito, Pix e Boleto Bancário;
 * Opção de parcelamento com ou sem juros (configurável no plugin);
@@ -40,6 +40,8 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * Pagamento por QR Code ou link Copia e Cola;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
 * Desconto percentual configurável para pagamento no Pix.
+
+Atenção: Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
 ### Ativação ###
 Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
@@ -82,30 +84,24 @@ Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request
 * Envie os arquivos do plugin para a pasta wp-content/plugins, ou instale usando o instalador de plugins do WordPress.
 * Ative o plugin.
 * Navegue para Woocommerce -> Configurações -> Pagamentos, escolha o “Pagseguro”,escolha o ambiente (produção ou sandbox), preencha o email da sua conta no PagSeguro e clique em salvar;
-* Clique em conectar.
-* Conceda as permissões.
+* Clique em conectar;
+* Conceda as permissões;
+* Clique em salvar novamente;
 
-Pronto, o plugin está pronto para uso.
+**Apenas com isso já é possível receber os pagamentos e fazer o retorno automático de dados.**
+
+### Atenção:### Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
+
 
 = Requerimentos: =
 
 1- Conta no [PagSeguro](http://pagseguro.uol.com.br/) e ter instalado o [WooCommerce](http://wordpress.org/plugins/woocommerce/);
 2 - Plugin [WooCommerce Extra Checkout Fields for Brazil] (http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/).
 
-= Configurações no PagSeguro: =
-
-Atenção: Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
-
-**Apenas com isso já é possível receber os pagamentos e fazer o retorno automático de dados.**
-
 <blockquote>Atenção: Não é necessário configurar qualquer URL em "Página de redirecionamento" ou "Notificação de transação", pois o plugin trabalha diretamente com a API do PagSeguro.</blockquote>
 
-= Configurações do Plugin: =
-
-1 - Com o plugin instalado acesse o admin do WordPress e entre em "WooCommerce" > "Configurações" > "Pagamentos" > "PagSeguro".
-2 - Adicione o seu e-mail e clique em conectar para conceder permissões ao plugin.
-
-Pronto, sua loja já pode receber pagamentos pelo PagSeguro.
+= Tela de configuração do Plugin: =
+Com o plugin instalado acesse o admin do WordPress e entre em "WooCommerce" > "Configurações" > "Pagamentos" > "PagSeguro".
 
 == Frequently Asked Questions ==
 
@@ -235,6 +231,11 @@ Pix      |  –                 | 1,00          | –
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.2.6 2023-05-02 =
+* Desconto Pix usando total do carrinho sem contar o valor de frete.
+* Identificação do titular do cartão no histórico(notas) do pedido.
+* Limite de tamanho nos campos de endereço do cliente.
+* Otimização na configuração Conectar / Desconectar com o PagSeguro.
 = 2.2.5 2023-03-27 =
 * Correção do problema ao exibir cobrança adicional em ambientes com php 8.0.
 * Correção na apresentação do valor do item no relatório do PagSeguro.
