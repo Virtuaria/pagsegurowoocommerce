@@ -138,10 +138,11 @@ class WC_Virtuaria_PagSeguro_API {
 			);
 
 			if ( floatval( $this->gateway->pix_discount ) > 0 ) {
-				$total /= 100;
-				$total -= $order->get_shipping_total();
-				$total -= $total * ( floatval( $this->gateway->pix_discount ) / 100 );
-				$total  = number_format( $total, 2, '', '' );
+				$discount  = $total / 100;
+				$discount -= $order->get_shipping_total();
+				$total    /= 100;
+				$total    -= $discount * ( floatval( $this->gateway->pix_discount ) / 100 );
+				$total     = number_format( $total, 2, '', '' );
 			}
 
 			$data['body']['qr_codes'][] = array(

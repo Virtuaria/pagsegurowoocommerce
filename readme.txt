@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -76,6 +76,9 @@ Compatível com Woocommerce 5.8.0 ou superior
 
 Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request no [Github](https://github.com/Virtuaria/pagsegurowoocommerce).
 
+= Suporte Individualizado =
+
+Caso precise de suporte individualizado relacionado ao plugin Virtuaria PagSeguro, incluindo: Instalação e configuração; Análise e ajustes no seu código fonte para correção de bugs; Desenvolvimento ou personalização de  funcionalidades sob demanda, entre em contato conosco pelo email tecnologia@virtuaria.com.br para fazermos uma proposta.
 
 == Installation ==
 
@@ -231,6 +234,8 @@ Pix      |  –                 | 1,00          | –
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.2.7 2023-05-05 =
+* Correção no total do pix quando o desconto está ativo;
 = 2.2.6 2023-05-02 =
 * Desconto Pix usando total do carrinho sem contar o valor de frete.
 * Identificação do titular do cartão no histórico(notas) do pedido.
