@@ -32,7 +32,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function __construct() {
 		$this->id                 = 'virt_pagseguro';
 		$this->icon               = apply_filters( 'woocommerce_pagseguro_virt_icon', VIRTUARIA_PAGSEGURO_URL . '/public/images/pagseguro.png' );
-		$this->has_fields         = false;
+		$this->has_fields         = true;
 		$this->method_title       = __( 'PagSeguro', 'virtuaria-pagseguro' );
 		$this->method_description = __( 'Pague com cartão de crédito e boleto.', 'virtuaria-pagseguro' );
 

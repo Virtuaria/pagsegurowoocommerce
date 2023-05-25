@@ -216,11 +216,13 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 			) . '</span>';
 
 			if ( $pix_discount && $pix_discount > 0 ) {
+				$shipping = 0;
 				if ( isset( WC()->cart ) && WC()->cart->get_shipping_total() > 0 ) {
-					$cart_total -= WC()->cart->get_shipping_total();
+					$shipping = WC()->cart->get_shipping_total();
 				}
-				$discount = $cart_total * $pix_discount;
-				echo '<span>Total de desconto: <b style="color:green">R$ ' . esc_html( number_format( $discount, 2, ',', '.' ) ) . '</b>.</span>';
+				$discount = ( $cart_total - $shipping ) * $pix_discount;
+				echo '<span class="discount">Desconto: <b style="color:green;">R$ ' . esc_html( number_format( $discount, 2, ',', '.' ) ) . '</b></span>';
+				echo '<span class="total">Novo total: <b style="color:green">R$ ' . esc_html( number_format( $cart_total - $discount, 2, ',', '.' ) ) . '</b></span>';
 			}
 			?>
 		</div>
@@ -231,7 +233,7 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 			<i id="pagseguro-icon-ticket"></i>
 			<?php esc_html_e( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ); ?>
 		</p>
-		<p><?php esc_html_e( '* Depois de clicar em "Realizar pagamento", você terá acesso ao boleto bancário, podendo imprimir e pagar em via internet ou rede bancária credenciada.', 'virtuaria-pagseguro' ); ?></p>
+		<p><?php esc_html_e( '* Depois de clicar em "Realizar pagamento", você terá acesso ao boleto bancário, podendo imprimir e pagar via internet banking ou rede bancária credenciada.', 'virtuaria-pagseguro' ); ?></p>
 		<div class="clear"></div>
 	</div>
 	<?php wp_nonce_field( 'do_new_charge', 'new_charge_nonce' ); ?>

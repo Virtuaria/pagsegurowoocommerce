@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.2.7
+Stable tag: 2.2.8
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -234,6 +234,10 @@ Pix      |  –                 | 1,00          | –
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.2.8 2023-05-25 =
+* Exibindo no checkout o valor do pagamento com desconto Pix;
+* Retirada da obrigatoriedade do preenchimento da descrição do plugin para que os campos apareçam.
+* Ajuste no texto informativo sobre o Boleto bancário.
 = 2.2.7 2023-05-05 =
 * Correção no total do pix quando o desconto está ativo;
 = 2.2.6 2023-05-02 =
