@@ -378,9 +378,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				),
 			),
 			'soft_descriptor' => array(
-				'title'       => __( 'Nome na fatura', 'virtuaria-pagseguro' ),
-				'type'        => 'text',
-				'description' => 'Texto exibido na fatura do cartão para identificar a loja. Tamanho máximo de <b>17 caracteres</b>. Não permite caracteres especiais. (Acentuações serão substituídas por caracteres sem acentos, demais caracteres especiais serão removidos).',
+				'title'             => __( 'Nome na fatura', 'virtuaria-pagseguro' ),
+				'type'              => 'text',
+				'description'       => 'Texto exibido na fatura do cartão para identificar a loja (máximo de <b>17 caracteres</b>, não deve conter caracteres especiais ou espaços em branco).',
+				'custom_attributes' => array(
+					'maxlength' => '17',
+				),
 			),
 			'save_card_info'  => array(
 				'title'       => __( 'Salvar dados de pagamento?', 'woocommerce-pagseguro' ),

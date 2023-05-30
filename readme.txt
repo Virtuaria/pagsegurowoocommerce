@@ -218,6 +218,10 @@ No menu “Woocommerce > Status > Logs”.
 
 Também é possível gerar um relatório detalhado do sistema no menu "Woocommerce > Status", através do botão “Obter Relatório do Sistema”. 
 
+= 17 - Qual o formato correto do campo "Nome na Fatura" do cartão?  =
+
+O PagSeguro não permite que o campo “Nome na Fatura” possua mais de 17 caracteres. Também não permite o uso de caracteres especiais ou espaços em branco. Isso pode gerar a mensagem "PagSeguro: Verifique os dados digitados e tente novamente". A partir da versão 2.3.0, a configuração do plugin não permite que o limite de caracteres seja excedido, então, caso tenha preenchido este campo em uma versão antiga e o nome esteja fora do padrão, basta ajustar o campo e salvar a configuração.
+
 
 == Screenshots ==
 
