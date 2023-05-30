@@ -40,9 +40,7 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * Pagamento por QR Code ou link Copia e Cola;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
 * Desconto percentual configurável para pagamento no Pix;
-* Confirmação automática de pagamento na tela do pedido.
-
-[https://teravirt.s3-accelerate.amazonaws.com/uploads/sites/107/2023/05/Finalizar-compras-_-SUPER-COMPRAS-loja-para-testes-Os-melhores-produtos-084027.gif  Confirmação de pagamento Pix]
+* Confirmação automática de pagamento na tela do pedido "[ver mais](https://teravirt.s3-accelerate.amazonaws.com/uploads/sites/107/2023/05/Finalizar-compras-_-SUPER-COMPRAS-loja-para-testes-Os-melhores-produtos-084027.gif)".
 
 Atenção: Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
