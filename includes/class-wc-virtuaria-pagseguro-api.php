@@ -480,6 +480,7 @@ class WC_Virtuaria_PagSeguro_API {
 					WC_Log_Levels::ERROR
 				);
 			}
+			return false;
 		}
 
 		if ( $this->debug_on ) {
@@ -497,6 +498,7 @@ class WC_Virtuaria_PagSeguro_API {
 		} elseif ( 401 === $resp_code && isset( $response['error_messages'][0]['description'] )
 			&& 'Invalid credential. Review AUTHORIZATION header' === $response['error_messages'][0]['description'] ) {
 			update_option( 'virtuaria_pagseguro_not_authorized', true );
+			return false;
 		} elseif ( 404 === $resp_code && 'sandbox' !== $this->gateway->environment ) {
 			$request = wp_remote_post(
 				$this->endpoint . 'public-keys',
@@ -515,6 +517,17 @@ class WC_Virtuaria_PagSeguro_API {
 					'Resposta do servidor ao tentar criar nova chave pública: ' . wp_json_encode( $request ),
 					WC_Log_Levels::INFO
 				);
+			}
+
+			if ( is_wp_error( $request ) || ! in_array( wp_remote_retrieve_response_code( $request ), array( 200, 201 ), true ) ) {
+				if ( $this->debug_on ) {
+					$this->gateway->log->add(
+						$this->tag,
+						'Falha ao obter chave pública: ' . $request->get_error_message(),
+						WC_Log_Levels::ERROR
+					);
+				}
+				return false;
 			}
 		}
 

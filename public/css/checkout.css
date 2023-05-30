@@ -179,7 +179,7 @@
   }
   .pagseguro-method-form {
     display: none;
-    min-height: 319px;
+    min-height: 295px;
     margin-top: 15px;
   }
   .card-loaded .pagseguro-method-form {

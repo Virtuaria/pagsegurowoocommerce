@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.2.8
+Stable tag: 2.3.0
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -39,7 +39,10 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * “Nova Cobrança Pix”, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
 * Pagamento por QR Code ou link Copia e Cola;
 * Exibe os dados de pagamento no e-mail enviado e na tela de confirmação do pedido;
-* Desconto percentual configurável para pagamento no Pix.
+* Desconto percentual configurável para pagamento no Pix;
+* Confirmação automática de pagamento na tela do pedido.
+
+[https://teravirt.s3-accelerate.amazonaws.com/uploads/sites/107/2023/05/Finalizar-compras-_-SUPER-COMPRAS-loja-para-testes-Os-melhores-produtos-084027.gif  Confirmação de pagamento Pix]
 
 Atenção: Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
@@ -108,74 +111,74 @@ Com o plugin instalado acesse o admin do WordPress e entre em "WooCommerce" > "C
 
 == Frequently Asked Questions ==
 
-= Qual é a licença do plugin? =
+= 1 - Qual é a licença do plugin? =
 
 Este plugin está licenciado como GPLv3. O código é 100% aberto (Open Source). Não disponibilizamos versões PRO com funcionalidades extras.
 
-= O que eu preciso para utilizar este plugin? =
+= 2 - O que eu preciso para utilizar este plugin? =
 
 * Ter instalado uma versão atual do plugin WooCommerce.
 * Ter instalado uma versão atual do plugin WooCommerce Extra Checkout Fields for Brazil.
 * Possuir uma conta no PagSeguro.
 * Caso deseje utilizar pagamentos com Pix, é preciso cadastrar uma chave aleatória em seu painel de vendedor no PagSeguro.
 
-= PagSeguro recebe pagamentos de quais países? =
+= 3 - PagSeguro recebe pagamentos de quais países? =
 
 No momento o PagSeguro recebe pagamentos apenas do Brasil e utilizando o real como moeda.
 
 Configuramos o plugin para receber pagamentos apenas de usuários que selecionaram o Brasil nas informações de pagamento durante o checkout.
 
-= Quais são os meios de pagamento que o plugin aceita? =
+= 4 - Quais são os meios de pagamento que o plugin aceita? =
 
 São aceitos pagamentos com cartão de crédito, pix e boleto bancário, entretanto você precisa ativá-los na sua conta.
 
 Confira os [meios de pagamento e parcelamento](https://pagseguro.uol.com.br/para_voce/meios_de_pagamento_e_parcelamento.jhtml#rmcl).
 
-= Como que o plugin faz integração com PagSeguro? =
+= 5 - Como que o plugin faz integração com PagSeguro? =
 
 Fazemos a integração baseada na documentação oficial do PagSeguro que pode ser encontrada nos "[guias de integração](https://dev.pagseguro.uol.com.br/reference/order-intro)" utilizando a última versão da API de pagamentos.
 
-= É possível enviar os dados de "Número", "Bairro" e "CPF" para o PagSeguro? =
+= 6 - É possível enviar os dados de "Número", "Bairro" e "CPF" para o PagSeguro? =
 
 Sim é possível, basta utilizar o plugin "[WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/)".
 
-= O pedido foi pago e ficou com o status de "processando" e não como "concluído", isto está certo? =
+= 7 - O pedido foi pago e ficou com o status de "processando" e não como "concluído", isto está certo? =
 
 Sim, por padrão em compras pagas o status do pedido muda automaticamente para processando, significa que pode enviar sua encomenda. Porém, definir o status como "concluído" é atribuição do lojista ao final do processo de venda e entrega.
 
 Para produtos baixáveis a configuração padrão do WooCommerce é permitir o acesso apenas quando o pedido tem o status "Concluído", entretanto nas configurações do WooCommerce na aba *Produtos* é possível ativar a opção **"Conceder acesso para download do produto após o pagamento"** e assim liberar o download quando o status do pedido está como "processando".
 
-Note que caso você esteja utilizando a opção de **sandbox**, é necessário usar um e-mail de teste que pode ser encontrado em "[PagSeguro Sandbox > Dados de Teste](https://sandbox.pagseguro.uol.com.br/vendedor/configuracoes.html)".
-
-Se você tem certeza que o E-mail estão corretos você deve acessar a página "WooCommerce > Status do Sistema" e verificar se **fsockopen** e **cURL** estão ativos. É necessário procurar ajuda do seu provedor de hospedagem caso você tenha o **fsockopen** e/ou o **cURL** desativados.
+Se os dados estão corretos, você deve acessar a página "WooCommerce > Status do Sistema" e verificar se **fsockopen** e **cURL** estão ativos. É necessário procurar ajuda do seu provedor de hospedagem caso você tenha o **fsockopen** e/ou o **cURL** desativados.
 
 Por último é possível ativar a opção de **Log de depuração** nas configurações do plugin e tentar novamente fechar um pedido (você deve tentar fechar um pedido para que o log grave o erro). Com o log é possível saber exatamente o que está dando errado com a sua instalação.
 
 Caso você não entenda o conteúdo do log não tem problema, você pode me abrir um "[tópico no fórum do plugin](https://wordpress.org/support/plugin/virtuaria-pagseguro#postform)" com o link do log (utilize o [pastebin.com](http://pastebin.com).
 
-= O status do pedido não é alterado automaticamente? =
+= 8 - Tem confirmação automática dos pagamentos? O status do pedido é alterado automaticamente? =
 
 Sim, o status é alterado automaticamente usando a API de notificações de mudança de status do PagSeguro.
 
-A seguir uma lista de ferramentas que podem estar bloqueando as notificações do PagSeguro:
+= 9 - Situações comuns para bloqueio no recebimento de notificações do PagSeguro pelo plugin =
 
+O motivo mais comum é algum plugin de segurança, firewall ou ferramenta no servidor onde a loja está rodando estar bloqueando as notificações. Neste caso, basta desativar o bloqueio ou incluir uma exceção para não barrar as notificações que tem o PagSeguro como origem.
+Exemplos:
 * Site com CloudFlare, pois por padrão serão bloqueadas quaisquer comunicações de outros servidores com o seu. É possível resolver isso desbloqueando a lista de IPs do PagSeguro.
 * Plugin de segurança como o "iThemes Security" com a opção para adicionar a lista do HackRepair.com no .htaccess do site. Acontece que o user-agent do PagSeguro está no meio da lista e vai bloquear qualquer comunicação. Você pode remover isso da lista, basta encontrar onde bloquea o user-agent "jakarta" e deletar ou criar uma regra para aceitar os IPs do PagSeguro).
 * `mod_security` habilitado, neste caso vai acontecer igual com o CloudFlare bloqueando qualquer comunicação de outros servidores com o seu. Como solução você pode desativar ou permitir os IPs do PagSeguro.
 
-= Funciona com o Sandbox do PagSeguro? =
+= 10 - Funciona com o Sandbox do PagSeguro? =
 
-Sim, funciona e basta você ativar isso nas opções do plugin, além de configurar o seu "[e-mail de testes](https://sandbox.pagseguro.uol.com.br/vendedor/configuracoes.html)".
+Sim, funciona e basta você ativar isso nas opções do plugin, além de configurar o seu "[e-mail de testes](https://sandbox.pagseguro.uol.com.br/vendedor/configuracoes.html)"
 
-= Quais URLs eu devo usar para configurar "Notificação de transação" e "Página de redirecionamento"? =
+.
+Lembrando que, se estiver fazendo testes na Sandbox, é comum ocorrerem instabilidades e isto pode fazer com que o PagSeguro não envie até o plugin as atualizações de status.
+
+
+= 11 - Quais URLs eu devo usar para configurar "Notificação de transação" e "Página de redirecionamento"? =
 
 Não é necessário configurar qualquer URL para "Notificação de transação" ou para "Página de redirecionamento", o plugin já diz para o PagSeguro quais URLs serão utilizadas.
 
-= Este plugin permite o reembolso total e parcial da venda? =
-
-Sim, você pode reembolsar pedidos com status processando indo direto a página do pedido no woocommerce e clicar em Reembolso -> Reembolso via Pagseguro e setar o valor seja ele total ou parcial.
-
-= Dificuldades ao usar a Sandbox =
+= 12 - Dificuldades ao usar a Sandbox =
 
 Em conversa com a equipe de integração do PagSeguro, nos foi informado que a API Orders não é 100% atualizada com a Sandbox. Portanto, é possível que algum dos problemas abaixo aconteça:
 
@@ -190,7 +193,7 @@ Em conversa com a equipe de integração do PagSeguro, nos foi informado que a A
 * External service error.
 
 
-= Quais valores meus clientes podem pagar com este plugin?  =
+= 13 - Quais valores meus clientes podem pagar com este plugin?  =
 
 Não há valores máximos para as vendas, porém existem valores mínimo a serem transacionados com o pagseguro, segue lista:
 
@@ -201,18 +204,22 @@ Crédito  |  Mastercard        | 0,20          | 5,00
 Crédito  |  American Express  | 0,20          | 5,00
 Crédito  |  Demais bandeiras  | 0,20          | 5,00
 Boleto   |  –                 | 0,20          | –
-Pix      |  –                 | 1,00          | –           
+Pix      |  –                 | 1,00          | –      
 
-### FAQ em Inglês: ###
+= 14 - Este plugin permite o reembolso total e parcial da venda? =
 
-= What is the plugin license? =
+Sim, você pode reembolsar pedidos com status processando indo direto a página do pedido no woocommerce e clicar em Reembolso -> Reembolso via Pagseguro e setar o valor seja ele total ou parcial.
 
-* This plugin is released under a GPLv3 license.
+= 15 - Tem valor mínimo para reembolso? =
 
-= What is needed to use this plugin? =
+Sim, o valor mínimo para reembolso via loja virtual é R$ 1,00.
 
-* WooCommerce version 4.5 or later installed and active.
-* Only one account on [PagSeguro](http://pagseguro.uol.com.br/).
+= 16 - Onde encontro o log do plugin ? =
+
+No menu “Woocommerce > Status > Logs”. 
+
+Também é possível gerar um relatório detalhado do sistema no menu "Woocommerce > Status", através do botão “Obter Relatório do Sistema”. 
+
 
 == Screenshots ==
 
@@ -234,6 +241,9 @@ Pix      |  –                 | 1,00          | –
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.3.0 2023-05-30 =
+* Confirmação automática de pagamento Pix na tela de pedido recebido.
+* Correção na validação de acesso quando a opção do Woocommerce, criar conta no checkout estiver ativada.
 = 2.2.8 2023-05-25 =
 * Exibindo no checkout o valor do pagamento com desconto Pix;
 * Retirada da obrigatoriedade do preenchimento da descrição do plugin para que os campos apareçam.

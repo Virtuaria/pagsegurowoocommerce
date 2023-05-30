@@ -64,6 +64,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->debug           = $this->get_option( 'debug' );
 		$this->pix_discount    = $this->get_option( 'pix_discount' );
 		$this->invoice_prefix  = $this->get_option( 'invoice_prefix', 'WC-' );
+		$this->signup_checkout = 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' );
+		$this->pix_msg_payment = $this->get_option( 'pix_msg_payment' );
 
 		// Active logs.
 		if ( 'yes' === $this->debug ) {
@@ -116,6 +118,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_not_authorized' ) );
 
 		add_filter( 'woocommerce_billing_fields', array( $this, 'billing_neighborhood_required' ), 9999 );
+		add_action( 'wp_ajax_fetch_payment_order', array( $this, 'fetch_payment_order' ) );
+		add_action( 'wp_ajax_nopriv_fetch_payment_order', array( $this, 'fetch_payment_order' ) );
 	}
 
 	/**
@@ -140,65 +144,94 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 * Checkout scripts.
 	 */
 	public function checkout_scripts() {
-		if ( is_checkout() && $this->is_available() && ! get_query_var( 'order-received' ) ) {
-			wp_enqueue_script(
-				'pagseguro-virt',
-				VIRTUARIA_PAGSEGURO_URL . 'public/js/checkout.js',
-				array( 'jquery' ),
-				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/js/checkout.js' ),
-				true
-			);
-
-			wp_enqueue_style(
-				'pagseguro-virt',
-				VIRTUARIA_PAGSEGURO_URL . 'public/css/checkout.css',
-				'',
-				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/checkout.css' )
-			);
-
-			wp_enqueue_script(
-				'pagseguro-sdk',
-				'https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js',
-				array(),
-				'1.1.1',
-				true
-			);
-
-			$pub_key = $this->api->get_public_key();
-			if ( $pub_key ) {
-				wp_localize_script(
+		if ( is_checkout() && $this->is_available() ) {
+			if ( ! get_query_var( 'order-received' ) ) {
+				wp_enqueue_script(
 					'pagseguro-virt',
-					'encriptation',
-					array( 'pub_key' => $pub_key )
+					VIRTUARIA_PAGSEGURO_URL . 'public/js/checkout.js',
+					array( 'jquery' ),
+					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/js/checkout.js' ),
+					true
 				);
-			}
 
-			if ( $this->pix_discount > 0 ) {
-				wp_localize_script(
+				wp_enqueue_style(
 					'pagseguro-virt',
-					'pix_discount',
+					VIRTUARIA_PAGSEGURO_URL . 'public/css/checkout.css',
+					'',
+					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/checkout.css' )
+				);
+
+				wp_enqueue_script(
+					'pagseguro-sdk',
+					'https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js',
+					array(),
+					'1.1.1',
+					true
+				);
+
+				$pub_key = $this->api->get_public_key();
+				if ( $pub_key ) {
+					wp_localize_script(
+						'pagseguro-virt',
+						'encriptation',
+						array( 'pub_key' => $pub_key )
+					);
+				}
+
+				if ( $this->pix_discount > 0 ) {
+					wp_localize_script(
+						'pagseguro-virt',
+						'pix_discount',
+						array(
+							'discount' => '<span class="pix-discount">(desconto de <b>' . str_replace( '.', ',', $this->pix_discount ) . '%</b> no Pix)</span>',
+							'title'    => $this->title,
+						)
+					);
+				}
+
+				if ( 'one' === $this->get_option( 'display' ) ) {
+					wp_enqueue_style(
+						'checkout-fields',
+						VIRTUARIA_PAGSEGURO_URL . 'public/css/full-width.css',
+						'',
+						filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/full-width.css' )
+					);
+				}
+
+				if ( 'yes' !== $this->credit_enable ) {
+					wp_enqueue_style(
+						'form-height',
+						VIRTUARIA_PAGSEGURO_URL . 'public/css/form-height.css',
+						'',
+						filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/form-height.css' )
+					);
+				}
+			} else {
+				global $wp;
+				wp_enqueue_script(
+					'pagseguro-payment-on-hold',
+					VIRTUARIA_PAGSEGURO_URL . 'public/js/on-hold-payment.js',
+					array( 'jquery' ),
+					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/js/on-hold-payment.js' ),
+					true
+				);
+
+				wp_localize_script(
+					'pagseguro-payment-on-hold',
+					'payment',
 					array(
-						'discount' => '<span class="pix-discount">(desconto de <b>' . str_replace( '.', ',', $this->pix_discount ) . '%</b> no Pix)</span>',
-						'title'    => $this->title,
+						'ajax_url'        => admin_url( 'admin-ajax.php' ),
+						'order_id'        => $wp->query_vars['order-received'],
+						'nonce'           => wp_create_nonce( 'fecth_order_status' ),
+						'confirm_message' => $this->pix_msg_payment,
 					)
 				);
-			}
 
-			if ( 'one' === $this->get_option( 'display' ) ) {
 				wp_enqueue_style(
-					'checkout-fields',
-					VIRTUARIA_PAGSEGURO_URL . 'public/css/full-width.css',
+					'pagseguro-payment-on-hold',
+					VIRTUARIA_PAGSEGURO_URL . 'public/css/on-hold-payment.css',
 					'',
-					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/full-width.css' )
-				);
-			}
-
-			if ( 'yes' !== $this->credit_enable ) {
-				wp_enqueue_style(
-					'form-height',
-					VIRTUARIA_PAGSEGURO_URL . 'public/css/form-height.css',
-					'',
-					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/form-height.css' )
+					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/on-hold-payment.css' )
 				);
 			}
 		}
@@ -347,7 +380,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			'soft_descriptor' => array(
 				'title'       => __( 'Nome na fatura', 'virtuaria-pagseguro' ),
 				'type'        => 'text',
-				'description' => 'Texto exibido na fatura do cartão para identificar a loja.',
+				'description' => 'Texto exibido na fatura do cartão para identificar a loja. Tamanho máximo de <b>17 caracteres</b>. Não permite caracteres especiais. (Acentuações serão substituídas por caracteres sem acentos, demais caracteres especiais serão removidos).',
 			),
 			'save_card_info'  => array(
 				'title'       => __( 'Salvar dados de pagamento?', 'woocommerce-pagseguro' ),
@@ -425,6 +458,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'step' => '0.01',
 				),
 			),
+			'pix_msg_payment' => array(
+				'title'       => __( 'Pagamento confirmado', 'virtuaria-pagseguro' ),
+				'type'        => 'textarea',
+				'description' => __( 'Define a mensagem a ser exibida, na tela de pedido recebido, após a confirmação do pagamento.', 'virtuaria-pagseguro' ),
+				'default'     => 'Seu pagamento foi aprovado!',
+			),
 
 		);
 
@@ -471,7 +510,9 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		if ( isset( $_POST['new_charge_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['new_charge_nonce'] ) ), 'do_new_charge' ) ) {
+		if ( $this->signup_checkout
+			|| ( isset( $_POST['new_charge_nonce'] )
+			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['new_charge_nonce'] ) ), 'do_new_charge' ) ) ) {
 			$order = wc_get_order( $order_id );
 
 			$paid = $this->api->new_charge( $order, $_POST );
@@ -916,7 +957,10 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function process_refund( $order_id, $amount = null, $reason = '' ) {
 		$order = wc_get_order( $order_id );
 
-		if ( $amount && 'processing' === $order->get_status() && 'BOLETO' !== $order->get_meta( '_payment_mode' ) ) {
+		if ( $amount
+			&& $amount > 1
+			&& 'processing' === $order->get_status()
+			&& 'BOLETO' !== $order->get_meta( '_payment_mode' ) ) {
 			if ( $this->api->refund_order( $order_id, $amount ) ) {
 				$order->add_order_note( 'PagSeguro: Reembolso de R$' . $amount . ' bem sucedido.', 0, true );
 				return true;
@@ -1526,6 +1570,20 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			$fields['billing_neighborhood']['required'] = true;
 		}
 		return $fields;
+	}
+
+	/**
+	 * Check order status.
+	 */
+	public function fetch_payment_order() {
+		if ( isset( $_POST['order_id'] )
+			&& isset( $_POST['payment_nonce'] )
+			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['payment_nonce'] ) ), 'fecth_order_status' ) ) {
+			if ( 'wc-processing' === get_post_status( sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) ) ) {
+				echo 'success';
+			}
+		}
+		wp_die();
 	}
 }
 

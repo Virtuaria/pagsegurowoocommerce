@@ -9,38 +9,41 @@ defined( 'ABSPATH' ) || exit;
 
 $is_android = ( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 'com.virtuaria.supertem' === $_SERVER['HTTP_X_REQUESTED_WITH'] );
 ?>
-<h3 class="validate-warning" style="color: green;">Pague com PIX. O código de pagamento tem validade de <?php echo esc_html( $validate ); ?>.</h3>
+<div class="pix-payment">
+	<h3 class="validate-warning" style="color: green;">Pague com PIX. O código de pagamento tem validade de <?php echo esc_html( $validate ); ?>.</h3>
 
-<strong style="display: block; margin-top: 10px;">
-	Escaneie este código para pagar
-</strong>
-<ol class="scan-instructions">
-	<li>Acesse seu internet Banking ou app de pagamentos</li>
-	<li>Escolha pagar via PIX</li>
-	<li>Use o seguinte QR Code:</li>
-</ol>
-<img style="max-width: 150px" src="<?php echo esc_html( $qr_code_png ); ?>" alt="Qr code" />
-<div class="code-area">
-	<span class="code-text">
-		Ou cole o seguinte código QR para fazer o pagamento ( escolha a opção Pix Copia e Cola no seu Internet Banking ).
-	</span>
-	<?php
-	if ( $is_android ) :
-		?>
-		<div class="pix">
-			<?php echo esc_html( $qr_code ); ?>
-		</div>
+	<h2 class="on-hold-payment" style="display: none;">Aguardando pagamento <img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ); ?>../public/images/loading.png" alt="Spinner" /></h2>
+	<strong style="display: block; margin-top: 10px;">
+		Escaneie este código para pagar
+	</strong>
+	<ol class="scan-instructions">
+		<li>Acesse seu internet Banking ou app de pagamentos</li>
+		<li>Escolha pagar via PIX</li>
+		<li>Use o seguinte QR Code:</li>
+	</ol>
+	<img style="max-width: 150px" src="<?php echo esc_html( $qr_code_png ); ?>" alt="Qr code" />
+	<div class="code-area">
+		<span class="code-text">
+			Ou cole o seguinte código QR para fazer o pagamento ( escolha a opção Pix Copia e Cola no seu Internet Banking ).
+		</span>
 		<?php
-	else :
+		if ( $is_android ) :
+			?>
+			<div class="pix">
+				<?php echo esc_html( $qr_code ); ?>
+			</div>
+			<?php
+		else :
+			?>
+			<div id="pix-code">
+				<span class="pix"><?php echo esc_html( $qr_code ); ?></span>
+			</div>
+			<button class="copy-pix">Copiar código</button>
+			<div class="pix-copied" style="color:green;"></div>
+			<?php
+		endif;
 		?>
-		<div id="pix-code">
-			<span class="pix"><?php echo esc_html( $qr_code ); ?></span>
-		</div>
-		<button class="copy-pix">Copiar código</button>
-		<div class="pix-copied" style="color:green;"></div>
-		<?php
-	endif;
-	?>
+	</div>
 </div>
 <style>
 	.code-area {
