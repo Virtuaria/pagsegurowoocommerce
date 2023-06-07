@@ -137,16 +137,19 @@
   #pagseguro-icon-ticket,
   #pagseguro-icon-pix {
     display: block;
-    float: left;
-    margin: 0 10px 5px 0;
+    float: right;
   }
   #pagseguro-icon-pix {
-    height: 71px;
-    width: 71px;
+    height: 101px;
+    width: 101px;
   }
   #pagseguro-icon-ticket {
-    height: 51px;
-    width: 51px;
+    height: 101px;
+    width: 101px;
+  }
+  .ticket-text {
+      display: inline-block;
+      max-width: calc(100% - 121px);
   }
   #pagseguro-icon-pix {
     background: transparent url("../images/pix.png") no-repeat top right;
@@ -155,7 +158,7 @@
   }
   .pix-desc {
     display: inline-block;
-    max-width: calc(100% - 81px);
+    max-width: calc(100% - 101px);
   }
   .pix-desc > span {
       display: block;
@@ -165,6 +168,8 @@
   #pagseguro-icon-ticket {
     background: transparent url("../images/codigo-de-barras.png") no-repeat top
       right;
+      background-size: contain;
+      display: inline-block;
   }
   .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li.active:after,
   .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li.active:after {
@@ -281,6 +286,11 @@
     .woocommerce-checkout .checkout #pagseguro-payment .form-row-last {
       width: 100%;
       clear: both;
+    }
+    #pagseguro-payment .pix-desc,
+    #pagseguro-payment .ticket-text {
+        display: block;
+        max-width: 100%;
     }
   }
   @media only screen and (max-width: 479px) {

@@ -1,6 +1,6 @@
 jQuery(document).ready(function() {
     setTimeout(function(){
-        setInterval(fetch_payment_status, 5000);
+        setInterval(fetch_payment_status, 8000);
     }, 20000);
 });
 

@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -243,6 +243,13 @@ O PagSeguro não permite que o campo “Nome na Fatura” possua mais de 17 cara
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.3.1 2023-06-07 =
+* Configuração para desativar o desconto no Pix caso algum cupom seja aplicado.
+* Configuração para desativar o desconto no Pix para produtos de algumas categorias. O desconto será aplicado somente aos itens fora das categorias selecionadas.
+* Ajuste na confirmação automática do pix, em alguns ambientes a tela não mudava após o pagamento ser realizado.
+* Filter virtuaria_pagseguro_disable_discount, permite desabilitar o desconto Pix em produtos de acordo com regras personalizadas.
+* Filter ‘virtuaria_pagseguro_purchased_item’, permite manipular a lista de itens enviados ao PagSeguro.
+* Action ‘after_virtuaria_pix_validate_text’, permite adicionar conteúdo extra a caixa do pix no checkout.
 = 2.3.0 2023-05-30 =
 * Confirmação automática de pagamento Pix na tela de pedido recebido.
 * Correção na validação de acesso quando a opção do Woocommerce, criar conta no checkout estiver ativada.

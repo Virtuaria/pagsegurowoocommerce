@@ -45,27 +45,28 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->init_settings();
 
 		// Define user set variables.
-		$this->title           = $this->get_option( 'title' );
-		$this->description     = $this->get_option( 'description' );
-		$this->environment     = $this->get_option( 'environment' );
-		$this->email           = $this->get_option( 'email' );
-		$this->debug           = $this->get_option( 'debug' );
-		$this->installments    = $this->get_option( 'installments' );
-		$this->tax             = $this->get_option( 'tax' );
-		$this->min_installment = $this->get_option( 'min_installment' );
-		$this->fee_from        = $this->get_option( 'fee_from' );
-		$this->soft_descriptor = $this->get_option( 'soft_descriptor' );
-		$this->ticket_validate = $this->get_option( 'ticket_validate' );
-		$this->pix_validate    = $this->get_option( 'pix_validate' );
-		$this->pix_enable      = $this->get_option( 'pix_enable' );
-		$this->ticket_enable   = $this->get_option( 'ticket_enable' );
-		$this->credit_enable   = $this->get_option( 'credit_enable' );
-		$this->process_mode    = $this->get_option( 'process_mode' );
-		$this->debug           = $this->get_option( 'debug' );
-		$this->pix_discount    = $this->get_option( 'pix_discount' );
-		$this->invoice_prefix  = $this->get_option( 'invoice_prefix', 'WC-' );
-		$this->signup_checkout = 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' );
-		$this->pix_msg_payment = $this->get_option( 'pix_msg_payment' );
+		$this->title               = $this->get_option( 'title' );
+		$this->description         = $this->get_option( 'description' );
+		$this->environment         = $this->get_option( 'environment' );
+		$this->email               = $this->get_option( 'email' );
+		$this->debug               = $this->get_option( 'debug' );
+		$this->installments        = $this->get_option( 'installments' );
+		$this->tax                 = $this->get_option( 'tax' );
+		$this->min_installment     = $this->get_option( 'min_installment' );
+		$this->fee_from            = $this->get_option( 'fee_from' );
+		$this->soft_descriptor     = $this->get_option( 'soft_descriptor' );
+		$this->ticket_validate     = $this->get_option( 'ticket_validate' );
+		$this->pix_validate        = $this->get_option( 'pix_validate' );
+		$this->pix_enable          = $this->get_option( 'pix_enable' );
+		$this->ticket_enable       = $this->get_option( 'ticket_enable' );
+		$this->credit_enable       = $this->get_option( 'credit_enable' );
+		$this->process_mode        = $this->get_option( 'process_mode' );
+		$this->debug               = $this->get_option( 'debug' );
+		$this->pix_discount        = $this->get_option( 'pix_discount' );
+		$this->invoice_prefix      = $this->get_option( 'invoice_prefix', 'WC-' );
+		$this->signup_checkout     = 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' );
+		$this->pix_msg_payment     = $this->get_option( 'pix_msg_payment' );
+		$this->pix_discount_coupon = 'yes' === $this->get_option( 'pix_discount_coupon' );
 
 		// Active logs.
 		if ( 'yes' === $this->debug ) {
@@ -118,8 +119,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_not_authorized' ) );
 
 		add_filter( 'woocommerce_billing_fields', array( $this, 'billing_neighborhood_required' ), 9999 );
-		add_action( 'wp_ajax_fetch_payment_order', array( $this, 'fetch_payment_order' ) );
-		add_action( 'wp_ajax_nopriv_fetch_payment_order', array( $this, 'fetch_payment_order' ) );
+		add_filter( 'virtuaria_pagseguro_disable_discount', array( $this, 'disable_discount_by_product_categoria' ), 10, 2 );
 	}
 
 	/**
@@ -178,7 +178,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					);
 				}
 
-				if ( $this->pix_discount > 0 ) {
+				if ( $this->pix_discount > 0 && ( ! $this->pix_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 ) ) {
 					wp_localize_script(
 						'pagseguro-virt',
 						'pix_discount',
@@ -242,37 +242,37 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 */
 	public function init_form_fields() {
 		$this->form_fields = array(
-			'enabled'         => array(
+			'enabled'             => array(
 				'title'   => __( 'Habilitar', 'virtuaria-pagseguro' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Habilita o método de Pagamento Virtuaria PagSeguro', 'virtuaria-pagseguro' ),
 				'default' => 'yes',
 			),
-			'title'           => array(
+			'title'               => array(
 				'title'       => __( 'Título', 'virtuaria-pagseguro' ),
 				'type'        => 'text',
 				'description' => __( 'Isto controla o título exibido ao usuário durante o checkout.', 'virtuaria-pagseguro' ),
 				'desc_tip'    => true,
 				'default'     => __( 'PagSeguro', 'virtuaria-pagseguro' ),
 			),
-			'description'     => array(
+			'description'         => array(
 				'title'       => __( 'Descrição', 'virtuaria-pagseguro' ),
 				'type'        => 'textarea',
 				'description' => __( 'Controla a descrição exibida ao usuário durante o checkout.', 'virtuaria-pagseguro' ),
 				'default'     => __( 'Pague com PagSeguro.', 'virtuaria-pagseguro' ),
 			),
-			'comments'        => array(
+			'comments'            => array(
 				'title'       => __( 'Observações', 'virtuaria-pagseguro' ),
 				'type'        => 'textarea',
 				'description' => __( 'Exibe suas observações logo abaixo da descrição na tela de finalização da compra.', 'virtuaria-pagseguro' ),
 				'default'     => __( 'Na área "Detalhes de Faturamento", recomendamos inserir os dados do titular do cartão. Caso a compra seja para outra pessoa, escolha "Entregar para um endereço diferente".', 'virtuaria-pagseguro' ),
 			),
-			'integration'     => array(
+			'integration'         => array(
 				'title'       => __( 'Integração', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
 				'description' => '',
 			),
-			'environment'     => array(
+			'environment'         => array(
 				'title'       => __( 'Ambiente', 'virtuaria-pagseguro' ),
 				'type'        => 'select',
 				'description' => __( 'Selecione Sanbox para testes ou Produção para vendas reais.', 'virtuaria-pagseguro' ),
@@ -282,19 +282,19 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => 'sandbox',
 			),
-			'email'           => array(
+			'email'               => array(
 				'title'       => __( 'E-mail', 'virtuaria-pagseguro' ),
 				'type'        => 'text',
 				'description' => __( 'Informe seu e-mail utilizado na conta do Pagseguro. Isto é necessário para a confirmação do pagamento.', 'virtuaria-pagseguro' ),
 				'default'     => '',
 			),
-			'autorization'    => array(
+			'autorization'        => array(
 				'title'       => __( 'Autorização', 'virtuaria-pagseguro' ),
 				'type'        => 'auth',
 				'description' => __( 'Autorize o plugin a processar compras e reembolsos junto ao PagSeguro.', 'virtuaria-pagseguro' ),
 				'default'     => '',
 			),
-			'process_mode'    => array(
+			'process_mode'        => array(
 				'title'       => __( 'Modo de processamento', 'virtuaria-pagseguro' ),
 				'type'        => 'select',
 				'description' => __( 'Define como os dados de retorno da API serão tratados. Se for assíncrono, o processamento do checkout será mais veloz, porém a mudança de status do pedido será feita via agendamento (cron).', 'virtuaria-pagseguro' ),
@@ -304,24 +304,24 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => 'sync',
 			),
-			'invoice_prefix'  => array(
+			'invoice_prefix'      => array(
 				'title'       => __( 'Prefixo da transação', 'virtuaria-pagseguro' ),
 				'type'        => 'text',
 				'description' => __( 'Defina se você usa sua conta do PagSeguro para várias lojas, certifique-se de que esse prefixo seja único, pois o PagSeguro não permitirá pedidos com o mesmo número de fatura.', 'virtuaria-pagseguro' ),
 				'default'     => 'WC-',
 			),
-			'credit'          => array(
+			'credit'              => array(
 				'title'       => __( 'Cartão de crédito', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
 				'description' => '',
 			),
-			'credit_enable'   => array(
+			'credit_enable'       => array(
 				'title'       => __( 'Habilitar', 'virtuaria-pagseguro' ),
 				'type'        => 'checkbox',
 				'description' => __( 'Define se a opção de pagamento Crédito deve estar disponível durante o checkout.', 'virtuaria-pagseguro' ),
 				'default'     => 'yes',
 			),
-			'installments'    => array(
+			'installments'        => array(
 				'title'       => __( 'Número de parcelas', 'virtuaria-pagseguro' ),
 				'type'        => 'select',
 				'description' => __( 'Selecione o número máximo de parcelas disponíveis para seus clientes.', 'virtuaria-pagseguro' ),
@@ -341,7 +341,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => 12,
 			),
-			'min_installment' => array(
+			'min_installment'     => array(
 				'title'             => __( 'Valor mínimo da parcela (R$)', 'virtuaria-pagseguro' ),
 				'type'              => 'number',
 				'description'       => __( 'Define o valor mínimo que uma parcela pode receber.', 'virtuaria-pagseguro' ),
@@ -350,7 +350,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'step' => 'any',
 				),
 			),
-			'tax'             => array(
+			'tax'                 => array(
 				'title'             => __( 'Taxa de juros (%)', 'virtuaria-pagseguro' ),
 				'type'              => 'number',
 				'description'       => __( 'Define o percentual de juros aplicado ao parcelamento.', 'virtuaria-pagseguro' ),
@@ -359,7 +359,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'step' => '0.01',
 				),
 			),
-			'fee_from'        => array(
+			'fee_from'            => array(
 				'title'       => __( 'Parcelamento com juros ', 'virtuaria-pagseguro' ),
 				'type'        => 'select',
 				'description' => __( 'Define a partir de qual parcela os juros serão aplicados.', 'virtuaria-pagseguro' ),
@@ -377,7 +377,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'12' => '12x',
 				),
 			),
-			'soft_descriptor' => array(
+			'soft_descriptor'     => array(
 				'title'             => __( 'Nome na fatura', 'virtuaria-pagseguro' ),
 				'type'              => 'text',
 				'description'       => 'Texto exibido na fatura do cartão para identificar a loja (máximo de <b>17 caracteres</b>, não deve conter caracteres especiais ou espaços em branco).',
@@ -385,7 +385,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'maxlength' => '17',
 				),
 			),
-			'save_card_info'  => array(
+			'save_card_info'      => array(
 				'title'       => __( 'Salvar dados de pagamento?', 'woocommerce-pagseguro' ),
 				'type'        => 'select',
 				'description' => __( 'Define se será possível memorizar as informações de pagamento do cliente para compras futuras', 'woocommerce-pagseguro' ),
@@ -398,7 +398,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'always_store'     => __( 'Sempre memorizar', 'woocommerce-pagseguro' ),
 				),
 			),
-			'display'         => array(
+			'display'             => array(
 				'title'       => __( 'Formulário de crédito', 'virtuaria-pagseguro' ),
 				'type'        => 'select',
 				'description' => __( 'Define como serão exibidos os campos do checkout.' ),
@@ -408,18 +408,18 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'two' => __( 'Duas colunas', 'virtuaria-pagseguro' ),
 				),
 			),
-			'ticket'          => array(
+			'ticket'              => array(
 				'title'       => __( 'Boleto', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
 				'description' => '',
 			),
-			'ticket_enable'   => array(
+			'ticket_enable'       => array(
 				'title'       => __( 'Habilitar', 'virtuaria-pagseguro' ),
 				'type'        => 'checkbox',
 				'description' => __( 'Define se a opção de pagamento Boleto deve estar disponível durante o checkout.', 'virtuaria-pagseguro' ),
 				'default'     => 'yes',
 			),
-			'ticket_validate' => array(
+			'ticket_validate'     => array(
 				'title'             => __( 'Validade', 'virtuaria-pagseguro' ),
 				'type'              => 'number',
 				'description'       => __( 'Define o limite de dias onde o boleto pode ser pago.', 'virtuaria-pagseguro' ),
@@ -428,17 +428,17 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'min' => 1,
 				),
 			),
-			'pix'             => array(
+			'pix'                 => array(
 				'title' => __( 'PIX', 'virtuaria-pagseguro' ),
 				'type'  => 'title',
 			),
-			'pix_enable'      => array(
+			'pix_enable'          => array(
 				'title'       => __( 'Habilitar', 'virtuaria-pagseguro' ),
 				'type'        => 'checkbox',
 				'description' => __( 'Define se a opção de pagamento Pix deve estar disponível durante o checkout.', 'virtuaria-pagseguro' ),
 				'default'     => 'yes',
 			),
-			'pix_validate'    => array(
+			'pix_validate'        => array(
 				'title'       => __( 'Validade do Código PIX', 'virtuaria-pagseguro' ),
 				'type'        => 'select',
 				'description' => __( 'Define o limite de tempo para aceitar pagamentos com PIX.', 'virtuaria-pagseguro' ),
@@ -452,27 +452,39 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				),
 				'default'     => '1800',
 			),
-			'pix_discount'    => array(
-				'title'             => __( 'Desconto (%)', 'virtuaria-pagseguro' ),
-				'type'              => 'number',
-				'description'       => __( 'Define um percentual de desconto para aplicar sob o total da venda com pix', 'virtuaria-pagseguro' ),
-				'custom_attributes' => array(
-					'min'  => 0,
-					'step' => '0.01',
-				),
-			),
-			'pix_msg_payment' => array(
+			'pix_msg_payment'     => array(
 				'title'       => __( 'Pagamento confirmado', 'virtuaria-pagseguro' ),
 				'type'        => 'textarea',
 				'description' => __( 'Define a mensagem a ser exibida, na tela de pedido recebido, após a confirmação do pagamento.', 'virtuaria-pagseguro' ),
 				'default'     => 'Seu pagamento foi aprovado!',
 			),
-
+			'pix_discount'        => array(
+				'title'             => __( 'Desconto (%)', 'virtuaria-pagseguro' ),
+				'type'              => 'number',
+				'description'       => __( 'Define um percentual de desconto para aplicar sob o total da venda(não inclui o valor do frete) com pix', 'virtuaria-pagseguro' ),
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => '0.01',
+				),
+			),
+			'pix_discount_coupon' => array(
+				'title'       => __( 'Desabilitar desconto em cupons', 'virtuaria-pagseguro' ),
+				'type'        => 'checkbox',
+				'label'       => __( 'Desabilita o desconto Pix em conjunto com cupons', 'virtuaria-pagseguro' ),
+				'description' => __( 'Marque se deseja desabilitar o desconto pix quando houver cupom de desconto aplicado.', 'virtuaria-pagseguro' ),
+				'default'     => '',
+			),
+			'pix_discount_ignore' => array(
+				'title'       => __( 'Desabilitar desconto em produtos das seguintes categorias', 'virtuaria-pagseguro' ),
+				'type'        => 'ignore_discount',
+				'description' => __( 'Define as categorias que serão ignoradas para o cálculo do desconto pix.', 'virtuaria-pagseguro' ),
+				'default'     => '',
+			),
 		);
 
 		if ( current_user_can( 'install_themes' ) ) {
 			$this->form_fields['testing'] = array(
-				'title'       => __( 'Testes', 'virtuaria-pagseguro' ),
+				'title'       => __( 'Depurar', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
 				'description' => '',
 			);
@@ -1004,6 +1016,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			);
 		}
 
+		$disable_discount = $this->pix_discount_coupon && count( WC()->cart->get_applied_coupons() ) > 0;
+
 		wc_get_template(
 			'transparent-checkout.php',
 			array(
@@ -1020,7 +1034,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'credit' => 'yes' === $this->credit_enable,
 				),
 				'full_width'      => 'one' === $this->get_option( 'display' ),
-				'pix_discount'    => $this->pix_discount ? $this->pix_discount / 100 : 0,
+				'pix_discount'    => $this->pix_discount && ! $disable_discount ? $this->pix_discount / 100 : 0,
 			),
 			'woocommerce/pagseguro/',
 			Virtuaria_Pagseguro::get_templates_path()
@@ -1455,6 +1469,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					.forminp-auth .connected .status{
 						color: green;
 					}
+					.woocommerce_page_wc-settings h3.wc-settings-sub-title {
+						font-size: 1.2em;
+						border-top: 1px solid #ccc;
+						padding-top: 30px;
+						font-weight: bold;
+					}
 				</style>
 				<script>
 					function getUrlParameter(name) {
@@ -1576,17 +1596,110 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Check order status.
+	 * Display ignore discount field.
+	 *
+	 * @param string $key  the name from field.
+	 * @param array  $data the data.
 	 */
-	public function fetch_payment_order() {
-		if ( isset( $_POST['order_id'] )
-			&& isset( $_POST['payment_nonce'] )
-			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['payment_nonce'] ) ), 'fecth_order_status' ) ) {
-			if ( 'wc-processing' === get_post_status( sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) ) ) {
-				echo 'success';
+	public function generate_ignore_discount_html( $key, $data ) {
+		$field_key = $this->get_field_key( $key );
+
+		if ( isset( $_POST['woocommerce_virt_pagseguro_pix_discount_ignore'] ) ) {
+			$ignored = sanitize_text_field( wp_unslash( $_POST['woocommerce_virt_pagseguro_pix_discount_ignore'] ) );
+			$ignored = explode( ',', $ignored );
+			$this->update_option(
+				'pix_discount_ignore',
+				$ignored
+			);
+		}
+		$selected_cats = $this->get_option( 'pix_discount_ignore' );
+		ob_start();
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr( $field_key ); ?>">
+					<?php echo esc_html( $data['title'] ); ?>
+					<span class="woocommerce-help-tip" data-tip="<?php echo esc_html( $data['description'] ); ?>"></span>
+				</label>
+			</th>
+			<td class="forminp forminp-<?php echo esc_attr( $data['type'] ); ?>">
+				<input type="hidden" name="<?php echo esc_attr( $field_key ); ?>" id="<?php echo esc_attr( $field_key ); ?>" />
+				<div id="product_cat-all" class="tabs-panel">
+					<ul id="product_catchecklist" data-wp-lists="list:product_cat" class="categorychecklist form-no-clear">
+						<?php
+						wp_terms_checklist(
+							0,
+							array(
+								'taxonomy'      => 'product_cat',
+								'selected_cats' => $selected_cats,
+							)
+						);
+						?>
+					</ul>
+				</div>
+			</td>
+		</tr>
+		<script>
+			jQuery(document).ready(function($){
+				$('.woocommerce-save-button').on('click', function() {
+					let selected_cats = [];
+					$('#product_catchecklist input[type="checkbox"]:checked').each(function(i, v){
+						selected_cats.push($(v).val());
+					});
+					$('#<?php echo esc_attr( $field_key ); ?>').val(selected_cats);
+				})
+			});
+		</script>
+		<style>
+			#product_cat-all {
+				background-color: #fff;
+				max-width: 400px;
+			}
+			#product_cat-all .categorychecklist {
+				margin: 10px;
+				max-height: 145px;
+				overflow: auto;
+			}
+			#product_cat-all .children {
+				margin-left: 20px;
+			}
+		</style>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Ignore product from categorie to pix discount.
+	 *
+	 * @param boolean    $disable true if disable item otherwise false.
+	 * @param wc_product $product the itens.
+	 */
+	public function disable_discount_by_product_categoria( $disable, $product ) {
+		$ignored_categories = $this->get_option( 'pix_discount_ignore', '' );
+		if ( $ignored_categories && count( $product->get_category_ids() ) > 0 ) {
+			foreach ( $product->get_category_ids() as $category_id ) {
+				if ( in_array( $category_id, $ignored_categories ) ) {
+					$disable = true;
+					break;
+				}
 			}
 		}
-		wp_die();
+		return $disable;
 	}
 }
 
+add_action( 'wp_ajax_fetch_payment_order', 'fetch_payment_order' );
+add_action( 'wp_ajax_nopriv_fetch_payment_order', 'fetch_payment_order' );
+/**
+ * Check order status.
+ */
+function fetch_payment_order() {
+	if ( isset( $_POST['order_id'] )
+		&& isset( $_POST['payment_nonce'] )
+		&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['payment_nonce'] ) ), 'fecth_order_status' ) ) {
+		if ( 'wc-processing' === get_post_status( sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) ) ) {
+			echo 'success';
+		}
+	}
+	wp_die();
+}

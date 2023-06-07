@@ -44,7 +44,7 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 			?>
 			<li class="active">
 				<label>
-					<input id="credit-card" type="radio" name="payment_mode" value="credit" <?php echo 'credit' === $_POST['payment_mode'] ? 'checked' : ''; ?> /> <?php esc_html_e( 'Cartão de Crédito', 'virtuaria-pagseguro' ); ?>
+					<input id="credit-card" type="radio" name="payment_mode" value="credit" <?php echo isset( $_POST['payment_mode'] ) && 'credit' === $_POST['payment_mode'] ? 'checked' : ''; ?> /> <?php esc_html_e( 'Cartão de Crédito', 'virtuaria-pagseguro' ); ?>
 				</label>
 			</li>	
 				<?php
@@ -53,7 +53,7 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 			?>
 			<li>
 				<label>
-					<input id="pix" type="radio" name="payment_mode" value="pix" <?php echo 'pix' === $_POST['payment_mode'] ? 'checked' : ''; ?>/> <?php esc_html_e( 'PIX', 'virtuaria-pagseguro' ); ?>
+					<input id="pix" type="radio" name="payment_mode" value="pix" <?php echo isset( $_POST['payment_mode'] ) && 'pix' === $_POST['payment_mode'] ? 'checked' : ''; ?>/> <?php esc_html_e( 'PIX', 'virtuaria-pagseguro' ); ?>
 				</label>
 			</li>
 			<?php
@@ -62,7 +62,7 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 			?>
 			<li>
 				<label>
-					<input id="banking-ticket" type="radio" name="payment_mode" value="ticket" <?php echo 'ticket' === $_POST['payment_mode'] ? 'checked' : ''; ?>/> <?php esc_html_e( 'Boleto', 'virtuaria-pagseguro' ); ?>
+					<input id="banking-ticket" type="radio" name="payment_mode" value="ticket" <?php echo isset( $_POST['payment_mode'] ) && 'ticket' === $_POST['payment_mode'] ? 'checked' : ''; ?>/> <?php esc_html_e( 'Boleto', 'virtuaria-pagseguro' ); ?>
 				</label>
 			</li>
 			<?php
@@ -203,7 +203,6 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 		<input type="hidden" name="pagseguro_encrypted_card" id="pagseguro_encrypted_card" />
 	</div>
 	<div id="pagseguro-banking-pix-form" class="pagseguro-method-form">
-		<i id="pagseguro-icon-pix"></i>
 		<div class="pix-desc">
 			<?php
 			echo '<span>' . esc_html( __( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ) ) . '</span>';
@@ -215,25 +214,41 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 				)
 			) . '</span>';
 
+			do_action( 'after_virtuaria_pix_validate_text', WC()->cart );
+
 			if ( $pix_discount && $pix_discount > 0 ) {
 				$shipping = 0;
 				if ( isset( WC()->cart ) && WC()->cart->get_shipping_total() > 0 ) {
 					$shipping = WC()->cart->get_shipping_total();
 				}
-				$discount = ( $cart_total - $shipping ) * $pix_discount;
-				echo '<span class="discount">Desconto: <b style="color:green;">R$ ' . esc_html( number_format( $discount, 2, ',', '.' ) ) . '</b></span>';
-				echo '<span class="total">Novo total: <b style="color:green">R$ ' . esc_html( number_format( $cart_total - $discount, 2, ',', '.' ) ) . '</b></span>';
+				$discount_reduce = 0;
+				$discount        = ( $cart_total - $shipping );
+				foreach ( WC()->cart->get_cart() as $item ) {
+					$product = wc_get_product( $item['product_id'] );
+					if ( $product && apply_filters( 'virtuaria_pagseguro_disable_discount', false, $product ) ) {
+						$discount_reduce += $product->get_price() * $item['quantity'];
+					}
+				}
+				$discount -= $discount_reduce;
+				$discount  = $discount * $pix_discount;
+				if ( $discount > 0 ) {
+					echo '<span class="discount">Desconto: <b style="color:green;">R$ ' . esc_html( number_format( $discount, 2, ',', '.' ) ) . '</b></span>';
+					echo '<span class="total">Novo total: <b style="color:green">R$ ' . esc_html( number_format( $cart_total - $discount, 2, ',', '.' ) ) . '</b></span>';
+				}
 			}
 			?>
 		</div>
+		<i id="pagseguro-icon-pix"></i>
 		<div class="clear"></div>
 	</div>
 	<div id="pagseguro-banking-ticket-form" class="pagseguro-method-form">
-		<p>
-			<i id="pagseguro-icon-ticket"></i>
-			<?php esc_html_e( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ); ?>
-		</p>
-		<p><?php esc_html_e( '* Depois de clicar em "Realizar pagamento", você terá acesso ao boleto bancário, podendo imprimir e pagar via internet banking ou rede bancária credenciada.', 'virtuaria-pagseguro' ); ?></p>
+		<div class="ticket-text">
+			<p>
+				<?php esc_html_e( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ); ?>
+			</p>
+			<p><?php esc_html_e( '* Depois de clicar em "Realizar pagamento", você terá acesso ao boleto bancário, podendo imprimir e pagar via internet banking ou rede bancária credenciada.', 'virtuaria-pagseguro' ); ?></p>
+		</div>
+		<i id="pagseguro-icon-ticket"></i>
 		<div class="clear"></div>
 	</div>
 	<?php wp_nonce_field( 'do_new_charge', 'new_charge_nonce' ); ?>

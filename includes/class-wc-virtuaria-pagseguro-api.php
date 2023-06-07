@@ -121,10 +121,14 @@ class WC_Virtuaria_PagSeguro_API {
 		}
 
 		foreach ( $order->get_items() as $item ) {
-			$data['body']['items'][] = array(
-				'name'        => $item->get_name(),
-				'quantity'    => $item->get_quantity(),
-				'unit_amount' => number_format( $item->get_total() / $item->get_quantity(), 2, '', '' ),
+			$data['body']['items'][] = apply_filters(
+				'virtuaria_pagseguro_purchased_item',
+				array(
+					'name'        => $item->get_name(),
+					'quantity'    => $item->get_quantity(),
+					'unit_amount' => number_format( $item->get_total() / $item->get_quantity(), 2, '', '' ),
+				),
+				$item
 			);
 		}
 
@@ -137,9 +141,21 @@ class WC_Virtuaria_PagSeguro_API {
 				new DateTimeZone( 'America/Sao_Paulo' )
 			);
 
-			if ( floatval( $this->gateway->pix_discount ) > 0 ) {
+			if ( floatval( $this->gateway->pix_discount ) > 0 && $this->discount_enable( $order ) ) {
 				$discount  = $total / 100;
 				$discount -= $order->get_shipping_total();
+
+				$discount_reduce = 0;
+
+				foreach ( $order->get_items() as $item ) {
+					$product = wc_get_product( $item['product_id'] );
+					if ( $product && apply_filters( 'virtuaria_pagseguro_disable_discount', false, $product ) ) {
+						$discount_reduce += $item->get_total();
+					}
+				}
+
+				$this->gateway->log->add('debug', $discount_reduce, WC_Log_Levels::ALERT );
+				$discount -= $discount_reduce;
 				$total    /= 100;
 				$total    -= $discount * ( floatval( $this->gateway->pix_discount ) / 100 );
 				$total     = number_format( $total, 2, '', '' );
@@ -372,7 +388,7 @@ class WC_Virtuaria_PagSeguro_API {
 
 			$order->set_transaction_id( $response['id'] );
 
-			if ( floatval( $this->gateway->pix_discount ) > 0 ) {
+			if ( floatval( $this->gateway->pix_discount ) > 0 && $this->discount_enable( $order ) ) {
 				$fee = new WC_Order_Item_Fee();
 				$fee->set_name(
 					__(
@@ -380,10 +396,24 @@ class WC_Virtuaria_PagSeguro_API {
 						'virtuaria-pagseguro'
 					)
 				);
-				$fee->set_total( - ( $order->get_total() - $order->get_shipping_total() ) * ( floatval( $this->gateway->pix_discount ) / 100 ) );
 
-				$order->add_item( $fee );
-				$order->calculate_totals();
+				$discountable_total = $order->get_total() - $order->get_shipping_total();
+				$discount_reduce    = 0;
+
+				foreach ( $order->get_items() as $item ) {
+					$product = wc_get_product( $item['product_id'] );
+					if ( $product && apply_filters( 'virtuaria_pagseguro_disable_discount', false, $product ) ) {
+						$discount_reduce += $item->get_total();
+					}
+				}
+
+				$discountable_total -= $discount_reduce;
+				if ( $discountable_total > 0 ) {
+					$fee->set_total( - $discountable_total * ( floatval( $this->gateway->pix_discount ) / 100 ) );
+
+					$order->add_item( $fee );
+					$order->calculate_totals();
+				}
 			}
 
 			$order->save();
@@ -831,5 +861,14 @@ class WC_Virtuaria_PagSeguro_API {
 		}
 
 		return 200 === $resp_code;
+	}
+
+	/**
+	 * Check if pix discount is enable.
+	 *
+	 * @param wc_order $order   the order.
+	 */
+	private function discount_enable( $order ) {
+		return ( ! $this->gateway->pix_discount_coupon || count( $order->get_coupon_codes() ) === 0 );
 	}
 }
