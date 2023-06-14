@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.1.1
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 Requires PHP: 7.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -243,6 +243,9 @@ O PagSeguro não permite que o campo “Nome na Fatura” possua mais de 17 cara
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.3.2 2023-06-14 =
+* Ajuste no título do método de pagamento ao utilizar o modo assíncrono de processamento do pedido.
+* Texto sobre o desconto pix aparecendo mesmo com método Pix inativo.
 = 2.3.1 2023-06-07 =
 * Configuração para desativar o desconto no Pix caso algum cupom seja aplicado.
 * Configuração para desativar o desconto no Pix para produtos de algumas categorias. O desconto será aplicado somente aos itens fora das categorias selecionadas.

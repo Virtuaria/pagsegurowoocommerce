@@ -120,6 +120,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		add_filter( 'woocommerce_billing_fields', array( $this, 'billing_neighborhood_required' ), 9999 );
 		add_filter( 'virtuaria_pagseguro_disable_discount', array( $this, 'disable_discount_by_product_categoria' ), 10, 2 );
+		add_filter( 'woocommerce_gateway_title', array( $this, 'discount_pix_text' ), 10, 2 );
+		add_action( 'after_virtuaria_pix_validate_text', array( $this, 'info_about_categories' ) );
 	}
 
 	/**
@@ -175,17 +177,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						'pagseguro-virt',
 						'encriptation',
 						array( 'pub_key' => $pub_key )
-					);
-				}
-
-				if ( $this->pix_discount > 0 && ( ! $this->pix_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 ) ) {
-					wp_localize_script(
-						'pagseguro-virt',
-						'pix_discount',
-						array(
-							'discount' => '<span class="pix-discount">(desconto de <b>' . str_replace( '.', ',', $this->pix_discount ) . '%</b> no Pix)</span>',
-							'title'    => $this->title,
-						)
 					);
 				}
 
@@ -586,17 +577,18 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					}
 				}
 
-				if ( 'PIX' === $order->get_meta( '_payment_mode' ) ) {
+				$payment_method = get_post_meta( $order_id, '_payment_mode', true );
+				if ( 'PIX' === $payment_method ) {
 					$order->set_payment_method_title(
-						$order->get_payment_method_title() . ' Pix'
+						$this->title . ' Pix'
 					);
-				} elseif ( 'CREDIT_CARD' === $order->get_meta( '_payment_mode' ) ) {
+				} elseif ( 'CREDIT_CARD' === $payment_method ) {
 					$order->set_payment_method_title(
-						$order->get_payment_method_title() . ' Crédito'
+						$this->title . ' Crédito'
 					);
-				} else {
+				} elseif ( 'BOLETO' === $payment_method ) {
 					$order->set_payment_method_title(
-						$order->get_payment_method_title() . ' Boleto'
+						$this->title . ' Boleto'
 					);
 				}
 				$order->save();
@@ -1685,6 +1677,57 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			}
 		}
 		return $disable;
+	}
+
+	/**
+	 * Display discount pix text.
+	 *
+	 * @param string $title      the gateway title.
+	 * @param string $gateway_id the gateway id.
+	 */
+	public function discount_pix_text( $title, $gateway_id ) {
+		if ( 'yes' === $this->pix_enable
+			&& is_checkout()
+			&& $this->pix_discount > 0
+			&& $this->id === $gateway_id
+			&& ( ! $this->pix_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 ) ) {
+			$title .= '<span class="pix-discount">(desconto de <b>' . str_replace( '.', ',', $this->pix_discount ) . '%</b> no Pix)</span>';
+		}
+		return $title;
+	}
+
+	/**
+	 * Text about categories disable to pix discount.
+	 *
+	 * @param array $itens the cart itens.
+	 */
+	public function info_about_categories( $itens ) {
+		$ignored_categories = $this->get_option( 'pix_discount_ignore', '' );
+		if ( 'yes' === $this->pix_enable && $this->pix_discount > 0 && $ignored_categories ) {
+			$category_disabled = array();
+			foreach ( $ignored_categories as $index => $category ) {
+				$term = get_term( $category );
+				if ( $term ) {
+					$category_disabled[] = ucwords( mb_strtolower( $term->name ) );
+				}
+			}
+
+			if ( $category_disabled ) {
+				echo '<div class="info-category">' . wp_kses_post(
+					sprintf(
+						/* translators: %s: categories */
+						_nx(
+							'O desconto pix não é válido para produtos da categoria <span class="categories">%s</span>.',
+							'O desconto pix não é válido para produtos das categorias <span class="categories">%s</span>.',
+							count( $category_disabled ),
+							'Checkout',
+							'virtuaria-pagseguro'
+						),
+						implode( ', ', $category_disabled )
+					)
+				) . '</div>';
+			}
+		}
 	}
 }
 

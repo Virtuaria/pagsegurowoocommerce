@@ -263,6 +263,11 @@
     margin-top: 20px;
     margin-bottom: 20px;
   }
+  #pagseguro-banking-pix-form .info-category {
+      font-style: italic;
+      font-size: 13px;
+      margin-top: 20px;
+  }
   @media only screen and (min-width: 1024px) and (max-width: 1299px) {
     .card-in-use {
       margin-right: 0;

@@ -214,8 +214,6 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 				)
 			) . '</span>';
 
-			do_action( 'after_virtuaria_pix_validate_text', WC()->cart );
-
 			if ( $pix_discount && $pix_discount > 0 ) {
 				$shipping = 0;
 				if ( isset( WC()->cart ) && WC()->cart->get_shipping_total() > 0 ) {
@@ -236,6 +234,8 @@ function pagseguro_form_class( $card_loaded, $full_width, $default ) {
 					echo '<span class="total">Novo total: <b style="color:green">R$ ' . esc_html( number_format( $cart_total - $discount, 2, ',', '.' ) ) . '</b></span>';
 				}
 			}
+
+			do_action( 'after_virtuaria_pix_validate_text', WC()->cart );
 			?>
 		</div>
 		<i id="pagseguro-icon-pix"></i>

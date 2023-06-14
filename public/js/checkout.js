@@ -167,16 +167,3 @@ getCardFlag = function(num) {
       }
     }
 };
-
-(function($){
-	$(document.body).on('updated_checkout', function() {
-		if ( typeof pix_discount !== 'undefined' && $('label[for="payment_method_virt_pagseguro"]').find('.pix-discount').length == 0 ) {
-			$('label[for="payment_method_virt_pagseguro"]').html(
-				$('label[for="payment_method_virt_pagseguro"]').html().replace(
-					pix_discount.title,
-					pix_discount.title + pix_discount.discount
-				)
-			);
-		}
-	});
-})(jQuery);
