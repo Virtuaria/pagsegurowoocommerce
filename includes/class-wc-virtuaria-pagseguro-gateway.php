@@ -580,15 +580,15 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				$payment_method = get_post_meta( $order_id, '_payment_mode', true );
 				if ( 'PIX' === $payment_method ) {
 					$order->set_payment_method_title(
-						$this->title . ' Pix'
+						'PagSeguro Pix'
 					);
 				} elseif ( 'CREDIT_CARD' === $payment_method ) {
 					$order->set_payment_method_title(
-						$this->title . ' Crédito'
+						'PagSeguro Crédito'
 					);
 				} elseif ( 'BOLETO' === $payment_method ) {
 					$order->set_payment_method_title(
-						$this->title . ' Boleto'
+						'PagSeguro Boleto'
 					);
 				}
 				$order->save();
@@ -878,7 +878,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 			if ( $qr_code && $qr_code_png ) {
 				$validate = $this->format_pix_validate( $this->pix_validate );
-				require_once plugin_dir_path( __FILE__ ) . '../templates/payment-instructions.php';
+				require plugin_dir_path( __FILE__ ) . '../templates/payment-instructions.php';
 			}
 		}
 	}

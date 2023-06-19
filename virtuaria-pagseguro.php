@@ -5,7 +5,7 @@
  * Description: Adiciona o método de pagamento PagSeguro a sua loja virtual.
  * Author: Virtuaria
  * Author URI: https://virtuaria.com.br/
- * Version: 2.3.2
+ * Version: 2.3.3
  * License: GPLv2 or later
  *
  * @package virtuaria
@@ -66,6 +66,7 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 				add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
 				add_action( 'template_include', array( $this, 'redirect_to_homolog_page' ) );
 				add_action( 'in_admin_footer', array( $this, 'display_review_info' ) );
+				add_action( 'init', array( $this, 'initialize_payment_gateway' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'missing_dependency' ) );
 			}
@@ -215,6 +216,13 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 				echo '<style>#wpfooter{display: block;}</style>';
 				echo '<p class="review-us">Apoie nosso trabalho, deixe uma avaliação na página do plugin no WordPress clicando <a href="https://wordpress.org/support/plugin/virtuaria-pagseguro/reviews/" target="_blank">aqui</a>.</p>';
 			}
+		}
+
+		/**
+		 * Init Payment gateway instance.
+		 */
+		public function initialize_payment_gateway() {
+			WC()->payment_gateways();
 		}
 	}
 

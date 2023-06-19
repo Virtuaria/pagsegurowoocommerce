@@ -16,25 +16,27 @@ if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 	}
 }
 
-/**
- * Get form class.
- *
- * @param boolean $card_loaded true if card is loaded.
- * @param boolean $full_width  true if one column.
- * @param string  $default default class.
- */
-function pagseguro_form_class( $card_loaded, $full_width, $default ) {
-	$class = '';
-	if ( $card_loaded ) {
-		$class .= ' card-loaded';
-	}
-	if ( $full_width ) {
-		$class .= ' form-row-wide';
-	} else {
-		$class .= ' ' . $default;
-	}
+if ( ! function_exists( 'pagseguro_form_class' ) ) {
+	/**
+	 * Get form class.
+	 *
+	 * @param boolean $card_loaded true if card is loaded.
+	 * @param boolean $full_width  true if one column.
+	 * @param string  $default default class.
+	 */
+	function pagseguro_form_class( $card_loaded, $full_width, $default ) {
+		$class = '';
+		if ( $card_loaded ) {
+			$class .= ' card-loaded';
+		}
+		if ( $full_width ) {
+			$class .= ' form-row-wide';
+		} else {
+			$class .= ' ' . $default;
+		}
 
-	return $class;
+		return $class;
+	}
 }
 ?>
 <fieldset id="pagseguro-payment" data-cart_total="<?php echo esc_attr( number_format( $cart_total, 2, '.', '' ) ); ?>" class="<?php echo $card_loaded ? 'card-loaded' : ''; ?>">
