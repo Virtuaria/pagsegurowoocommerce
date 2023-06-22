@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.2.2
-Stable tag: 2.3.3
+Stable tag: 2.3.4
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -243,6 +243,8 @@ O PagSeguro não permite que o campo “Nome na Fatura” possua mais de 17 cara
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.3.4 2023-06-22 =
+* Ajuste na exibição da mensagem sobre categorias ignoradas no desconto pix.
 = 2.3.3 2023-06-19 =
 * Ajuste no carregamento do QR Code;
 * Ajuste na exibição dos campos do checkout transparente;

@@ -1703,11 +1703,20 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 */
 	public function info_about_categories( $itens ) {
 		$ignored_categories = $this->get_option( 'pix_discount_ignore', '' );
-		if ( 'yes' === $this->pix_enable && $this->pix_discount > 0 && $ignored_categories ) {
+
+		if ( is_array( $ignored_categories ) ) {
+			$ignored_categories = array_filter( $ignored_categories );
+		}
+
+		if ( 'yes' === $this->pix_enable
+			&& $this->pix_discount > 0
+			&& is_array( $ignored_categories )
+			&& $ignored_categories ) {
+
 			$category_disabled = array();
 			foreach ( $ignored_categories as $index => $category ) {
 				$term = get_term( $category );
-				if ( $term ) {
+				if ( $term && ! is_wp_error( $term ) ) {
 					$category_disabled[] = ucwords( mb_strtolower( $term->name ) );
 				}
 			}
