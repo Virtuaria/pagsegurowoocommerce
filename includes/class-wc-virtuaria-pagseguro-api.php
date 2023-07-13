@@ -252,7 +252,26 @@ class WC_Virtuaria_PagSeguro_API {
 				$to_log['body']['charges'][0]['payment_method']['card']['number']        = preg_replace( '/\d/', 'x', $to_log['body']['charges'][0]['payment_method']['card']['number'] );
 				$to_log['body']['charges'][0]['payment_method']['card']['security_code'] = preg_replace( '/\d/', 'x', $to_log['body']['charges'][0]['payment_method']['card']['security_code'] );
 			}
-			$this->gateway->log->add( $this->tag, 'Enviando novo pedido: ' . wp_json_encode( $to_log ), WC_Log_Levels::INFO );
+			unset( $to_log['headers'] );
+			if ( isset( $to_log['body']['charges'][0]['payment_method']['card']['id'] ) ) {
+				$to_log['body']['charges'][0]['payment_method']['card']['id'] = preg_replace(
+					'/\w/',
+					'x',
+					$to_log['body']['charges'][0]['payment_method']['card']['id']
+				);
+			}
+			if ( isset( $to_log['body']['charges'][0]['payment_method']['card']['encrypted'] ) ) {
+				$to_log['body']['charges'][0]['payment_method']['card']['encrypted'] = preg_replace(
+					'/\w/',
+					'x',
+					$to_log['body']['charges'][0]['payment_method']['card']['encrypted']
+				);
+			}
+			$this->gateway->log->add(
+				$this->tag,
+				'Enviando novo pedido: ' . wp_json_encode( $to_log ),
+				WC_Log_Levels::INFO
+			);
 		}
 
 		$data['body'] = wp_json_encode( $data['body'] );
@@ -454,9 +473,11 @@ class WC_Virtuaria_PagSeguro_API {
 		);
 
 		if ( $this->debug_on ) {
+			$to_log = $data;
+			unset( $to_log['headers'] );
 			$this->gateway->log->add(
 				$this->tag,
-				'Reembolso para o pedido ' . $order_id . ' (' . $charge . ') ' . wp_json_encode( $data ),
+				'Reembolso para o pedido ' . $order_id . ' (' . $charge . ') ' . wp_json_encode( $to_log ),
 				WC_Log_Levels::INFO
 			);
 		}
@@ -705,6 +726,15 @@ class WC_Virtuaria_PagSeguro_API {
 		}
 
 		if ( $this->debug_on ) {
+			$to_log = $data;
+			unset( $to_log['headers'] );
+			if ( isset( $to_log['body']['charges'][0]['payment_method']['card']['id'] ) ) {
+				$to_log['body']['charges'][0]['payment_method']['card']['id'] = preg_replace(
+					'/\w/',
+					'x',
+					$to_log['body']['charges'][0]['payment_method']['card']['id']
+				);
+			}
 			$this->gateway->log->add(
 				$this->tag,
 				'Enviando cobrança adicional: ' . wp_json_encode( $data ),
@@ -870,5 +900,45 @@ class WC_Virtuaria_PagSeguro_API {
 	 */
 	private function discount_enable( $order ) {
 		return ( ! $this->gateway->pix_discount_coupon || count( $order->get_coupon_codes() ) === 0 );
+	}
+
+	/**
+	 * Get public key using client token.
+	 *
+	 * @param string $charge_id the charge id.
+	 */
+	public function fetch_payment_status( $charge_id ) {
+		$request = wp_remote_get(
+			$this->endpoint . 'charges/' . $charge_id,
+			array(
+				'headers' => array(
+					'Authorization'  => 'Bearer ' . $this->gateway->token,
+					'Content-Type'   => 'application/json',
+					'Content-Length' => 0,
+				),
+			)
+		);
+
+		if ( $this->debug_on ) {
+			$this->gateway->log->add(
+				$this->tag,
+				'Resposta do servidor ao consultar pagamento da cobrança ' . $charge_id . ': ' . wp_json_encode( $request ),
+				WC_Log_Levels::INFO
+			);
+		}
+
+		if ( is_wp_error( $request ) || ! in_array( wp_remote_retrieve_response_code( $request ), array( 200, 201 ), true ) ) {
+			$error_message = is_wp_error( $request ) ? $request->get_error_message() : wp_remote_retrieve_body( $request );
+			if ( $this->debug_on ) {
+				$this->gateway->log->add(
+					$this->tag,
+					'Falha ao obter status de pagamento: ' . $error_message,
+					WC_Log_Levels::ERROR
+				);
+			}
+			return false;
+		}
+
+		return json_decode( wp_remote_retrieve_body( $request ), true )['status'];
 	}
 }

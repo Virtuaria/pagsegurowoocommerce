@@ -122,6 +122,10 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		add_filter( 'virtuaria_pagseguro_disable_discount', array( $this, 'disable_discount_by_product_categoria' ), 10, 2 );
 		add_filter( 'woocommerce_gateway_title', array( $this, 'discount_pix_text' ), 10, 2 );
 		add_action( 'after_virtuaria_pix_validate_text', array( $this, 'info_about_categories' ) );
+
+		// Fetch order status.
+		add_action( 'add_meta_boxes_shop_order', array( $this, 'fetch_order_status_metabox' ), 10 );
+		add_action( 'save_post_shop_order', array( $this, 'search_order_payment_status' ) );
 	}
 
 	/**
@@ -300,6 +304,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'type'        => 'text',
 				'description' => __( 'Defina se você usa sua conta do PagSeguro para várias lojas, certifique-se de que esse prefixo seja único, pois o PagSeguro não permitirá pedidos com o mesmo número de fatura.', 'virtuaria-pagseguro' ),
 				'default'     => 'WC-',
+			),
+			'payment_status'      => array(
+				'title'       => __( 'Status após confirmação', 'virtuaria-pagseguro' ),
+				'type'        => 'select',
+				'description' => __( 'Define o status que o plugin usará ao receber confirmação de pagamento.', 'virtuaria-pagseguro' ),
+				'options'     => $this->get_payment_status(),
+				'default'     => 'processing',
 			),
 			'credit'              => array(
 				'title'       => __( 'Cartão de crédito', 'virtuaria-pagseguro' ),
@@ -537,9 +548,9 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						$order->save();
 					}
 					if ( 'async' !== $this->process_mode ) {
-						$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+						$order->update_status( $this->get_option( 'payment_status' ), __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 					} else {
-						$args = array( $order_id, 'processing' );
+						$args = array( $order_id, $this->get_option( 'payment_status' ) );
 						if ( ! wp_next_scheduled( 'pagseguro_process_update_order_status', $args ) ) {
 							wp_schedule_single_event(
 								strtotime( 'now' ) + 60,
@@ -720,8 +731,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 									)
 								);
 
-								if ( ! $order->has_status( 'processing' ) ) {
-									$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+								if ( ! $order->has_status( $this->get_option( 'payment_status' ) ) ) {
+									$order->update_status( $this->get_option( 'payment_status' ), __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 								}
 
 								if ( $is_additional_charge ) {
@@ -797,7 +808,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 							)
 						);
 						if ( ! $is_additional_charge ) {
-							$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+							$order->update_status( $this->get_option( 'payment_status' ), __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 						}
 						break;
 					case 4:
@@ -810,7 +821,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 							)
 						);
 						if ( ! $is_additional_charge ) {
-							$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+							$order->update_status( $this->get_option( 'payment_status' ), __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 						}
 						break;
 					case 5:
@@ -966,7 +977,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		if ( $amount
 			&& $amount > 1
-			&& 'processing' === $order->get_status()
+			&& $this->get_option( 'payment_status' ) === $order->get_status()
 			&& 'BOLETO' !== $order->get_meta( '_payment_mode' ) ) {
 			if ( $this->api->refund_order( $order_id, $amount ) ) {
 				$order->add_order_note( 'PagSeguro: Reembolso de R$' . $amount . ' bem sucedido.', 0, true );
@@ -1093,15 +1104,15 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		if ( ! $order
 			|| 'BOLETO' === $order->get_meta( '_payment_mode' )
-			|| ( 'CREDIT_CARD' === $order->get_meta( '_payment_mode' ) && 'processing' !== $order->get_status() )
-			|| ( 'PIX' === $order->get_meta( '_payment_mode' ) && ! in_array( $order->get_status(), array( 'on-hold', 'processing' ), true ) )
+			|| ( 'CREDIT_CARD' === $order->get_meta( '_payment_mode' ) && $this->get_option( 'payment_status' ) !== $order->get_status() )
+			|| ( 'PIX' === $order->get_meta( '_payment_mode' ) && ! in_array( $order->get_status(), array( 'on-hold', $this->get_option( 'payment_status' ) ), true ) )
 			|| 'virt_pagseguro' !== $order->get_payment_method()
 			|| ( ! isset( $options['enabled'] ) || 'yes' !== $options['enabled'] )
 			|| ( ( ! isset( $credit['token'] ) || ! $credit['token'] ) && 'PIX' !== $order->get_meta( '_payment_mode' ) ) ) {
 			return;
 		}
 
-		$title = 'processing' === $order->get_status()
+		$title = $this->get_option( 'payment_status' ) === $order->get_status()
 			? __( 'Cobrança Adicional', 'virtuaria-pagseguro' ) : __( 'Nova Cobrança', 'virtuaria-pagseguro' );
 		add_meta_box(
 			'pagseguro-additional-charge',
@@ -1147,7 +1158,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 */
 	public function do_additional_charge( $order_id ) {
 		$order = wc_get_order( $order_id );
-		if ( ! $order || ! in_array( $order->get_status(), array( 'on-hold', 'processing' ), true ) ) {
+		if ( ! $order || ! in_array( $order->get_status(), array( 'on-hold', $this->get_option( 'payment_status' ) ), true ) ) {
 			return;
 		}
 
@@ -1372,7 +1383,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					$order->update_status( 'on-hold', __( 'PagSeguro: Aguardando confirmação de pagamento.', 'virtuaria-pagseguro' ) );
 				}
 			} else {
-				$order->update_status( 'processing', __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
+				$order->update_status( $this->get_option( 'payment_status' ), __( 'PagSeguro: Pagamento aprovado.', 'virtuaria-pagseguro' ) );
 			}
 		}
 	}
@@ -1688,6 +1699,8 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function discount_pix_text( $title, $gateway_id ) {
 		if ( 'yes' === $this->pix_enable
 			&& is_checkout()
+			&& isset( $_REQUEST['wc-ajax'] )
+			&& 'update_order_review' === $_REQUEST['wc-ajax']
 			&& $this->pix_discount > 0
 			&& $this->id === $gateway_id
 			&& ( ! $this->pix_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 ) ) {
@@ -1738,6 +1751,153 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			}
 		}
 	}
+
+	/**
+	 * Get store order status.
+	 */
+	private function get_payment_status() {
+		$status = array();
+		foreach ( wc_get_order_statuses() as $key => $text ) {
+			if ( ! in_array( $key, array( 'wc-pending', 'wc-cancelled', 'wc-refunded', 'wc-failed' ), true ) ) {
+				$status[ str_replace( 'wc-', '', $key ) ] = $text;
+			}
+		}
+		return $status;
+	}
+
+	/**
+	 * Create box to fetch order status.
+	 *
+	 * @param wc_order $order the order.
+	 */
+	public function fetch_order_status_metabox( $order ) {
+		if ( is_a( $order, 'WP_Post' ) && get_post_meta( $order->ID, '_charge_id', true ) ) {
+			add_meta_box(
+				'fetch-status',
+				__( 'Consultar PagSeguro', 'virtuaria-pagseguro' ),
+				array( $this, 'fetch_order_status_content' ),
+				'shop_order',
+				'side'
+			);
+		}
+	}
+
+	/**
+	 * Fetch order status box callback.
+	 */
+	public function fetch_order_status_content() {
+		global $post;
+		?>
+		<small>Clique para checar o status de pagamento deste pedido no painel do PagSeguro.</small>
+		<small>O resultado da consulta será exibido nas notas(histórico) do pedido.</small>
+		<button id="fetch-order-payment" class="button-primary button">
+			Verificar Status<span class="dashicons dashicons-money-alt" style="vertical-align: middle;margin-left:5px"></span>
+		</button>
+		<input type="hidden" name="fetch_order_payment">
+		<script>
+			jQuery(document).ready(function($){
+				$('#fetch-order-payment').on('click', function(){
+					$('input[name="fetch_order_payment"]').val('<?php echo esc_html( $post->ID ); ?>');
+				});
+			});
+		</script>
+		<style>
+			#fetch-status small {
+				display: block;
+				margin-bottom: 10px;
+			}
+			#fetch-order-payment {
+				display: table;
+				margin: 0 auto;
+			}
+		</style>
+		<?php
+		wp_nonce_field( 'search_order_payment_status', 'fetch_payment_nonce' );
+	}
+
+	/**
+	 * Search payment status.
+	 */
+	public function search_order_payment_status() {
+		if ( isset( $_POST['fetch_order_payment'] )
+			&& isset( $_POST['fetch_payment_nonce'] )
+			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['fetch_payment_nonce'] ) ), 'search_order_payment_status' ) ) {
+			$order = wc_get_order(
+				sanitize_text_field(
+					wp_unslash(
+						$_POST['fetch_order_payment']
+					)
+				)
+			);
+
+			if ( $order ) {
+				$status = $this->api->fetch_payment_status(
+					get_post_meta(
+						$order->get_id(),
+						'_charge_id',
+						true
+					)
+				);
+
+				if ( $status ) {
+					$translated = $status;
+
+					switch ( $status ) {
+						case 'AUTHORIZED':
+							$translated = __(
+								'Pré-autorizada. O total do pedido está reservado no cartão de crédito do cliente.',
+								'virtuaria-pagseguro'
+							);
+							break;
+						case 'PAID':
+							$translated = __(
+								'Paga.',
+								'virtuaria-pagseguro'
+							);
+							break;
+						case 'IN_ANALYSIS':
+							$translated = __(
+								'Em análise. O comprador optou por pagar com um cartão de crédito e o PagSeguro está analisando o risco da transação.',
+								'virtuaria-pagseguro'
+							);
+							break;
+						case 'DECLINED':
+							$translated = __(
+								'Negada pelo PagSeguro ou Emissor do Cartão de Crédito.',
+								'virtuaria-pagseguro'
+							);
+							break;
+						case 'CANCELED':
+							$translated = __(
+								'Cancelada.',
+								'virtuaria-pagseguro'
+							);
+							break;
+						case 'WAITING':
+							$translated = __(
+								'Aguardando Pagamento.',
+								'virtuaria-pagseguro'
+							);
+							break;
+					}
+					$order->add_order_note(
+						'Consulta PagSeguro: Transação ' . $translated,
+						0,
+						true
+					);
+					return;
+				}
+			}
+
+			if ( ! $status && $order ) {
+				$order->add_order_note(
+					'PagSeguro: Não possível consultar o status de pagamento do pedido. Consulte o log para mais detalhes.',
+					0,
+					true
+				);
+			}
+		}
+	}
 }
 
 add_action( 'wp_ajax_fetch_payment_order', 'fetch_payment_order' );
@@ -1749,7 +1909,8 @@ function fetch_payment_order() {
 	if ( isset( $_POST['order_id'] )
 		&& isset( $_POST['payment_nonce'] )
 		&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['payment_nonce'] ) ), 'fecth_order_status' ) ) {
-		if ( 'wc-processing' === get_post_status( sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) ) ) {
+		$options = get_option( 'woocommerce_virt_pagseguro_settings' );
+		if ( 'wc-' . $options['payment_status'] === get_post_status( sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) ) ) {
 			echo 'success';
 		}
 	}

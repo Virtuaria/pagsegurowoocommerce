@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
 Requires at least: 4.7
 Tested up to: 6.2.2
-Stable tag: 2.3.4
+Stable tag: 2.4.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -27,7 +27,9 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * Identificação na fatura para pagamentos via cartão (exibir na fatura);
 * Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no PagSeguro;
 * Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
-* Permite que a mesma conta do PagSeguro seja usada em várias lojas virtuais diferentes.
+* Permite que a mesma conta do PagSeguro seja usada em várias lojas virtuais diferentes;
+* Permite definir o status de pagamento confirmado via configuração;
+* Permite a consulta do status de pagamento na tela do pedido.
 
 [youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
 
@@ -222,6 +224,11 @@ Também é possível gerar um relatório detalhado do sistema no menu "Woocommer
 
 O PagSeguro não permite que o campo “Nome na Fatura” possua mais de 17 caracteres. Também não permite o uso de caracteres especiais ou espaços em branco. Isso pode gerar a mensagem "PagSeguro: Verifique os dados digitados e tente novamente". A partir da versão 2.3.0, a configuração do plugin não permite que o limite de caracteres seja excedido, então, caso tenha preenchido este campo em uma versão antiga e o nome esteja fora do padrão, basta ajustar o campo e salvar a configuração.
 
+= 18 - Pedidos no Pix sendo Cancelado
+Quando uma compra é feita via pagamento com Pix, é criado um pedido com status “Aguardando” no painel, porém, caso o pagamento do Pix não seja identificado até o tempo limite, o pedido mudará para o status “Cancelado” automaticamente. O tempo limite é definido no campo “Validade do Código PIX” na tela de configurações do plugin (existe uma tolerância de 30 min, além do tempo limite).
+Se o pagamento foi feito, mas não identificado pelo plugin, algumas orientações podem ser encontradas no tópico 9 desta FAQ.
+
+
 
 == Screenshots ==
 
@@ -236,13 +243,17 @@ O PagSeguro não permite que o campo “Nome na Fatura” possua mais de 17 cara
 9. Boleto bancário;
 10. Boleto bancário no e-mail de novo pedido;
 11. Pagamento com Pix;
-12. Segunda via do Pix no e-mail de novo pedido.
+12. Segunda via do Pix no e-mail de novo pedido;
+13. Consulta de status de pagamento.
 
 
 == Upgrade Notice ==
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.4.0 2023-07-13 =
+* Nova configuração que permite o controle do status utilizado para indicar que o pagamento do pedido foi confirmado, padrão “Processando”;
+* Opção de consulta de status de pagamento na tela de gerenciamento dos pedidos.
 = 2.3.4 2023-06-22 =
 * Ajuste na exibição da mensagem sobre categorias ignoradas no desconto pix.
 = 2.3.3 2023-06-19 =
