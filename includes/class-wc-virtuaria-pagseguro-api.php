@@ -121,15 +121,17 @@ class WC_Virtuaria_PagSeguro_API {
 		}
 
 		foreach ( $order->get_items() as $item ) {
-			$data['body']['items'][] = apply_filters(
-				'virtuaria_pagseguro_purchased_item',
-				array(
-					'name'        => $item->get_name(),
-					'quantity'    => $item->get_quantity(),
-					'unit_amount' => number_format( $item->get_total() / $item->get_quantity(), 2, '', '' ),
-				),
-				$item
-			);
+			if (  $item->get_total() > 0 ) {
+				$data['body']['items'][] = apply_filters(
+					'virtuaria_pagseguro_purchased_item',
+					array(
+						'name'        => substr( $item->get_name(), 0, 99 ),
+						'quantity'    => $item->get_quantity(),
+						'unit_amount' => number_format( $item->get_total() / $item->get_quantity(), 2, '', '' ),
+					),
+					$item
+				);
+			}
 		}
 
 		if ( 'pix' === $posted['payment_mode'] ) {

@@ -1,41 +1,75 @@
 === Virtuaria - PagSeguro Crédito, Pix e Boleto ===
 Contributors: tecnologiavirtuaria
-Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto
+Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito
 Requires at least: 4.7
 Tested up to: 6.2.2
-Stable tag: 2.4.0
+Stable tag: 2.5.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Adiciona o PagSeguro como método de pagamento para o Woocommerce.
-
 == Description ==
 
-Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce com confirmação automática do pagamento nos 3 métodos. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
+**Adiciona o PagSeguro como método de pagamento para seu e-commerce Woocommerce. Mais Segurança e eficiência para seu Woocommerce.**
 
-* Suporte a Crédito, Pix e Boleto Bancário;
-* Opção de parcelamento com ou sem juros (configurável no plugin);
-* Disparo de cobrança extra;
-* Reembolso (total e parcial);
-* Modo de processamento (síncrono ou assíncrono) do checkout;
-* Opção do cliente salvar método de pagamento (sem armazenar o número do cartão do cliente);
-* Boleto com prazo de validade configurável;
-* Link de segunda via do boleto na tela de confirmação e no e-mail com os detalhes do pedido;
-* Checkout Transparente (permite fazer o pagamento sem sair do site);
-* Relatório (log) para consulta a detalhes de transações, incluindo erros;
-* Identificação na fatura para pagamentos via cartão (exibir na fatura);
-* Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no PagSeguro;
-* Detalhamento nas notas do pedido das operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
-* Permite que a mesma conta do PagSeguro seja usada em várias lojas virtuais diferentes;
-* Permite definir o status de pagamento confirmado via configuração;
-* Permite a consulta do status de pagamento na tela do pedido.
+Fácil de instalar e configurar, permite pagamentos no cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce, com confirmação automática do pagamento nos 3 métodos. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
+
+### ⭐ **Virtuaria & PagSeguro: Parceiros em Excelência** ⭐
+
+A qualidade do nosso plugin chamou a atenção do próprio PagSeguro, resultando em uma parceria da qual nos orgulhamos muito. Esta união não só fortalece a confiabilidade e eficiência do nosso plugin, mas também traz benefícios exclusivos, como **taxas especiais**, para todos os usuários que optem pelo nosso plugin. 
+![Pareceria Virtuaria e PagSeguro](https://teravirt.s3-accelerate.amazonaws.com/uploads/sites/107/2023/09/pagSeguro-virtuaria-1.jpg)
+
+Desfrute de **taxas com desconto** no PagSeguro. É simples ativar essa oferta: Basta escolher a taxa especial desejada no painel de configuração do plugin.  
+
+#### **Opções de Taxa:**
+- **Especial Virtuaria 01**: Crédito 3,79% (recebimento em 30 dias) | Pix 0,99% | Boleto R$ 2,99;
+- **Especial Virtuaria 02**: Crédito 4,39% (recebimento em 14 dias) | Pix 0,99% | Boleto R$ 2,99;
+- **Negociada PagSeguro**: Caso já tenha negociado com o PagSeguro uma taxa personalizada melhor;
+- **Padrão do PagSeguro**Taxas padrão da plataforma PagSeguro.
+
+*Obs.: Caso já esteja usando o plugin, é preciso refazer a conexão para ativar o desconto.*  
+
+### ✅ **Funcionalidades Principais:**
+* **Múltiplos métodos de pagamento**: Suporte a Crédito, Pix e Boleto Bancário;
+* **Opções de parcelamento**: Com ou sem juros, configurável no próprio plugin;
+- **Disparo de cobrança extra**: Cobrar um valor adicional do cliente;
+- **Reembolso fácil**: Seja total ou parcial, crédito ou Pix;
+- **Otimize o checkout**: Modos síncrono e assíncrono;
+- **Salvar método de pagamento**: Para acelerar as próximas compras (sem armazenar dados do cartão);
+- **Boleto**: Com prazo de validade configurável;
+- **Atualizações de status**: Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) em tempo real, via Webhook;
+- **Checkout transparente**: Permite fazer o pagamento sem sair da tela de sua loja virtual;
+- **Log detalhado**: Para consulta a detalhes de transações, incluindo erros;
+* **Identificação na fatura**: Para pagamentos via cartão (exibir na fatura);
+- **Detalhamento das operações**: Acompanhe nas notas dos pedidos, as operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
+- **Use a mesma conta PagSeguro**: Em múltiplas lojas virtuais;
+* **Status pagamento confirmado** Permite definir via configuração, qual status identifica o pagamento confirmado;
+- **Consulta status no PagSeguro**: Permite consultar o status atual da transação no PagSeguro a qualquer momento.
 
 [youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
 
-### Pix ###
-* Confirmação automática do pagamento, semelhante a cartão de crédito; 
-* Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
+
+## ✨ Ativação
+Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
+
+## 🌟 **Suporte Premium**
+
+Embora o plugin Virtuaria PagSeguro seja **gratuito e de código aberto**, entendemos que, às vezes, os usuários podem precisar de assistência especializada. Por isso, oferecemos nosso Suporte Premium.
+- **Instalação e configuração completa:** R$ 290,00
+    - Inclui treinamento geral e homologação do funcionamento do plugin na sua loja virtual;
+    - Duração: até 1 hora (Google Meet);
+- **Suporte Avançado:**
+    - Se durante a instalação e configuração, identificarmos problemas em códigos de terceiros, nossa equipe está preparada para auxiliar. Faremos uma análise e lhe explicaremos o escopo do problema.
+    - Investimento: R$ 190,00 por hora.
+
+💌 **Interessado?** 
+Não hesite! Contate-nos diretamente em [tecnologia@virtuaria.com.br](mailto:tecnologia@virtuaria.com.br) e garanta uma solução sob medida para suas necessidades.
+
+## Recursos
+
+### 🚀 **Pix**
+* Confirmação automática do pagamento, semelhante a cartão de crédito;
+* Atualizações de status em tempo real para seus pedidos. Mudança automática dos status (aprovado, negado, cancelado, etc) via Webhook de retorno de dados dos status no Pagseguro;
 * Reembolso total e parcial;
 * Tempo limite para pagamento configurável;
 * “Nova Cobrança Pix”, muito útil para cobrança de valores extras ou nos casos onde o cliente perde o tempo limite de pagamento;
@@ -44,44 +78,36 @@ Fácil de instalar e configurar, permite pagamentos no Cartão de Crédito, Pix 
 * Desconto percentual configurável para pagamento no Pix;
 * Confirmação automática de pagamento na tela do pedido "[ver mais](https://teravirt.s3-accelerate.amazonaws.com/uploads/sites/107/2023/05/Finalizar-compras-_-SUPER-COMPRAS-loja-para-testes-Os-melhores-produtos-084027.gif)".
 
-Atenção: Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
+⚠️ Atenção:  É obrigatório que exista uma chave Pix cadastrada na sua conta de vendedor no painel do PagSeguro. Qualquer chave Pix, não precisa criar uma exclusiva para este plugin. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
-### Ativação ###
-Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
 
-### Salvar Método de Pagamento ###
-É disponibilizado ao lojista uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
+### 🔒 **Salvar Método de Pagamento**
+Para compras futuras mais ágeis, o plugin permite uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
 
-### Cobrança Extra ###
+### 💳 **Cobrança Extra**
 O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. Para realizar cobranças extras, é necessário que a função de armazenar dados do pagamento esteja ativa.
 
-### Processamento Assíncrono ###
-Uma novidade desta versão é o modo de processamento do pedido. Com ele a mudança de status do pedido pode ser realizada em background(Assíncrono), o que confere muito mais rapidez ao checkout.
+### ⚡ **Otimização do Checkout**
+O plugin possui uma configuração para ativar o modo de processamento assíncrono do pedido. Isso permite que algumas das atualizações de status que ocorrem durante a finalização da compra, sejam feitas em segundo plano e de forma assíncrona, acelerando significativamente o checkout. Recomendamos ativar somente se seus clientes costumam comprar muitos itens de uma vez e isto esteja deixando o seu checkout lento.
 
-### Observações: ###
-[PagSeguro](https://pagseguro.uol.com.br/) é um método de pagamento brasileiro desenvolvido pela UOL. Este plugin foi desenvolvido, sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro](https://dev.pagseguro.uol.com.br/reference/intro-charge) e utiliza a última versão ( 4.0 ) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
- 
-Todas as compras são processadas utilizando o checkout transparente:
-- **Transparente:** O cliente faz o pagamento direto no seu site sem precisar ir ao site do PagSeguro.
 
-Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde, mas o plugin é 100% compatível com o painel padrão do Wordpress.
+## Observações:
 
-**Para mais informações, acesse** [virtuaria.com.br - desenvolvimento de plugins, criação e hospedagem de lojas virtuais](https://virtuaria.com.br/) ou envie um email para tecnologia@virtuaria.com.br
+- [PagSeguro](https://pagseguro.uol.com.br/) é uma plataforma de pagamento brasileira desenvolvida pela UOL. Este plugin foi desenvolvido sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro] e utiliza a última versão ( 4.0 ) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
+- Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde, mas o plugin é 100% compatível com o painel padrão do Wordpress.  
+- **Para mais informações, acesse** [virtuaria.com.br - desenvolvimento de plugins, criação e hospedagem de lojas virtuais](https://virtuaria.com.br/) ou envie um email para tecnologia@virtuaria.com.br
 
-Em caso de atualização a partir da versão 1.x, é necessária uma nova autenticação junto ao PagSeguro. O processo está muito mais simples. Favor consultar a aba "Instalação" logo acima para mais detalhes.
 
 = Compatibilidade =
 
 Este plugin necessita do [WooCommerce Extra Checkout Fields for Brazil](http://wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/) para funcionar corretamente.
+
 Compatível com Woocommerce 5.8.0 ou superior
 
 = Contribuição =
 
 Se desejar contribuir com o desenvolvimento do plugin, nos envie um pull request no [Github](https://github.com/Virtuaria/pagsegurowoocommerce).
 
-= Suporte Individualizado =
-
-Caso precise de suporte individualizado relacionado ao plugin Virtuaria PagSeguro, incluindo: Instalação e configuração; Análise e ajustes no seu código fonte para correção de bugs; Desenvolvimento ou personalização de  funcionalidades sob demanda, entre em contato conosco pelo email tecnologia@virtuaria.com.br para fazermos uma proposta.
 
 == Installation ==
 
@@ -95,9 +121,6 @@ Caso precise de suporte individualizado relacionado ao plugin Virtuaria PagSegur
 * Clique em salvar novamente;
 
 **Apenas com isso já é possível receber os pagamentos e fazer o retorno automático de dados.**
-
-### Atenção:### Para vendas com Pix, é necessário que exista uma chave Pix cadastrada na conta do vendedor no painel do PagSeguro. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
-
 
 = Requerimentos: =
 
@@ -224,9 +247,21 @@ Também é possível gerar um relatório detalhado do sistema no menu "Woocommer
 
 O PagSeguro não permite que o campo “Nome na Fatura” possua mais de 17 caracteres. Também não permite o uso de caracteres especiais ou espaços em branco. Isso pode gerar a mensagem "PagSeguro: Verifique os dados digitados e tente novamente". A partir da versão 2.3.0, a configuração do plugin não permite que o limite de caracteres seja excedido, então, caso tenha preenchido este campo em uma versão antiga e o nome esteja fora do padrão, basta ajustar o campo e salvar a configuração.
 
-= 18 - Pedidos no Pix sendo Cancelado
+= 18 - Pedidos no Pix sendo Cancelado =
 Quando uma compra é feita via pagamento com Pix, é criado um pedido com status “Aguardando” no painel, porém, caso o pagamento do Pix não seja identificado até o tempo limite, o pedido mudará para o status “Cancelado” automaticamente. O tempo limite é definido no campo “Validade do Código PIX” na tela de configurações do plugin (existe uma tolerância de 30 min, além do tempo limite).
 Se o pagamento foi feito, mas não identificado pelo plugin, algumas orientações podem ser encontradas no tópico 9 desta FAQ.
+
+= 19 - Como ativar as taxas especiais?
+A partir da versão 2.5.0 a Virtuaria em parceria com o PagSeguro, disponibilizam condições especiais relacionadas a taxa cobrada dos lojistas usuários do plugin. Para habilitar estas novas taxas é necessário desconectar o plugin e reconectá-lo utilizando uma das taxas especiais fornecidas na tela de configuração do plugin.
+
+Atualmente temos as seguintes opções:
+* Especial Virtuaria 01: Crédito 3,79% (recebimento em 30 dias) | Pix 0,99% | Boleto R$ 2,99;
+* Especial Virtuaria 02: Crédito 4,39% (recebimento em 14 dias) | Pix 0,99% | Boleto R$ 2,99;
+* Negociada PagSeguro (caso tenha negociado com o PagSeguro uma taxa personalizada);
+* Padrão do PagSeguro.
+
+**Observação:** As taxas podem ser alteradas a critério do PagSeguro.
+
 
 
 
@@ -251,6 +286,13 @@ Se o pagamento foi feito, mas não identificado pelo plugin, algumas orientaçõ
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.5.0 2023-09-05 =
+* Taxas especiais para clientes;
+* Estilização da tela de configurações;
+* Warning no template de checkout transparente;
+* Ajuste para impedir o envio de produtos com preço 0 no JSON de produtos;
+* Atualização dos modelos de tradução (.POT, .PO, .MO); 
+* Ajuste para limitar a 100, o número de caracteres do título de produtos.
 = 2.4.0 2023-07-13 =
 * Nova configuração que permite o controle do status utilizado para indicar que o pagamento do pedido foi confirmado, padrão “Processando”;
 * Opção de consulta de status de pagamento na tela de gerenciamento dos pedidos.

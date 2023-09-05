@@ -8,7 +8,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$settings = get_option( 'woocommerce_virt_pagseguro_settings' );
+$settings    = get_option( 'woocommerce_virt_pagseguro_settings' );
+$card_loaded = false;
 if ( is_user_logged_in() && 'do_not_store' !== $settings['save_card_info'] ) {
 	$pagseguro_card_info = get_user_meta( get_current_user_id(), '_pagseguro_credit_info_store_' . get_current_blog_id(), true );
 	if ( isset( $pagseguro_card_info['token'] ) ) {

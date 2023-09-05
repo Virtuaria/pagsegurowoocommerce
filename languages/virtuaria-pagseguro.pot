@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Virtuaria - Pagseguro para Woocommerce\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-29 18:05+0000\n"
+"POT-Creation-Date: 2023-08-25 14:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -16,88 +16,263 @@ msgstr ""
 "X-Loco-Version: 2.5.5; wp-5.8.2\n"
 "X-Domain: virtuaria-pagseguro"
 
-#: templates/transparent-checkout.php:149
+#: templates/transparent-checkout.php:252
 msgid ""
 "* Depois de clicar em \"Realizar pagamento\", você terá acesso ao boleto "
-"bancário, podendo imprimir e pagar em via internet ou rede bancária "
+"bancário, podendo imprimir e pagar via internet banking ou rede bancária "
 "credenciada."
 msgstr ""
 
-#: templates/transparent-checkout.php:95
+#. %s: card itens
+#: templates/transparent-checkout.php:157
 #, php-format
 msgid ""
-"<span class=\"card-brand\"><i class=\"fa fa-credit-card-alt\" aria-"
-"hidden=\"true\"></i>%1$s</span><span class=\"number\">**** **** **** "
-"%2$s</span><span class=\"holder\">%3$s</span>"
+"<span class=\"card-brand\"><img src=\"%1$s\" alt=\"Cartão\" /></i>%2$s</span>"
+"<span class=\"number\">**** **** **** %3$s</span><span class=\"holder\">"
+"%4$s</span>"
 msgstr ""
 
 #. Description of the plugin
 msgid "Adiciona o método de pagamento PagSeguro a sua loja virtual."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:142
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1899
+msgid "Aguardando Pagamento."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:287
 msgid "Ambiente"
 msgstr ""
 
-#: templates/transparent-checkout.php:124
+#: templates/transparent-checkout.php:187
 msgid ""
 "Ao finalizar a compra, permito que a loja memorize esta forma de pagamento."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:211
-#: templates/transparent-checkout.php:31
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:314
+msgid "Assíncrono"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:303
+msgid "Autorização"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:305
+msgid "Autorize o plugin a processar compras e reembolsos junto ao PagSeguro."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:430
+#: templates/transparent-checkout.php:68
 msgid "Boleto"
 msgstr ""
 
-#: templates/transparent-checkout.php:26
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1893
+msgid "Cancelada."
+msgstr ""
+
+#: templates/transparent-checkout.php:50
 msgid "Cartão de Crédito"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:163
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:332
 msgid "Cartão de crédito"
 msgstr ""
 
-#: templates/transparent-checkout.php:40
+#. %s: categories
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1763
+#, php-format
+msgctxt "Checkout"
+msgid ""
+"O desconto pix não é válido para produtos da categoria <span "
+"class=\"categories\">%s</span>."
+msgid_plural ""
+"O desconto pix não é válido para produtos das categorias <span "
+"class=\"categories\">%s</span>."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1165
+msgid "Cobrança Adicional"
+msgstr ""
+
+#: templates/transparent-checkout.php:78
 msgid "como no cartão"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:133
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1799
+msgid "Consultar PagSeguro"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:272
 msgid "Controla a descrição exibida ao usuário durante o checkout."
 msgstr ""
 
-#: templates/transparent-checkout.php:54
+#: templates/transparent-checkout.php:92
 msgid "CVV"
 msgstr ""
 
-#: templates/transparent-checkout.php:53
+#: templates/transparent-checkout.php:91
 msgid "Código de segurança"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:230
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:510
 msgid "Debug Log"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:190
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:321
+msgid ""
+"Defina se você usa sua conta do PagSeguro para várias lojas, certifique-se "
+"de que esse prefixo seja único, pois o PagSeguro não permitirá pedidos com o "
+"mesmo número de fatura."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:476
+msgid ""
+"Define a mensagem a ser exibida, na tela de pedido recebido, após a "
+"confirmação do pagamento."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:383
+msgid "Define a partir de qual parcela os juros serão aplicados."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:535
+msgid ""
+"Define a taxa utilizada na integração com PagSeguro. O percentual especial "
+"pode ser redefinido a critério do PagSeguro."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:498
+msgid ""
+"Define as categorias que serão ignoradas para o cálculo do desconto pix."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:311
+msgid ""
+"Define como os dados de retorno da API serão tratados. Se for assíncrono, o "
+"processamento do checkout será mais veloz, porém a mudança de status do "
+"pedido será feita via agendamento (cron)."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:443
+msgid "Define o limite de dias onde o boleto pode ser pago."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:462
+msgid "Define o limite de tempo para aceitar pagamentos com PIX."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:374
 msgid "Define o percentual de juros aplicado ao parcelamento."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:131
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:327
+msgid "Define o status que o plugin usará ao receber confirmação de pagamento."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:365
+msgid "Define o valor mínimo que uma parcela pode receber."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:437
+msgid ""
+"Define se a opção de pagamento Boleto deve estar disponível durante o "
+"checkout."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:339
+msgid ""
+"Define se a opção de pagamento Crédito deve estar disponível durante o "
+"checkout."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:456
+msgid ""
+"Define se a opção de pagamento Pix deve estar disponível durante o checkout."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:482
+msgid ""
+"Define um percentual de desconto para aplicar sob o total da venda(não "
+"inclui o valor do frete) com pix"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:505
+msgid "Depurar"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:491
+msgid "Desabilita o desconto Pix em conjunto com cupons"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:489
+msgid "Desabilitar desconto em cupons"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:496
+msgid "Desabilitar desconto em produtos das seguintes categorias"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:480
+msgid "Desconto (%)"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-api.php:415
+msgid "Desconto do Pix"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:270
 msgid "Descrição"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:157
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:426
+msgid "Duas colunas"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:297
 msgid "E-mail"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:120
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1881
+msgid ""
+"Em análise. O comprador optou por pagar com um cartão de crédito e o "
+"PagSeguro está analisando o risco da transação."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:538
+msgid ""
+"Especial Virtuaria 01: Crédito 3,79% (recebimento em 30 dias) | Pix 0,99% | "
+"Boleto R$ 2,99"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:539
+msgid ""
+"Especial Virtuaria 02: Crédito 4,39% (recebimento em 14 dias) | Pix 0,99% | "
+"Boleto R$ 2,99"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:278
+msgid ""
+"Exibe suas observações logo abaixo da descrição na tela de finalização da "
+"compra."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:420
+msgid "Formulário de crédito"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:260
 msgid "Habilita o método de Pagamento Virtuaria PagSeguro"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:118
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:258
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:337
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:435
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:454
 msgid "Habilitar"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:232
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:512
 msgid "Habilitar registro de log"
 msgstr ""
 
@@ -109,201 +284,318 @@ msgstr ""
 msgid "https://virtuaria.com.br/virtuaria-pagseguro-plugin/"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:159
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:299
 msgid ""
 "Informe seu e-mail utilizado na conta do Pagseguro. Isto é necessário para a "
 "confirmação do pagamento."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:153
-msgid ""
-"Informe seu token do Pagseguro. Isto é necessário para o processamento do "
-"pagamento."
-msgstr ""
-
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:137
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:282
 msgid "Integração"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:126
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:266
 msgid "Isto controla o título exibido ao usuário durante o checkout."
 msgstr ""
 
-#: templates/transparent-checkout.php:50
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:492
+msgid ""
+"Marque se deseja desabilitar o desconto pix quando houver cupom de desconto "
+"aplicado."
+msgstr ""
+
+#: templates/transparent-checkout.php:88
 msgid "MM / AAAA"
 msgstr ""
 
-#: templates/transparent-checkout.php:58
-msgid "mínimo de R$ 5,00"
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:309
+msgid "Modo de processamento"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:193
+#. %s: amount
+#: templates/transparent-checkout.php:107
+#, php-format
+msgid "mínima de R$ %s"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:279
+msgid ""
+"Na área \"Detalhes de Faturamento\", recomendamos inserir os dados do "
+"titular do cartão. Caso a compra seja para outra pessoa, escolha \"Entregar "
+"para um endereço diferente\"."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1887
+msgid "Negada pelo PagSeguro ou Emissor do Cartão de Crédito."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:541
+msgid ""
+"Negociada PagSeguro (caso tenha negociado com o PagSeguro uma taxa "
+"personalizada)"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:399
 msgid "Nome na fatura"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:771
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1165
+msgid "Nova Cobrança"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-api.php:794
 msgid ""
 "Não foi possível processar a sua cobrança. Por favor, tente novamente mais "
 "tarde."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:168
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:343
 msgid "Número de parcelas"
 msgstr ""
 
-#: templates/transparent-checkout.php:44
+#: templates/transparent-checkout.php:82
 msgid "Número do cartão"
 msgstr ""
 
-#: templates/transparent-checkout.php:147
+#: includes/class-wc-virtuaria-pagseguro-api.php:116
+msgid "o campo <b>Bairro</b> é obrigatório!"
+msgstr ""
+
+#: templates/transparent-checkout.php:211
+#: templates/transparent-checkout.php:250
 msgid "O pedido será confirmado apenas após a confirmação do pagamento."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:763
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:276
+msgid "Observações"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:540
+msgid "Padrão do PagSeguro"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1875
+msgid "Paga."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:474
+msgid "Pagamento confirmado"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-api.php:786
 msgid "Pagamento não autorizado."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:22
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:128
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:36
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:267
 msgid "PagSeguro"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:289
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1433
+msgid "PagSeguro: A simulação de pagamento Pix falhou."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:627
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1453
 msgid "PagSeguro: Aguardando confirmação de pagamento."
 msgstr ""
 
-#. %s: amount value
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:789
+#. %s: amount
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:777
 #, php-format
-msgid "PagSeguro: Cobrança recebida R$ %s"
+msgid "PagSeguro: Cobrança recebida R$ %s."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:760
+msgid "PagSeguro: Compra não autorizada."
 msgstr ""
 
 #. %s: payment response
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:799
+#: includes/class-wc-virtuaria-pagseguro-api.php:822
 #, php-format
 msgid "PagSeguro: Não autorizado, %s."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:435
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:904
 msgid ""
 "PagSeguro: O comprador abriu uma solicitação de chargeback junto à operadora "
 "do cartão de crédito."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:373
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:842
 msgid ""
 "PagSeguro: O comprador iniciou a transação, mas até o momento o PagSeguro "
 "não recebeu nenhuma informação sobre o pagamento."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:379
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:848
 msgid ""
 "PagSeguro: O comprador optou por pagar com um cartão de crédito e o "
 "PagSeguro está analisando o risco da transação."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:415
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:757
+msgid "PagSeguro: O PagSeguro está analisando o risco da transação."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:884
 msgid ""
 "PagSeguro: O valor da cobrança adicional foi devolvido para o comprador. "
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:412
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:881
 msgid "PagSeguro: O valor da transação foi devolvido para o comprador. "
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:277
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:391
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:404
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:600
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:784
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:860
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:873
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1456
 msgid "PagSeguro: Pagamento aprovado."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:421
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:762
+msgid "PagSeguro: Pagamento não aprovado."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:890
 msgid "PagSeguro: Pedido cancelado."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:413
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:882
 msgid "PagSeguro: Pedido reembolsado."
 msgstr ""
 
 #. %s: amount
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:398
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:744
+#, php-format
+msgid "PagSeguro: R$ %s Devolvido(s)."
+msgstr ""
+
+#. %s: amount
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:867
 #, php-format
 msgid "PagSeguro: R$ %s disponível na conta."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:23
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1427
+msgid "PagSeguro: Simulação de pagamento Pix realizada com sucesso."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:37
 msgid "Pague com cartão de crédito e boleto."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:134
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:273
 msgid "Pague com PagSeguro."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:281
+#. %s: pix validate
+#: templates/transparent-checkout.php:215
+#, php-format
+msgid "Pague com PIX. O código de pagamento tem validade de %s."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:381
+msgid "Parcelamento com juros "
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:592
 msgid "Parcelamento pagseguro"
 msgstr ""
 
-#: templates/transparent-checkout.php:58
+#: templates/transparent-checkout.php:98
 msgid "Parcelas"
 msgstr ""
 
-#. %s: log page link
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:235
-msgid "Registra eventos de comunição com a API e erros"
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:450
+#: templates/transparent-checkout.php:59
+msgid "PIX"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:445
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:319
+msgid "Prefixo da transação"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1869
+msgid ""
+"Pré-autorizada. O total do pedido está reservado no cartão de crédito do "
+"cliente."
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:912
 msgid "Requisição PagSeguro Não autorizada"
 msgstr ""
 
-#: templates/transparent-checkout.php:132
+#: templates/transparent-checkout.php:195
 msgid "Salvar método de pagamento para compras futuras?"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:170
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:345
 msgid "Selecione o número máximo de parcelas disponíveis para seus clientes."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:144
-msgid "Selecione Sanbox para testes ou Produção para vendas reais."
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:289
+msgid ""
+"Selecione Sandbox para testes ou Produção para vendas reais. O ambiente de "
+"sandbox é instável e comumente apresenta problemas. Consulte o item 12 da "
+"FAQ na <a href=\"https://wordpress.org/plugins/virtuaria-pagseguro/#faq\" "
+"target=\"_blank\">página do plugin</a> para mais informações."
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:188
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:325
+msgid "Status após confirmação"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:313
+msgid "Síncrono"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:372
 msgid "Taxa de juros (%)"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:240
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:520
 msgid "Tecnologia Virtuaria"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:225
-msgid "Testes"
-msgstr ""
-
-#: templates/transparent-checkout.php:40
+#: templates/transparent-checkout.php:78
 msgid "Titular"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:151
-msgid "Token"
-msgstr ""
-
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:124
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:264
 msgid "Título"
 msgstr ""
 
-#: templates/transparent-checkout.php:114
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:425
+msgid "Uma coluna"
+msgstr ""
+
+#: templates/transparent-checkout.php:177
 msgid "Usar outro cartão?"
 msgstr ""
 
-#: includes/class-wc-virtuaria-pagseguro-gateway.php:478
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:953
 msgid ""
 "Utilize o código de barras abaixo para efetuar o pagamento em lotéricas, "
 "instituições financeiras ou internet banking."
 msgstr ""
 
-#: templates/transparent-checkout.php:49
-msgid "Validade (MM/AAAA)"
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:441
+msgid "Validade"
+msgstr ""
+
+#: templates/transparent-checkout.php:87
+msgid "Validade (MM / AAAA)"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:460
+msgid "Validade do Código PIX"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:363
+msgid "Valor mínimo da parcela (R$)"
 msgstr ""
 
 #. Author of the plugin
@@ -311,15 +603,36 @@ msgid "Virtuaria"
 msgstr ""
 
 #. Name of the plugin
-msgid "Virtuaria - Pagseguro para Woocommerce"
+msgid "Virtuaria - Pagseguro Crédito, Pix e Boleto"
 msgstr ""
 
-#: virtuaria-pagseguro.php:69
-msgid "Virtuaria Pagseguro need Woocommerce 4.0+ to work!"
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1591
+msgid "Virtuaria PagSeguro - Falha ao processar operação!"
 msgstr ""
 
-#: virtuaria-pagseguro.php:80
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1569
+msgid "Virtuaria PagSeguro Conectado!"
+msgstr ""
+
+#: includes/class-wc-virtuaria-pagseguro-gateway.php:1580
+msgid "Virtuaria PagSeguro Desconectado!"
+msgstr ""
+
+#: virtuaria-pagseguro.php:92
 msgid ""
-"Virtuaria Pagseguro não pode ser usado ao mesmo tempo que \"Claudio Sanches -"
+"Virtuaria PagSeguro não pode ser usado ao mesmo tempo que \"Claudio Sanches -"
 " PagSeguro for WooCommerce\""
+msgstr ""
+
+#. translators %s: plugin link
+#: virtuaria-pagseguro.php:194
+#, php-format
+msgid ""
+"Virtuaria PagSeguro precisa do plugin Brazilian Market on WooCommerce 3.7 ou "
+"superior para funcionar! O plugin pode ser obtido clicando <a href=\"%s\" "
+"target=\"_blank\">aqui</a>."
+msgstr ""
+
+#: virtuaria-pagseguro.php:81
+msgid "Virtuaria PagSeguro precisa do Woocommerce 4.0+ para funcionar!"
 msgstr ""

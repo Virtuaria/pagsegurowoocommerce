@@ -1,0 +1,63 @@
+.auth img {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 30px;
+    margin-left: 5px;
+}
+.forminp-auth .auth {
+    margin-left: 10px;
+    padding: 4px 10px;
+    box-shadow: none;
+}
+.wp-core-ui .auth.button-primary:hover {
+    box-shadow: none;
+    font-weight: normal;
+}
+.expire-info {
+    display: block;
+    margin-top: 5px;
+}
+.forminp-auth .connected .status{
+    color: green;
+}
+.woocommerce_page_wc-settings h3.wc-settings-sub-title {
+    font-size: 1.2em;
+    border-top: 1px solid #ccc;
+    padding-top: 30px;
+    font-weight: bold;
+}
+#mainform table.form-table {
+    background-color: #fff;
+    max-width: calc(100% - 20px);
+    padding: 20px;
+    display: block;
+}
+.woocommerce_page_wc-settings h3.wc-settings-sub-title {
+    background-color: white;
+    padding: 20px;
+    margin: 0;
+    max-width: calc(100% - 60px);
+    font-weight: normal;
+    font-size: 23px;
+    margin-top: 40px;
+    border-bottom: 1px solid #eee;
+}
+h3#woocommerce_virt_pagseguro_tecvirtuaria {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+h3#woocommerce_virt_pagseguro_tecvirtuaria + .form-table {
+    background-color: transparent;
+    padding: 0;
+}
+#product_cat-all {
+    border: 1px solid #ddd;
+}
+#woocommerce_virt_pagseguro_fee_setup {
+    width: auto;
+    max-width: initial;
+}
+.woocommerce table.form-table th label {
+    font-weight: 400;
+}

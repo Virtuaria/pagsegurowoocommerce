@@ -83,7 +83,15 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			$this->app_revoke = 'https://pagseguro.virtuaria.com.br/revoke/pagseguro-sandbox';
 			$this->token      = $this->get_option( 'token_sanbox' );
 		} else {
-			$this->app_id     = '7acbe665-76c3-4312-afd5-29c263e8fb93';
+			$fee_setup = $this->get_option( 'fee_setup' );
+
+			if ( 'd14' === $fee_setup ) {
+				$this->app_id = 'f7aa07e1-5368-45cd-9372-67db6777b4b0';
+			} elseif ( 'd30' === $fee_setup ) {
+				$this->app_id = 'a59bb94a-2e78-43bc-a497-30447bdf1a3e';
+			} else {
+				$this->app_id = '7acbe665-76c3-4312-afd5-29c263e8fb93';
+			}
 			$this->app_url    = 'pagseguro.virtuaria.com.br/auth/pagseguro';
 			$this->app_revoke = 'https://pagseguro.virtuaria.com.br/revoke/pagseguro';
 			$this->token      = $this->get_option( 'token_production' );
@@ -116,6 +124,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		add_action( 'pagseguro_process_update_order_status', array( $this, 'process_order_status' ), 10, 2 );
 
 		add_action( 'admin_init', array( $this, 'save_store_token' ) );
+		add_action( 'admin_init', array( $this, 'fee_setup_update' ), 20 );
 		add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_not_authorized' ) );
 
 		add_filter( 'woocommerce_billing_fields', array( $this, 'billing_neighborhood_required' ), 9999 );
@@ -247,7 +256,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'title'       => __( 'Título', 'virtuaria-pagseguro' ),
 				'type'        => 'text',
 				'description' => __( 'Isto controla o título exibido ao usuário durante o checkout.', 'virtuaria-pagseguro' ),
-				'desc_tip'    => true,
 				'default'     => __( 'PagSeguro', 'virtuaria-pagseguro' ),
 			),
 			'description'         => array(
@@ -270,7 +278,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			'environment'         => array(
 				'title'       => __( 'Ambiente', 'virtuaria-pagseguro' ),
 				'type'        => 'select',
-				'description' => __( 'Selecione Sanbox para testes ou Produção para vendas reais.', 'virtuaria-pagseguro' ),
+				'description' => __( 'Selecione Sandbox para testes ou Produção para vendas reais. O ambiente de sandbox é instável e comumente apresenta problemas. Consulte o item 12 da FAQ na <a href="https://wordpress.org/plugins/virtuaria-pagseguro/#faq" target="_blank">página do plugin</a> para mais informações.', 'virtuaria-pagseguro' ),
 				'options'     => array(
 					'sandbox'    => 'Sandbox',
 					'production' => 'Produção',
@@ -504,6 +512,39 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			'title' => __( 'Tecnologia Virtuaria', 'virtuaria-pagseguro' ),
 			'type'  => 'title',
 		);
+
+		if ( 'production' === $this->get_option( 'environment' ) ) {
+			$plugin_settings = array_slice(
+				$this->form_fields,
+				0,
+				6,
+				true
+			);
+
+			$plugin_settings['fee_setup'] = array(
+				'title'       => __( 'Taxas' ),
+				'type'        => 'select',
+				'description' => __( 'Define a taxa utilizada na integração com PagSeguro. O percentual especial pode ser redefinido a critério do PagSeguro.', 'virtuaria-pagseguro' ),
+				'default'     => 'd30',
+				'options'     => array(
+					'd30'     => __( 'Especial Virtuaria 01: Crédito 3,79% (recebimento em 30 dias) | Pix 0,99% | Boleto R$ 2,99', 'virtuaria-pagseguro' ),
+					'd14'     => __( 'Especial Virtuaria 02: Crédito 4,39% (recebimento em 14 dias) | Pix 0,99% | Boleto R$ 2,99', 'virtuaria-pagseguro' ),
+					'default' => __( 'Padrão do PagSeguro', 'virtuaria-pagseguro' ),
+					'custom'  => __( 'Negociada PagSeguro (caso tenha negociado com o PagSeguro uma taxa personalizada)', 'virtuaria-pagseguro' ),
+				),
+			);
+
+			if ( $this->get_option( 'token_production' ) ) {
+				$plugin_settings['fee_setup']['default'] = 'default';
+			}
+
+			$this->form_fields = $plugin_settings + array_slice(
+				$this->form_fields,
+				6,
+				null,
+				true
+			);
+		}
 	}
 
 	/**
@@ -1269,22 +1310,43 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 	/**
 	 * Add scripts to dash.
+	 *
+	 * @param string $page the idendifier page.
 	 */
-	public function admin_checkout_scripts() {
+	public function admin_checkout_scripts( $page ) {
 		if ( isset( $_GET['post'] ) && 'shop_order' === get_post_type( sanitize_text_field( wp_unslash( $_GET['post'] ) ) ) ) {
 			wp_enqueue_script(
 				'copy-qr',
-				VIRTUARIA_PAGSEGURO_URL . 'public/js/copy-code.js',
+				VIRTUARIA_PAGSEGURO_URL . 'admin/js/copy-code.js',
 				array( 'jquery' ),
-				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/js/copy-code.js' ),
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'admin/js/copy-code.js' ),
 				true
 			);
 
 			wp_enqueue_style(
 				'copy-qr',
-				VIRTUARIA_PAGSEGURO_URL . 'public/css/pix-code.css',
+				VIRTUARIA_PAGSEGURO_URL . 'admin/css/pix-code.css',
 				array(),
-				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/pix-code.css' )
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'admin/css/pix-code.css' )
+			);
+		}
+
+		if ( 'woocommerce_page_wc-settings' === $page
+			&& isset( $_GET['section'] )
+			&& $this->id === $_GET['section'] ) {
+			wp_enqueue_script(
+				'setup',
+				VIRTUARIA_PAGSEGURO_URL . 'admin/js/setup.js',
+				array( 'jquery' ),
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'admin/js/setup.js' ),
+				true
+			);
+
+			wp_enqueue_style(
+				'setup',
+				VIRTUARIA_PAGSEGURO_URL . 'admin/css/setup.css',
+				array(),
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'admin/css/setup.css' )
 			);
 		}
 	}
@@ -1438,10 +1500,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				$auth  = 'https://connect.' . $auth . 'pagseguro.uol.com.br/oauth2/authorize';
 				$auth .= '?response_type=code&client_id=' . $this->app_id . '&redirect_uri=' . $this->app_url;
 				$auth .= '&scope=payments.read+payments.create+payments.refund+accounts.read&state=' . $origin;
+				$auth .= '-' . $this->get_option( 'fee_setup' ) . '-' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
 
 				if ( $token ) {
+					$revoke_url = $this->app_revoke . '?state=' . $origin . '-' . $this->get_option( 'fee_setup' ) . '-' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
 					echo '<span class="connected"><strong>Status: <span class="status">Conectado.</span></strong></span>';
-					echo '<a href="' . esc_url( $this->app_revoke ) . '?state=' . $origin . '" class="auth button-primary">Desconectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectado.svg" alt="Desconectar" /></a>';
+					echo '<a href="' . esc_url( $revoke_url ) . '" class="auth button-primary">Desconectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectado.svg" alt="Desconectar" /></a>';
 					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
 				} else {
 					echo '<span class="disconnected"><strong>Status: <span class="status">Desconectado.</span></strong></span>';
@@ -1449,57 +1513,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
 				}
 				?>
-				<style>
-					.auth img {
-						display: inline-block;
-						vertical-align: middle;
-						max-width: 30px;
-						margin-left: 5px;
-					}
-					.forminp-auth .auth {
-						margin-left: 10px;
-						padding: 4px 10px;
-						box-shadow: none;
-					}
-					.wp-core-ui .auth.button-primary:hover {
-						box-shadow: none;
-						font-weight: normal;
-					}
-					.expire-info {
-						display: block;
-						margin-top: 5px;
-					}
-					.forminp-auth .connected .status{
-						color: green;
-					}
-					.woocommerce_page_wc-settings h3.wc-settings-sub-title {
-						font-size: 1.2em;
-						border-top: 1px solid #ccc;
-						padding-top: 30px;
-						font-weight: bold;
-					}
-				</style>
-				<script>
-					function getUrlParameter(name) {
-						name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-						var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-						results = regex.exec(location.search);
-						return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-					}
-					jQuery(document).ready(function($) {
-						$('#woocommerce_virt_pagseguro_environment').on('change', function() {
-							$('.woocommerce-save-button').click();
-						});
-
-						let connected = $('.forminp-auth > .connected' ).length > 0;
-						if ( ( getUrlParameter( 'token' ) != '' && ! connected ) || ( getUrlParameter( 'access_revoked' ) != '' && connected ) ) {
-							alert( 'Para efetivar a conexão/desconexão clique em "Salvar Alterações".' );
-							$([document.documentElement, document.body]).animate({
-								scrollTop: $("#woocommerce_virt_pagseguro_tecvirtuaria").offset().top
-							}, 2000);
-						}
-					});
-				</script>
 			</td>
 		</tr>  
 
@@ -1512,6 +1525,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 */
 	public function save_store_token() {
 		if ( isset( $_GET['section'] )
+			&& ! isset( $_POST['fee_setup_updated'] )
 			&& 'virt_pagseguro' === $_GET['section'] ) {
 			if ( isset( $_GET['token'] ) ) {
 				if ( 'sandbox' === $this->environment ) {
@@ -1896,6 +1910,15 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					true
 				);
 			}
+		}
+	}
+
+	/**
+	 * Fee setup change.
+	 */
+	public function fee_setup_update() {
+		if ( isset( $_POST['fee_setup_updated'] ) ) {
+			$this->update_option( 'token_production', null );
 		}
 	}
 }
