@@ -1,0 +1,99 @@
+.products .virt-pagseguro-installments {
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.products .virt-pagseguro-installments .notax {
+    font-weight: bold;
+}
+.pagseguro-installments {
+    font-family: Arial, sans-serif;
+    position: relative;
+    color: #313131;
+}
+.pagseguro-installments .link {
+    text-decoration: underline;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 20px;
+    color: #3498db;
+    transition: background-color 0.2s;
+}
+.pagseguro-installments .link:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+.pagseguro-installments .overlay {
+    visibility: hidden;
+    position: relative;
+    z-index: 0;
+}
+.pagseguro-installments .overlay-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.pagseguro-installments .table-pagseguro-installments {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #e9e9e9;
+    box-shadow: 0 2px 5px rgb(75 75 75 / 15%);
+    min-width: 350px;
+    opacity: 0;
+    transition: opacity 0.3s, top 0.3s;
+}
+.pagseguro-installments #showTable:checked + .overlay {
+    visibility: visible;
+    z-index: 2;
+}
+.pagseguro-installments #showTable:checked + .overlay .table-pagseguro-installments {
+    opacity: 1;
+    top: -40px;
+}
+.pagseguro-installments table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 15px;
+}
+.pagseguro-installments th,
+.pagseguro-installments td {
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 5px 10px;
+    text-align: left;
+}
+.pagseguro-installments table td {
+    font-size: 14px;
+}
+.pagseguro-installments tbody tr:last-child td {
+    border-bottom: none;
+}
+.pagseguro-installments th {
+    background-color: #f5f5f5;
+}
+.pagseguro-installments .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 30px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.pagseguro-installments .title {
+    font-size: 18px;
+    margin: 0 0 10px;
+    font-weight: bold;
+}
+
+@media only screen and (max-width: 479px) {
+    .pagseguro-installments table {
+        font-size: 15px;
+    }
+}

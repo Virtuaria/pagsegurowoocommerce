@@ -3,7 +3,7 @@ Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito
 Requires at least: 4.7
 Tested up to: 6.2.2
-Stable tag: 2.5.0
+Stable tag: 2.6.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -25,7 +25,7 @@ Desfrute de **taxas com desconto** no PagSeguro. É simples ativar essa oferta: 
 - **Especial Virtuaria 01**: Crédito 3,79% (recebimento em 30 dias) | Pix 0,99% | Boleto R$ 2,99;
 - **Especial Virtuaria 02**: Crédito 4,39% (recebimento em 14 dias) | Pix 0,99% | Boleto R$ 2,99;
 - **Negociada PagSeguro**: Caso já tenha negociado com o PagSeguro uma taxa personalizada melhor;
-- **Padrão do PagSeguro**Taxas padrão da plataforma PagSeguro.
+- **Padrão do PagSeguro**: Taxas padrão da plataforma PagSeguro.
 
 *Obs.: Caso já esteja usando o plugin, é preciso refazer a conexão para ativar o desconto.*  
 
@@ -43,8 +43,9 @@ Desfrute de **taxas com desconto** no PagSeguro. É simples ativar essa oferta: 
 * **Identificação na fatura**: Para pagamentos via cartão (exibir na fatura);
 - **Detalhamento das operações**: Acompanhe nas notas dos pedidos, as operações ocorridas durante a comunicação com o PagSeguro (reembolsos, parcelamentos, mudanças de status e valores recebidos/cobrados);
 - **Use a mesma conta PagSeguro**: Em múltiplas lojas virtuais;
-* **Status pagamento confirmado** Permite definir via configuração, qual status identifica o pagamento confirmado;
-- **Consulta status no PagSeguro**: Permite consultar o status atual da transação no PagSeguro a qualquer momento.
+* **Status pagamento confirmado**: Permite definir via configuração, qual status identifica o pagamento confirmado;
+- **Consulta status no PagSeguro**: Permite consultar o status atual da transação no PagSeguro a qualquer momento;
+- **Exibição do Parcelamento**: Permite, via configuração, exibir o parcelamento na página do produto e listagens como catálogo e pesquisa.
 
 [youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
 
@@ -279,13 +280,17 @@ Atualmente temos as seguintes opções:
 10. Boleto bancário no e-mail de novo pedido;
 11. Pagamento com Pix;
 12. Segunda via do Pix no e-mail de novo pedido;
-13. Consulta de status de pagamento.
+13. Consulta de status de pagamento;
+14. Parcelamento na página do produto.
 
 
 == Upgrade Notice ==
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.6.0 2023-10-19 =
+* Exibição de parcelamento, controlável por configuração, para listagens de produtos(pesquisa/home/categorias e etc) e página do produto;
+* Compatibilidade Plugin Asaas Gateway for WooCommerce.
 = 2.5.0 2023-09-05 =
 * Taxas especiais para clientes;
 * Estilização da tela de configurações;

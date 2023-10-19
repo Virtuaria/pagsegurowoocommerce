@@ -107,7 +107,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		// Transparent checkout actions. Pix code in mail and thankyou page.
 		add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'email_instructions' ), 10, 3 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'checkout_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'public_scripts_styles' ) );
 
 		// Additional charge.
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'additional_charge_metabox' ), 10 );
@@ -135,6 +135,10 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		// Fetch order status.
 		add_action( 'add_meta_boxes_shop_order', array( $this, 'fetch_order_status_metabox' ), 10 );
 		add_action( 'save_post_shop_order', array( $this, 'search_order_payment_status' ) );
+
+		add_action( 'woocommerce_single_product_summary', array( $this, 'display_product_installments' ) );
+		// add_filter( 'woocommerce_available_variation', array( $this, 'variation_discount_and_installment' ), 10, 3 );
+		add_action( 'woocommerce_after_shop_loop_item_title', array( $this, 'loop_products_installment' ), 15 );
 	}
 
 	/**
@@ -158,7 +162,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	/**
 	 * Checkout scripts.
 	 */
-	public function checkout_scripts() {
+	public function public_scripts_styles() {
 		if ( is_checkout() && $this->is_available() ) {
 			if ( ! get_query_var( 'order-received' ) ) {
 				wp_enqueue_script(
@@ -239,6 +243,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				);
 			}
 		}
+
+		wp_enqueue_style(
+			'pagseguro-installmnets',
+			VIRTUARIA_PAGSEGURO_URL . 'public/css/installments.css',
+			'',
+			filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/installments.css' )
+		);
 	}
 
 	/**
@@ -359,6 +370,17 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'min'  => 0,
 					'step' => 'any',
 				),
+			),
+			'display_installment' => array(
+				'title'       => __( 'Exibir parcelamento?', 'virtuaria-pagseguro' ),
+				'type'        => 'select',
+				'description' => __( 'Selecione a forma de exibição do parcelamento na listagem de produtos.', 'virtuaria-pagseguro' ),
+				'options'     => array(
+					'no-display' => __( 'Não exibir', 'virtuaria-pagseguro' ),
+					'with-fee'   => __( 'Exibir todas as parcelas', 'virtuaria-pagseguro' ),
+					'no-fee'     => __( 'Exibir somente as parcelas sem juros', 'virtuaria-pagseguro' ),
+				),
+				'default'     => 'no-display',
 			),
 			'tax'                 => array(
 				'title'             => __( 'Taxa de juros (%)', 'virtuaria-pagseguro' ),
@@ -1017,7 +1039,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 
 		if ( $amount
-			&& $amount > 1
+			&& $amount >= 1
 			&& $this->get_option( 'payment_status' ) === $order->get_status()
 			&& 'BOLETO' !== $order->get_meta( '_payment_mode' ) ) {
 			if ( $this->api->refund_order( $order_id, $amount ) ) {
@@ -1500,10 +1522,10 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				$auth  = 'https://connect.' . $auth . 'pagseguro.uol.com.br/oauth2/authorize';
 				$auth .= '?response_type=code&client_id=' . $this->app_id . '&redirect_uri=' . $this->app_url;
 				$auth .= '&scope=payments.read+payments.create+payments.refund+accounts.read&state=' . $origin;
-				$auth .= '-' . $this->get_option( 'fee_setup' ) . '-' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
+				$auth .= '|' . $this->get_option( 'fee_setup' ) . '|' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
 
 				if ( $token ) {
-					$revoke_url = $this->app_revoke . '?state=' . $origin . '-' . $this->get_option( 'fee_setup' ) . '-' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
+					$revoke_url = $this->app_revoke . '?state=' . $origin . '|' . $this->get_option( 'fee_setup' ) . '|' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
 					echo '<span class="connected"><strong>Status: <span class="status">Conectado.</span></strong></span>';
 					echo '<a href="' . esc_url( $revoke_url ) . '" class="auth button-primary">Desconectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectado.svg" alt="Desconectar" /></a>';
 					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
@@ -1919,6 +1941,147 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function fee_setup_update() {
 		if ( isset( $_POST['fee_setup_updated'] ) ) {
 			$this->update_option( 'token_production', null );
+		}
+	}
+
+	/**
+	 * Display pagseguro installments to product.
+	 */
+	public function display_product_installments() {
+		global $product;
+
+		if ( 'yes' === $this->credit_enable
+			&& $product
+			&& 'no-display' !== $this->get_option( 'display_installment' )
+			&& $this->installments > 1 ) {
+
+			$has_tax         = floatval( $this->tax ) > 0;
+			$max_installment = $this->installments;
+			$min_installment = $this->min_installment;
+			$fee_from        = intval( $this->fee_from );
+
+			if ( 2 === $fee_from ) {
+				echo wp_kses_post(
+					$this->display_max_installments(
+						$product->get_price(),
+						$has_tax,
+						'with-fee'
+					),
+				);
+			} else {
+				echo wp_kses_post(
+					$this->display_max_installments(
+						$product->get_price(),
+						$has_tax,
+						'no-fee'
+					),
+				);
+			}
+
+			if ( $product->get_price() < $min_installment ) {
+				return;
+			}
+			require_once plugin_dir_path( __FILE__ ) . '../templates/credit-installments-table.php';
+		}
+	}
+
+	/**
+	 * Get max installments to credit.
+	 *
+	 * @param float   $total   total to buy.
+	 * @param boolean $has_tax true if tax should applied otherwise false.
+	 * @param string  $display setting from display.
+	 */
+	private function display_max_installments( $total, $has_tax, $display = '' ) {
+		$installment = 1;
+		$subtotal    = 0;
+		$calc_total  = 0;
+		$tax_applied = false;
+
+		if ( $total < $this->min_installment ) {
+			$subtotal = $total;
+		} else {
+			while ( $installment <= $this->installments ) {
+				if ( $has_tax
+					&& $this->fee_from <= $installment
+					&& 1 !== $installment ) {
+					$calc_total = $this->get_installment_value(
+						$total,
+						$installment
+					) / $installment;
+				} else {
+					$calc_total = $total / $installment;
+				}
+
+				if ( $this->min_installment > $calc_total
+					|| ( $has_tax && $this->fee_from <= $installment && 'no-fee' === $display ) ) {
+					-- $installment;
+					break;
+				}
+
+				if ( $has_tax && $this->fee_from <= $installment && 'with-fee' === $display ) {
+					$tax_applied = true;
+				}
+
+				$subtotal = $calc_total;
+				$installment++;
+			}
+		}
+
+		if ( $installment > $this->installments ) {
+			$installment = $this->installments;
+		}
+
+		return sprintf(
+			'<div class="virt-pagseguro-installments">Em <span class="installment">%dx</span> de <span class="subtotal">R$%s</span> <span class="notax">%s</span></div>',
+			esc_html( $installment ),
+			esc_html(
+				number_format(
+					$subtotal,
+					2,
+					',',
+					'.'
+				)
+			),
+			$tax_applied ? '' : 'sem juros'
+		);
+	}
+
+	/**
+	 * Display based in variation installment price and discount.
+	 *
+	 * @param array      $params    parameters.
+	 * @param wc_product $parent    the product parent.
+	 * @param wc_product $variation the variation.
+	 */
+	public function variation_discount_and_installment( $params, $parent, $variation ) {
+		if ( $variation ) {
+			ob_start();
+			$product = $variation;
+			$this->display_product_installments();
+			$params['price_html'] .= ob_get_clean();
+		}
+		return $params;
+	}
+
+	/**
+	 * Display installment in loop products.
+	 */
+	public function loop_products_installment() {
+		global $product;
+
+		$option_display = $this->get_option( 'display_installment' );
+		if ( 'yes' === $this->credit_enable
+			&& $product
+			&& 'no-display' !== $option_display
+			&& $this->installments > 1 ) {
+			echo wp_kses_post(
+				$this->display_max_installments(
+					$product->get_price(),
+					floatval( $this->tax ) > 0,
+					$option_display
+				)
+			);
 		}
 	}
 }
