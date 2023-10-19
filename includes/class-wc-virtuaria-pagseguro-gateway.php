@@ -1522,10 +1522,10 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				$auth  = 'https://connect.' . $auth . 'pagseguro.uol.com.br/oauth2/authorize';
 				$auth .= '?response_type=code&client_id=' . $this->app_id . '&redirect_uri=' . $this->app_url;
 				$auth .= '&scope=payments.read+payments.create+payments.refund+accounts.read&state=' . $origin;
-				$auth .= '|' . $this->get_option( 'fee_setup' ) . '|' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
+				$auth .= '--' . $this->get_option( 'fee_setup' ) . '--' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
 
 				if ( $token ) {
-					$revoke_url = $this->app_revoke . '?state=' . $origin . '|' . $this->get_option( 'fee_setup' ) . '|' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
+					$revoke_url = $this->app_revoke . '?state=' . $origin . '--' . $this->get_option( 'fee_setup' ) . '--' . str_replace( '@', 'aN', $this->get_option( 'email' ) );
 					echo '<span class="connected"><strong>Status: <span class="status">Conectado.</span></strong></span>';
 					echo '<a href="' . esc_url( $revoke_url ) . '" class="auth button-primary">Desconectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectado.svg" alt="Desconectar" /></a>';
 					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>, após esse período é necessário reconectar para atualizar as permissões junto ao PagSeguro.</span>';
