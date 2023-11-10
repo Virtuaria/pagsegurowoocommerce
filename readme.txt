@@ -1,16 +1,16 @@
 === Virtuaria - PagSeguro Crédito, Pix e Boleto ===
 Contributors: tecnologiavirtuaria
-Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito
+Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito, pagamento
 Requires at least: 4.7
-Tested up to: 6.2.2
-Stable tag: 2.6.0
+Tested up to: 6.4.1
+Stable tag: 2.7.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
 
-**Adiciona o PagSeguro como método de pagamento para seu e-commerce Woocommerce. Mais Segurança e eficiência para seu Woocommerce.**
+**Adiciona o PagSeguro como método de pagamento para seu ecommerce Woocommerce de forma fácil e segura. Taxas especiais para usuários do plugin.**
 
 Fácil de instalar e configurar, permite pagamentos no cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce, com confirmação automática do pagamento nos 3 métodos. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
 
@@ -288,6 +288,10 @@ Atualmente temos as seguintes opções:
 Nenhuma atualização disponível
 
 == Changelog ==
+= 2.7.0 2023-11-10 =
+* Novo layout de exibição das formas de pagamento na tela de checkout;
+* Opção para remoção de todos os "Cartões" (tokens de pagamento) armazenados pelo plugin;
+* Correção de problema de confirmação de pagamento via pix/boleto quando a opção de log está inativa.
 = 2.6.0 2023-10-19 =
 * Exibição de parcelamento, controlável por configuração, para listagens de produtos(pesquisa/home/categorias e etc) e página do produto;
 * Compatibilidade Plugin Asaas Gateway for WooCommerce.

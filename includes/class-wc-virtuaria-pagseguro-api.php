@@ -156,7 +156,6 @@ class WC_Virtuaria_PagSeguro_API {
 					}
 				}
 
-				$this->gateway->log->add('debug', $discount_reduce, WC_Log_Levels::ALERT );
 				$discount -= $discount_reduce;
 				$total    /= 100;
 				$total    -= $discount * ( floatval( $this->gateway->pix_discount ) / 100 );
@@ -269,11 +268,13 @@ class WC_Virtuaria_PagSeguro_API {
 					$to_log['body']['charges'][0]['payment_method']['card']['encrypted']
 				);
 			}
-			$this->gateway->log->add(
-				$this->tag,
-				'Enviando novo pedido: ' . wp_json_encode( $to_log ),
-				WC_Log_Levels::INFO
-			);
+			if ( $this->debug_on ) {
+				$this->gateway->log->add(
+					$this->tag,
+					'Enviando novo pedido: ' . wp_json_encode( $to_log ),
+					WC_Log_Levels::INFO
+				);
+			}
 		}
 
 		$data['body'] = wp_json_encode( $data['body'] );
@@ -877,7 +878,11 @@ class WC_Virtuaria_PagSeguro_API {
 
 		if ( $this->debug_on ) {
 			if ( 200 === $resp_code ) {
-				$this->gateway->log->add( $this->tag, 'Simulação de Pagamento Pix efetuada com sucesso.', WC_Log_Levels::INFO );
+				$this->gateway->log->add(
+					$this->tag,
+					'Simulação de Pagamento Pix efetuada com sucesso.',
+					WC_Log_Levels::INFO
+				);
 			} else {
 				$this->gateway->log->add(
 					$this->tag,

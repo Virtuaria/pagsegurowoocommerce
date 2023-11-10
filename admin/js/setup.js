@@ -21,4 +21,12 @@ jQuery(document).ready(function($) {
             scrollTop: $("#woocommerce_virt_pagseguro_tecvirtuaria").offset().top
         }, 2000);
     }
+
+    $('.erase-card-option').on('click', function(){
+        if ( confirm('Tem certeza que deseja remover TODOS os cartões (tokens) de clientes armazenados?') ) {
+            $('#erase-cards').val('CONFIRMED');
+        } else {
+            return false;
+        }
+    });
 });

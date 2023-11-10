@@ -61,3 +61,42 @@ h3#woocommerce_virt_pagseguro_tecvirtuaria + .form-table {
 .woocommerce table.form-table th label {
     font-weight: 400;
 }
+label[for="woocommerce_virt_pagseguro_erase_cards"]:after,
+label[for="woocommerce_virt_pagseguro_layout_checkout"]:after {
+    content: '';
+    background-size: contain;
+    background-image: url(../images/giphy.gif);
+    height: 30px;
+    width: 30px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+@media only screen and (max-width: 767px) {
+    .auto-fold #wpfooter {
+        position: static;
+        margin-left: 0;
+    }
+    #wpbody-content {
+        padding-bottom: 0px;
+    }
+}
+@media only screen and (max-width: 479px) {
+    tbody {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #product_cat-all {
+        max-width: 250px;
+    }
+    #product_cat-all li label {
+        font-size: 11px;
+    }
+    .woocommerce table.form-table .select2-container {
+        max-width: 256px;
+    }
+    #woocommerce_virt_pagseguro_fee_setup {
+        max-width: 255px;
+    }
+}

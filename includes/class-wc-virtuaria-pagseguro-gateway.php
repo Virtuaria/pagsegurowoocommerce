@@ -125,11 +125,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		add_action( 'admin_init', array( $this, 'save_store_token' ) );
 		add_action( 'admin_init', array( $this, 'fee_setup_update' ), 20 );
+		add_action( 'admin_init', array( $this, 'erase_cards' ), 20 );
 		add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_not_authorized' ) );
 
 		add_filter( 'woocommerce_billing_fields', array( $this, 'billing_neighborhood_required' ), 9999 );
 		add_filter( 'virtuaria_pagseguro_disable_discount', array( $this, 'disable_discount_by_product_categoria' ), 10, 2 );
-		add_filter( 'woocommerce_gateway_title', array( $this, 'discount_pix_text' ), 10, 2 );
+		// add_filter( 'woocommerce_gateway_title', array( $this, 'discount_pix_text' ), 10, 2 );
 		add_action( 'after_virtuaria_pix_validate_text', array( $this, 'info_about_categories' ) );
 
 		// Fetch order status.
@@ -212,6 +213,23 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						VIRTUARIA_PAGSEGURO_URL . 'public/css/form-height.css',
 						'',
 						filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/form-height.css' )
+					);
+				}
+
+				if ( 'lines' === $this->get_option( 'layout_checkout' ) ) {
+					wp_enqueue_script(
+						'pagseguro-virt-new-checkout',
+						VIRTUARIA_PAGSEGURO_URL . 'public/js/new-checkout.js',
+						array( 'jquery' ),
+						filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/js/new-checkout.js' ),
+						true
+					);
+
+					wp_enqueue_style(
+						'pagseguro-virt-new-checkout',
+						VIRTUARIA_PAGSEGURO_URL . 'public/css/new-checkout.css',
+						'',
+						filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/new-checkout.css' )
 					);
 				}
 			} else {
@@ -331,6 +349,16 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				'options'     => $this->get_payment_status(),
 				'default'     => 'processing',
 			),
+			'layout_checkout'    => array(
+				'title'       => __( 'Layout', 'virtuaria-pagseguro' ),
+				'type'        => 'select',
+				'options'     => array(
+					'tabs'  => __( 'Abas', 'virtuaria-pagseguro' ),
+					'lines' => __( 'Linhas', 'virtuaria-pagseguro' ),
+				),
+				'description' => __( 'Define padrão visual utilizado na página de finalização das compras.', 'virtuaria-pagseguro' ),
+				'default'     => 'tabs',
+			),
 			'credit'              => array(
 				'title'       => __( 'Cartão de crédito', 'virtuaria-pagseguro' ),
 				'type'        => 'title',
@@ -412,7 +440,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			'soft_descriptor'     => array(
 				'title'             => __( 'Nome na fatura', 'virtuaria-pagseguro' ),
 				'type'              => 'text',
-				'description'       => 'Texto exibido na fatura do cartão para identificar a loja (máximo de <b>17 caracteres</b>, não deve conter caracteres especiais ou espaços em branco).',
+				'description'       => __( 'Texto exibido na fatura do cartão para identificar a loja (máximo de <b>17 caracteres</b>, não deve conter caracteres especiais ou espaços em branco).', 'virtuaria-pagseguro' ),
 				'custom_attributes' => array(
 					'maxlength' => '17',
 				),
@@ -439,6 +467,11 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 					'one' => __( 'Uma coluna', 'virtuaria-pagseguro' ),
 					'two' => __( 'Duas colunas', 'virtuaria-pagseguro' ),
 				),
+			),
+			'erase_cards'         => array(
+				'title'       => __( 'Limpar cartões (tokens)', 'virtuaria-pagseguro' ),
+				'type'        => 'erase_cards',
+				'description' => __( 'Remove métodos de pagamento armazenados. <b>Atenção:</b> essa opção não pode ser desfeita.', 'virtuaria-pagseguro' ),
 			),
 			'ticket'              => array(
 				'title'       => __( 'Boleto', 'virtuaria-pagseguro' ),
@@ -710,16 +743,30 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function ipn_handler() {
 		$body = $this->get_raw_data();
 
-		$this->log->add( $this->id, 'IPN request...', WC_Log_Levels::INFO );
+		if ( 'yes' === $this->debug ) {
+			$this->log->add(
+				$this->id,
+				'IPN request...',
+				WC_Log_Levels::INFO
+			);
+		}
 		$request = json_decode( $body, true );
-		$this->log->add(
-			$this->id,
-			'Request to order ' . $body,
-			WC_Log_Levels::INFO
-		);
+		if ( 'yes' === $this->debug ) {
+			$this->log->add(
+				$this->id,
+				'Request to order ' . $body,
+				WC_Log_Levels::INFO
+			);
+		}
 
 		if ( isset( $request['charges'] ) && isset( $request['reference_id'] ) ) {
-			$this->log->add( $this->id, 'IPN valid', WC_Log_Levels::INFO );
+			if ( 'yes' === $this->debug ) {
+				$this->log->add(
+					$this->id,
+					'IPN valid',
+					WC_Log_Levels::INFO
+				);
+			}
 
 			$order = wc_get_order(
 				sanitize_text_field(
@@ -752,13 +799,23 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 						}
 
 						if ( ! $old_webhook || $body !== $old_webhook ) {
-							$order->add_order_note(
-								sprintf(
-									/* translators: %s: amount */
-									__( 'PagSeguro: R$ %s Devolvido(s).', 'virtuaria-pagseguro' ),
-									number_format( $request['charges'][0]['amount']['summary']['refunded'] / 100, 2, ',', '.' )
-								)
-							);
+							if ( $request['charges'][0]['amount']['summary']['refunded'] > 0 ) {
+								$order->add_order_note(
+									sprintf(
+										/* translators: %s: amount */
+										__( 'PagSeguro: R$ %s Devolvido(s).', 'virtuaria-pagseguro' ),
+										number_format( $request['charges'][0]['amount']['summary']['refunded'] / 100, 2, ',', '.' )
+									)
+								);
+							}
+
+							if ( 0 === $request['charges'][0]['amount']['summary']['refunded']
+								&& ! $is_additional_charge ) {
+								$order->update_status(
+									'cancelled',
+									__( 'PagSeguro: Pagamento cancelado.', 'virtuaria-pagseguro' )
+								);
+							}
 
 							if ( ! $is_additional_charge ) {
 								update_post_meta( $order->get_id(), '_canceled_webhook', $body );
@@ -824,7 +881,9 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			header( 'HTTP/1.1 200 OK' );
 			return;
 		} elseif ( 'transaction' === $request['notificationType'] && isset( $request['notificationCode'] ) ) {
-			$this->log->add( $this->id, 'IPN valid', WC_Log_Levels::INFO );
+			if ( 'yes' === $this->debug ) {
+				$this->log->add( $this->id, 'IPN valid', WC_Log_Levels::INFO );
+			}
 			$sandbox = 'sandbox' === $this->environment ? 'sandbox.' : '';
 			$url     = 'https://ws.' . $sandbox . 'pagseguro.uol.com.br/v3/transactions/notifications/';
 			$url    .= $request['notificationCode'] . '?email=' . $this->email . '&token=' . $this->token;
@@ -834,11 +893,23 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 				array( 'timeout' => 120 )
 			);
 
-			$this->log->add( $this->id, 'Recovery transactions status: ' . wp_json_encode( $transaction ), WC_Log_Levels::INFO );
+			if ( 'yes' === $this->debug ) {
+				$this->log->add(
+					$this->id,
+					'Recovery transactions status: ' . wp_json_encode( $transaction ),
+					WC_Log_Levels::INFO
+				);
+			}
 
 			if ( is_wp_error( $transaction ) || 200 !== wp_remote_retrieve_response_code( $transaction ) ) {
 				$error = is_wp_error( $transaction ) ? $transaction->get_error_message() : wp_remote_retrieve_body( $transaction );
-				$this->log->add( $this->id, 'Get transaction status error: ' . $error, WC_Log_Levels::ERROR );
+				if ( 'yes' === $this->debug ) {
+					$this->log->add(
+						$this->id,
+						'Get transaction status error: ' . $error,
+						WC_Log_Levels::ERROR
+					);
+				}
 				wp_die( esc_html( $error ), esc_html( $error ), array( 'response' => 401 ) );
 			}
 
@@ -922,7 +993,13 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			}
 			return;
 		} else {
-			$this->log->add( $this->id, 'REJECT IPN request...', WC_Log_Levels::INFO );
+			if ( 'yes' === $this->debug ) {
+				$this->log->add(
+					$this->id,
+					'REJECT IPN request...',
+					WC_Log_Levels::INFO
+				);
+			}
 			$error = __( 'Requisição PagSeguro Não autorizada', 'virtuaria-pagseguro' );
 			wp_die( esc_html( $error ), esc_html( $error ), array( 'response' => 401 ) );
 		}
@@ -1084,27 +1161,39 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 
 		$disable_discount = $this->pix_discount_coupon && count( WC()->cart->get_applied_coupons() ) > 0;
 
-		wc_get_template(
-			'transparent-checkout.php',
-			array(
-				'cart_total'      => $cart_total,
-				'flag'            => plugins_url( 'assets/images/brazilian-flag.png', plugin_dir_path( __FILE__ ) ),
-				'installments'    => $combo_installments,
-				'has_tax'         => floatval( $this->tax ) > 0,
-				'min_installment' => floatval( $this->min_installment ),
-				'fee_from'        => $this->fee_from,
-				'pix_validate'    => $this->format_pix_validate( $this->pix_validate ),
-				'methods_enabled' => array(
-					'pix'    => 'yes' === $this->pix_enable,
-					'ticket' => 'yes' === $this->ticket_enable,
-					'credit' => 'yes' === $this->credit_enable,
-				),
-				'full_width'      => 'one' === $this->get_option( 'display' ),
-				'pix_discount'    => $this->pix_discount && ! $disable_discount ? $this->pix_discount / 100 : 0,
+		$checkou_args = array(
+			'cart_total'      => $cart_total,
+			'flag'            => plugins_url( 'assets/images/brazilian-flag.png', plugin_dir_path( __FILE__ ) ),
+			'installments'    => $combo_installments,
+			'has_tax'         => floatval( $this->tax ) > 0,
+			'min_installment' => floatval( $this->min_installment ),
+			'fee_from'        => $this->fee_from,
+			'pix_validate'    => $this->format_pix_validate( $this->pix_validate ),
+			'methods_enabled' => array(
+				'pix'    => 'yes' === $this->pix_enable,
+				'ticket' => 'yes' === $this->ticket_enable,
+				'credit' => 'yes' === $this->credit_enable,
 			),
-			'woocommerce/pagseguro/',
-			Virtuaria_Pagseguro::get_templates_path()
+			'full_width'      => 'one' === $this->get_option( 'display' ),
+			'pix_discount'    => $this->pix_discount && ! $disable_discount ? $this->pix_discount / 100 : 0,
+			'pix_offer_text'  => $this->discount_pix_text( 'PIX', $this->id ),
 		);
+
+		if ( 'lines' === $this->get_option( 'layout_checkout' ) ) {
+			wc_get_template(
+				'new-transparent-checkout.php',
+				$checkou_args,
+				'woocommerce/pagseguro/',
+				Virtuaria_Pagseguro::get_templates_path()
+			);
+		} else {
+			wc_get_template(
+				'transparent-checkout.php',
+				$checkou_args,
+				'woocommerce/pagseguro/',
+				Virtuaria_Pagseguro::get_templates_path()
+			);
+		}
 	}
 
 	/**
@@ -1473,6 +1562,50 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Erase cards option.
+	 *
+	 * @param string $key  the name from field.
+	 * @param array  $data the data.
+	 */
+	public function generate_erase_cards_html( $key, $data ) {
+		$defaults = array(
+			'title'             => '',
+			'disabled'          => false,
+			'class'             => '',
+			'css'               => '',
+			'placeholder'       => '',
+			'type'              => 'text',
+			'desc_tip'          => false,
+			'description'       => '',
+			'custom_attributes' => array(),
+		);
+
+		$data = wp_parse_args( $data, $defaults );
+
+		$data['id'] = 'woocommerce_' . $this->id . '_erase_cards';
+		ob_start();
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr( $data['id'] ); ?>">
+					<?php echo esc_html( $data['title'] ); ?>
+					<span class="woocommerce-help-tip" data-tip="<?php echo esc_html( $data['description'] ); ?>"></span>
+				</label>
+			</th>
+			<td class="forminp forminp-<?php echo esc_attr( $data['type'] ); ?>">
+				<input type="hidden" name="erase_cards" id="erase-cards" />
+				<button class="button-primary erase-card-option">Remover TODOS os cartões</button>
+				<p class="description">
+					<?php echo wp_kses_post( $data['description'] ); ?>
+				</p>
+			</td>
+		</tr>  
+
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
 	 * Display auth field.
 	 *
 	 * @param string $key  the name from field.
@@ -1740,7 +1873,7 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			&& $this->pix_discount > 0
 			&& $this->id === $gateway_id
 			&& ( ! $this->pix_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 ) ) {
-			$title .= '<span class="pix-discount">(desconto de <b>' . str_replace( '.', ',', $this->pix_discount ) . '%</b> no Pix)</span>';
+			$title .= '<span class="pix-discount">(desconto de <span class="percentage">' . str_replace( '.', ',', $this->pix_discount ) . '%</span>)</span>';
 		}
 		return $title;
 	}
@@ -1941,6 +2074,23 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public function fee_setup_update() {
 		if ( isset( $_POST['fee_setup_updated'] ) ) {
 			$this->update_option( 'token_production', null );
+		}
+	}
+
+	/**
+	 * Do erase cards.
+	 */
+	public function erase_cards() {
+		if ( isset( $_POST['erase_cards'] )
+			&& 'CONFIRMED' === $_POST['erase_cards'] ) {
+			global $wpdb;
+
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM wp_usermeta WHERE meta_key = '_pagseguro_credit_info_store_%d'",
+					get_current_blog_id()
+				)
+			);
 		}
 	}
 
