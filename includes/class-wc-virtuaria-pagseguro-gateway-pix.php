@@ -11,53 +11,9 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Gateway.
  */
-class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
+class WC_Virtuaria_PagSeguro_Gateway_Pix extends WC_Payment_Gateway {
 	use Virtuaria_PagSeguro_Common,
-	Virtuaria_PagSeguro_Credit,
-	Virtuaria_PagSeguro_Pix,
-	Virtuaria_PagSeguro_Ticket;
-
-	/**
-	 * Installments.
-	 *
-	 * @var int
-	 */
-	public $installments;
-
-	/**
-	 * Installments tax.
-	 *
-	 * @var float
-	 */
-	public $tax;
-
-	/**
-	 * Min value to installments.
-	 *
-	 * @var int
-	 */
-	public $min_installment;
-
-	/**
-	 * Apply tax from installments.
-	 *
-	 * @var int
-	 */
-	public $fee_from;
-
-	/**
-	 * Credit invoice description.
-	 *
-	 * @var string
-	 */
-	public $soft_descriptor;
-
-	/**
-	 * Day to valid payment from ticket.
-	 *
-	 * @var int
-	 */
-	public $ticket_validate;
+	Virtuaria_PagSeguro_Pix;
 
 	/**
 	 * Hours to valid payment from pix.
@@ -72,20 +28,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 * @var bool
 	 */
 	public $pix_enable;
-
-	/**
-	 * True if ticket payment is enabled.
-	 *
-	 * @var bool
-	 */
-	public $ticket_enable;
-
-	/**
-	 * True if credit payment is enabled.
-	 *
-	 * @var bool
-	 */
-	public $credit_enable;
 
 	/**
 	 * Percentage from pix discount.
@@ -151,56 +93,38 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public $token;
 
 	/**
-	 * Store card info.
-	 *
-	 * @var string
-	 */
-	public $save_card_info;
-
-	/**
-	 * Observations.
-	 *
-	 * @var string
-	 */
-	public $comments;
-
-	/**
 	 * Constructor for the gateway.
 	 */
 	public function __construct() {
-		$this->id                 = 'virt_pagseguro';
+		$this->id                 = 'virt_pagseguro_pix';
 		$this->icon               = apply_filters(
 			'woocommerce_pagseguro_virt_icon',
 			VIRTUARIA_PAGSEGURO_URL . '/public/images/pagseguro.png'
 		);
 		$this->has_fields         = true;
-		$this->method_title       = __( 'Virtuaria PagSeguro', 'virtuaria-pagseguro' );
+		$this->method_title       = __( 'PagSeguro Pix', 'virtuaria-pagseguro' );
 		$this->method_description = __(
-			'Pague com cartão de crédito, pix e boleto.',
+			'Pague com pix.',
 			'virtuaria-pagseguro'
 		);
 
 		$this->supports = array( 'products', 'refunds' );
 
+		// Load the form fields.
+		$this->init_form_fields();
+
+		// Load the settings.
+		$this->init_settings();
+
 		// Define user set variables.
 		$this->title               = $this->get_option( 'title' );
 		$this->description         = $this->get_option( 'description' );
-		$this->installments        = $this->get_option( 'installments' );
-		$this->tax                 = $this->get_option( 'tax' );
-		$this->min_installment     = $this->get_option( 'min_installment' );
-		$this->fee_from            = $this->get_option( 'fee_from' );
-		$this->soft_descriptor     = $this->get_option( 'soft_descriptor' );
-		$this->ticket_validate     = $this->get_option( 'ticket_validate' );
 		$this->pix_validate        = $this->get_option( 'pix_validate' );
-		$this->pix_enable          = $this->get_option( 'pix_enable' );
-		$this->ticket_enable       = $this->get_option( 'ticket_enable' );
-		$this->credit_enable       = $this->get_option( 'credit_enable' );
+		$this->pix_enable          = $this->enabled;
 		$this->pix_discount        = $this->get_option( 'pix_discount' );
 		$this->signup_checkout     = 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' );
 		$this->pix_msg_payment     = $this->get_option( 'pix_msg_payment' );
 		$this->pix_discount_coupon = 'yes' === $this->get_option( 'pix_discount_coupon' );
-		$this->save_card_info      = $this->get_option( 'save_card_info' );
-		$this->comments            = $this->get_option( 'comments' );
 
 		$this->global_settings = get_option( 'woocommerce_virt_pagseguro_settings' );
 		$this->invoice_prefix  = $this->get_invoice_prefix();
@@ -209,12 +133,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->log = $this->get_log();
 
 		$this->token = $this->get_token();
-
-		// Load the form fields.
-		$this->init_form_fields();
-
-		// Load the settings.
-		$this->init_settings();
 
 		// Set the API.
 		$this->api = new WC_Virtuaria_PagSeguro_API( $this );
@@ -231,24 +149,10 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			array( $this, 'pix_thankyou_page' )
 		);
 		add_action(
-			'woocommerce_thankyou_' . $this->id,
-			array( $this, 'ticket_thankyou_page' )
-		);
-		add_action(
 			'woocommerce_email_after_order_table',
 			array( $this, 'pix_email_instructions' ),
 			10,
 			3
-		);
-		add_action(
-			'woocommerce_email_after_order_table',
-			array( $this, 'ticket_email_instructions' ),
-			10,
-			3
-		);
-		add_action(
-			'wp_enqueue_scripts',
-			array( $this, 'public_credit_scripts_styles' )
 		);
 		add_action(
 			'wp_enqueue_scripts',
@@ -275,12 +179,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			array( $this, 'make_pix_payment' )
 		);
 
-		add_action(
-			'admin_init',
-			array( $this, 'erase_cards' ),
-			20
-		);
-
 		add_filter(
 			'woocommerce_billing_fields',
 			array( $this, 'billing_neighborhood_required' ),
@@ -292,15 +190,12 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			10,
 			2
 		);
-		if ( isset( $this->global_settings['layout_checkout'] )
-			&& 'tabs' === $this->global_settings['layout_checkout'] ) {
-			add_filter(
-				'woocommerce_gateway_title',
-				array( $this, 'discount_pix_text' ),
-				10,
-				2
-			);
-		}
+		add_filter(
+			'woocommerce_gateway_title',
+			array( $this, 'discount_pix_text' ),
+			10,
+			2
+		);
 		add_action(
 			'after_virtuaria_pix_validate_text',
 			array( $this, 'info_about_categories' )
@@ -315,22 +210,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			'save_post_shop_order',
 			array( $this, 'search_order_payment_status' )
 		);
-
-		add_action(
-			'woocommerce_single_product_summary',
-			array( $this, 'display_product_installments' )
-		);
-		add_action(
-			'woocommerce_after_shop_loop_item_title',
-			array( $this, 'loop_products_installment' ),
-			15
-		);
-		add_filter(
-			'woocommerce_available_variation',
-			array( $this, 'variation_discount_and_installment' ),
-			10,
-			3
-		);
 	}
 
 	/**
@@ -338,8 +217,6 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	 */
 	public function init_form_fields() {
 		$this->form_fields = $this->get_default_settings()
-			+ $this->get_credit_default_settings()
-			+ $this->get_ticket_default_settings()
 			+ $this->get_pix_default_settings();
 	}
 }

@@ -7,8 +7,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-global $product;
-
 ?>
 <div class="pagseguro-installments">
 	<label for="showTable" class="link">Ver parcelas disponíveis</label>

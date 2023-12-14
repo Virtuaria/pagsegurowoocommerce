@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 ?>
-<div id="pagseguro-banking-ticket-form" class="pagseguro-method-form payment-details">
+<div id="virt-pagseguro-banking-ticket-form" class="virt-pagseguro-method-form payment-details">
 	<div class="ticket-text">
 		<p>
 			<?php esc_html_e( 'O pedido será confirmado apenas após a confirmação do pagamento.', 'virtuaria-pagseguro' ); ?>

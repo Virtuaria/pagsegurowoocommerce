@@ -12,7 +12,7 @@
     margin-bottom: 20px;
     font-style: italic;
 }
-#pagseguro-payment .payment-method {
+#virt-pagseguro-payment .payment-method {
     border: 1px solid #d3d3d3;
     border-radius: 5px;
     padding: 10px;
@@ -20,22 +20,22 @@
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
 }
-#pagseguro-payment .payment-method:hover {
+#virt-pagseguro-payment .payment-method:hover {
     background-color: #f9f9f9;
 }
-#pagseguro-payment .payment-method.selected {
+#virt-pagseguro-payment .payment-method.selected {
     background-color: #fff;
     border-color: #d0d0d0;
 }
-#pagseguro-payment .payment-option {
+#virt-pagseguro-payment .payment-option {
     display: block;
     align-items: center;
     cursor: pointer;
 }
-#pagseguro-payment .payment-option input[type="radio"] {
+#virt-pagseguro-payment .payment-option input[type="radio"] {
     display: none;
 }
-#pagseguro-payment .indicator {
+#virt-pagseguro-payment .indicator {
     width: 10px;
     margin-left: 10px;
     margin-right: 10px;
@@ -45,7 +45,7 @@
     vertical-align: middle;
     font-weight: bold;
 }
-#pagseguro-payment .payment-option input[type="radio"]:checked + .indicator:before {
+#virt-pagseguro-payment .payment-option input[type="radio"]:checked + .indicator:before {
     content: '-';
     border: none;
     transform: translate(-50%, -57%);
@@ -68,10 +68,10 @@
     transform: translate(-50%, -50%);
     color: gray;
 }
-#pagseguro-payment .payment-method input[type="radio"]:checked {
+#virt-pagseguro-payment .payment-method input[type="radio"]:checked {
     border-color: #007bff;
 }
-#pagseguro-payment .payment-details {
+#virt-pagseguro-payment .payment-details {
     border: 1px solid #f0f0f0;
     border-radius: 5px;
     padding: 2px 5px;
@@ -81,14 +81,14 @@
     margin-top: 0;
     min-height: initial;
 }
-#pagseguro-payment .payment-method:not(.selected) .payment-details {
+#virt-pagseguro-payment .payment-method:not(.selected) .payment-details {
     max-height: 0;
     visibility: hidden;
     padding: 0 10px;
     border: 0;
     overflow: hidden;
 }
-#pagseguro-payment .payment-method.selected .payment-details {
+#virt-pagseguro-payment .payment-method.selected .payment-details {
     visibility: visible;
     max-height: 1000px;
     padding: 10px;

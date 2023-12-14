@@ -1,314 +1,321 @@
-  /* CSS default */
-  #pagseguro-payment-form label {
-    font-size: 14px;
-  }
-  .woocommerce-checkout #payment div.payment_method_virt_pagseguro {
-    padding: 1em;
-    margin: 1em 0;
-    font-size: 15px;
-  }
-  .payment_method_virt_pagseguro > p {
-    margin: 0 0 5px;
-    line-height: 23px;
-  }
-  .woocommerce-checkout #payment div.payment_method_virt_pagseguro::before {
-    content: "";
-    display: block;
-    top: -0.75em;
-    margin: -1em 0 0 2em;
-  }
-  #pagseguro-payment {
-    border: none;
-    padding: 0;
-    margin: 0;
-  }
-  #pagseguro-payment p {
-    margin-bottom: 5px;
-    line-height: 23px;
-    margin-top: 0;
-  }
-  .card-loaded #pagseguro-load-card {
-    float: left;
-    display: block;
-    clear: left;
-  }
-  .card-loaded .clear.after-installments {
-    display: none;
-  }
-  #pagseguro-card-installments,
-  #pagseguro-payment .input-text {
-    font-size: inherit !important;
-    min-height: 44px;
-  }
-  #pagseguro-payment .form-row {
-    min-height: 82px;
-  }
-  #pagseguro-payment .clear {
-    clear: both;
-  }
-  label[for="payment_method_virt_pagseguro"] img {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 10px;
-  }
-  #pagseguro-payment small {
-    font-size: 11px;
-  }
-  .woocommerce-checkout
-    #payment
-    div.payment_method_virt_pagseguro
-    .pagseguro-info {
-    display: block;
-    margin-bottom: 10px;
-    line-height: 20px;
-    font-size: 0.8em;
-    font-style: italic;
-    margin-top: -2px;
-  }
+/* CSS default */
+#pagseguro-payment-form label {
+  font-size: 14px;
+}
+.woocommerce-checkout #payment div.payment_method_virt_pagseguro {
+  padding: 1em;
+  margin: 1em 0;
+  font-size: 15px;
+}
+.payment_method_virt_pagseguro > p {
+  margin: 0 0 5px;
+  line-height: 23px;
+}
+.woocommerce-checkout #payment div.payment_method_virt_pagseguro::before {
+  content: "";
+  display: block;
+  top: -0.75em;
+  margin: -1em 0 0 2em;
+}
+#virt-pagseguro-payment {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+#virt-pagseguro-payment p {
+  margin-bottom: 5px;
+  line-height: 23px;
+  margin-top: 0;
+}
+.card-loaded #pagseguro-load-card {
+  float: left;
+  display: block;
+  clear: left;
+}
+.card-loaded .clear.after-installments {
+  display: none;
+}
+#virt-pagseguro-card-installments,
+#virt-pagseguro-payment .input-text {
+  font-size: inherit !important;
+  min-height: 44px;
+}
+#virt-pagseguro-payment .form-row {
+  min-height: 82px;
+}
+#virt-pagseguro-payment .clear {
+  clear: both;
+}
+label[for="payment_method_virt_pagseguro"] img {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+  max-width: 100px;
+}
+#virt-pagseguro-payment small {
+  font-size: 11px;
+}
+.woocommerce-checkout
+  #payment
+  div.payment_method_virt_pagseguro
+  .pagseguro-info {
+  display: block;
+  margin-bottom: 10px;
+  line-height: 20px;
+  font-size: 0.8em;
+  font-style: italic;
+  margin-top: -2px;
+}
 
-  #pagseguro-payment-methods:before,
-  #pagseguro-payment-methods:after,
-  #pagseguro-bank-transfer-form ul:before,
-  #pagseguro-bank-transfer-form ul:after {
-    content: " ";
-    display: table;
-  }
-  #pagseguro-payment-methods:after,
-  #pagseguro-bank-transfer-form ul:after {
-    clear: both;
-  }
-  #pagseguro-payment-methods,
-  #pagseguro-bank-transfer-form ul {
-    list-style: none;
-    margin: 0 0 10px;
-    padding: 0;
-    *zoom: 1;
-  }
-  #pagseguro-payment-methods input[type="radio"],
-  #pagseguro-bank-transfer-form ul input[type="radio"] {
-    display: none;
-  }
-  .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li,
-  .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li {
-    float: left;
-    list-style: none;
-    margin-right: 5px;
-  }
-  .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li:after,
-  .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li:after {
-    content: "";
-    height: 2px;
-    width: 0;
+#virt-pagseguro-payment-methods:before,
+#virt-pagseguro-payment-methods:after,
+#virt-pagseguro-bank-transfer-form ul:before,
+#virt-pagseguro-bank-transfer-form ul:after {
+  content: " ";
+  display: table;
+}
+#virt-pagseguro-payment-methods:after,
+#virt-pagseguro-bank-transfer-form ul:after {
+  clear: both;
+}
+#virt-pagseguro-payment-methods,
+#virt-pagseguro-bank-transfer-form ul {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  zoom: 1;
+}
+#virt-pagseguro-payment-methods input[type="radio"],
+#virt-pagseguro-bank-transfer-form ul input[type="radio"] {
+  display: none;
+}
+.woocommerce #payment ul.payment_methods li #virt-pagseguro-payment-methods li,
+.woocommerce-page #payment ul.payment_methods li #virt-pagseguro-payment-methods li {
+  float: left;
+  list-style: none;
+  margin-right: 5px;
+}
+.woocommerce #payment ul.payment_methods li #virt-pagseguro-payment-methods li:after,
+.woocommerce-page #payment ul.payment_methods li #virt-pagseguro-payment-methods li:after {
+  content: "";
+  height: 2px;
+  width: 0;
+  display: block;
+  max-width: 150px;
+  transition: .2s width linear;
+}
+.woocommerce
+  #payment
+  ul.payment_methods
+  li
+  .woocommerce-pagseguro-form-storefront
+  #virt-pagseguro-payment-methods
+  li,
+.woocommerce-page
+  #payment
+  ul.payment_methods
+  li
+  .woocommerce-pagseguro-form-storefront
+  #virt-pagseguro-payment-methods
+  li {
+  padding: 5px !important;
+}
+.woocommerce #payment ul.payment_methods li #virt-pagseguro-payment-methods label,
+.woocommerce-page
+  #payment
+  ul.payment_methods
+  li
+  #virt-pagseguro-payment-methods
+  label {
+  cursor: pointer;
+  display: block;
+  font-weight: bold;
+  margin: 0;
+  padding: 5px 5px;
+  min-width: 100px;
+  text-align: center;
+}
+#pagseguro-icon-ticket,
+#pagseguro-icon-pix {
+  display: block;
+  float: right;
+}
+#pagseguro-icon-pix {
+  height: 101px;
+  width: 101px;
+}
+#pagseguro-icon-ticket {
+  height: 101px;
+  width: 101px;
+}
+.ticket-text {
+    display: inline-block;
+    max-width: calc(100% - 121px);
+}
+#pagseguro-icon-pix {
+  background: transparent url("../images/pix.png") no-repeat top right;
+  background-size: contain;
+  display: inline-block;
+}
+.pix-desc {
+  display: inline-block;
+  max-width: calc(100% - 101px);
+}
+.pix-desc > span {
     display: block;
-    max-width: 150px;
-    transition: .2s width linear;
-  }
-  .woocommerce
-    #payment
-    ul.payment_methods
-    li
-    .woocommerce-pagseguro-form-storefront
-    #pagseguro-payment-methods
-    li,
-  .woocommerce-page
-    #payment
-    ul.payment_methods
-    li
-    .woocommerce-pagseguro-form-storefront
-    #pagseguro-payment-methods
-    li {
-    padding: 5px !important;
-  }
-  .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods label,
-  .woocommerce-page
-    #payment
-    ul.payment_methods
-    li
-    #pagseguro-payment-methods
-    label {
-    cursor: pointer;
-    display: block;
-    font-weight: bold;
-    margin: 0;
-    padding: 5px 5px;
-    min-width: 100px;
-    text-align: center;
-  }
-  #pagseguro-icon-ticket,
-  #pagseguro-icon-pix {
-    display: block;
-    float: right;
-  }
-  #pagseguro-icon-pix {
-    height: 101px;
-    width: 101px;
-  }
-  #pagseguro-icon-ticket {
-    height: 101px;
-    width: 101px;
-  }
-  .ticket-text {
-      display: inline-block;
-      max-width: calc(100% - 121px);
-  }
-  #pagseguro-icon-pix {
-    background: transparent url("../images/pix.png") no-repeat top right;
+    margin-bottom: 5px;
+    line-height: 20px;
+}
+#pagseguro-icon-ticket {
+  background: transparent url("../images/codigo-de-barras.png") no-repeat top
+    right;
     background-size: contain;
     display: inline-block;
+}
+.woocommerce #payment ul.payment_methods li #virt-pagseguro-payment-methods li.active:after,
+.woocommerce-page #payment ul.payment_methods li #virt-pagseguro-payment-methods li.active:after {
+  background-color: #898989;
+  width: 100%;
+}
+#virt-pagseguro-payment-methods li.active {
+  background-color: #ffffff5c;
+}
+#virt-pagseguro-payment-methods {
+  border-bottom: 1px solid #ccc;
+}
+.virt_pagseguro_installments {
+  display: none;
+  min-height: 295px;
+  margin-top: 15px;
+}
+.card-loaded .virt_pagseguro_installments {
+  min-height: 160px;
+}
+#virt-pagseguro-payment {
+  display: block;
+}
+.card-loaded {
+  display: none;
+}
+input#virt-pagseguro-save-hash-card {
+  font-size: 5px;
+  width: 16px;
+  height: 16px;
+}
+#virt-pagseguro-payment label[for="virt-pagseguro-save-hash-card"] {
+  font-size: 12px;
+  line-height: 18px;
+  display: inline-block;
+}
+#virt-pagseguro-payment #pagseguro-card-holder-name-field small {
+  font-weight: bold;
+  color: #000;
+}
+.payment_method_pagseguro .pagseguro-info {
+  font-size: 14px;
+  display: block;
+  margin: 0px 0 20px;
+}
+.card-in-use {
+  font-size: 14px;
+  margin-left: 10px;
+  background: linear-gradient(to bottom, #000, #282828);
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #fff;
+  width: 130px;
+  float: right;
+}
+.card-in-use > span {
+  display: block;
+}
+.fa-credit-card-alt {
+  margin-right: 10px;
+}
+.card-in-use .number {
+  margin: 7px 0px;
+}
+.card-in-use .holder {
+  font-size: 14px;
+}
+.card-loaded#virt-pagseguro-payment #virt-pagseguro-card-installments-field {
+  width: 100%;
+  max-width: 51%;
+  display: inline-block;
+}
+.card-loaded #virt-pagseguro-card-installments {
+  min-height: 40px;
+  font-size: 0.94em !important;
+}.card-loaded #pagseguro-load-card {
+    float: left;
+}
+.woocommerce-checkout #payment ul.payment_methods li .card-brand > img {
+  margin-left: 0;
+  margin-right: 5px;
+  display: inline-block;
+  vertical-align: baseline;
+}
+.payment_method_virt_pagseguro .pix-discount {
+  color: green;
+  margin-left: 5px;
+  font-style: italic;
+}
+.pix-desc > .discount {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+#virt-pagseguro-banking-pix-form .info-category {
+  font-style: italic;
+  font-size: 13px;
+  margin-top: 20px;
+}
+.payment_method_virt_pagseguro_credit label img,
+.payment_method_virt_pagseguro_pix label img,
+.payment_method_virt_pagseguro_ticket label img {
+  max-width: 90px;
+  vertical-align: bottom;
+}
+@media only screen and (min-width: 1024px) and (max-width: 1299px) {
+  .card-in-use {
+    margin-right: 0;
   }
-  .pix-desc {
-    display: inline-block;
-    max-width: calc(100% - 101px);
-  }
-  .pix-desc > span {
-      display: block;
-      margin-bottom: 5px;
-      line-height: 20px;
-  }
-  #pagseguro-icon-ticket {
-    background: transparent url("../images/codigo-de-barras.png") no-repeat top
-      right;
-      background-size: contain;
-      display: inline-block;
-  }
-  .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods li.active:after,
-  .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods li.active:after {
-    background-color: #898989;
-    width: 100%;
-  }
-  #pagseguro-payment-methods li.active {
-    background-color: #ffffff5c;
-  }
-  #pagseguro-payment-methods {
-    border-bottom: 1px solid #ccc;
-  }
-  .pagseguro-method-form {
-    display: none;
-    min-height: 295px;
-    margin-top: 15px;
-  }
-  .card-loaded .pagseguro-method-form {
-    min-height: 160px;
-  }
-  #pagseguro-payment {
-    display: block;
-  }
-  .card-loaded {
-    display: none;
-  }
-  input#pagseguro-save-hash-card {
-    font-size: 5px;
-    width: 16px;
-    height: 16px;
-  }
-  #pagseguro-payment label[for="pagseguro-save-hash-card"] {
-    font-size: 12px;
-    line-height: 18px;
-    display: inline-block;
-  }
-  #pagseguro-payment #pagseguro-card-holder-name-field small {
-    font-weight: bold;
-    color: #000;
-  }
-  .payment_method_pagseguro .pagseguro-info {
-    font-size: 14px;
-    display: block;
-    margin: 0px 0 20px;
+}
+@media only screen and (max-width: 767px) {
+  #virt-pagseguro-card-installments-field {
+      width: 100%;
   }
   .card-in-use {
-    font-size: 14px;
-    margin-left: 30px;
-    background: linear-gradient(to bottom, #000, #282828);
-    padding: 10px 17px;
-    border-radius: 10px;
-    color: #fff;
-    width: 130px;
-    float: right;
+      margin-left: 0;
   }
-  .card-in-use > span {
-    display: block;
+  .woocommerce #payment ul.payment_methods li #virt-pagseguro-payment-methods label,
+  .woocommerce-page #payment ul.payment_methods li #virt-pagseguro-payment-methods label {
+    min-width: 80px;
   }
-  .fa-credit-card-alt {
-    margin-right: 10px;
+  .card-loaded#virt-pagseguro-payment #virt-pagseguro-card-installments-field {
+    max-width: 100%;
   }
-  .card-in-use .number {
-    margin: 7px 0px;
-  }
-  .card-in-use .holder {
-    font-size: 14px;
-  }
-  .card-loaded#pagseguro-payment #pagseguro-card-installments-field {
+  .woocommerce-checkout .checkout #virt-pagseguro-payment .form-row-first,
+  .woocommerce-checkout .checkout #virt-pagseguro-payment .form-row-last {
     width: 100%;
-    max-width: 51%;
-    display: inline-block;
+    clear: both;
   }
-  .card-loaded #pagseguro-card-installments {
-    min-height: 40px;
-    font-size: 0.94em !important;
-  }.card-loaded #pagseguro-load-card {
-      float: left;
-  }
-  .woocommerce-checkout #payment ul.payment_methods li .card-brand > img {
-    margin-left: 0;
-    margin-right: 5px;
-    display: inline-block;
-    vertical-align: baseline;
-  }
-  .payment_method_virt_pagseguro .pix-discount {
-    color: green;
-    margin-left: 5px;
-    font-style: italic;
-  }
-  .pix-desc > .discount {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  #pagseguro-banking-pix-form .info-category {
-      font-style: italic;
-      font-size: 13px;
-      margin-top: 20px;
-  }
-  @media only screen and (min-width: 1024px) and (max-width: 1299px) {
-    .card-in-use {
-      margin-right: 0;
-    }
-  }
-  @media only screen and (max-width: 767px) {
-    #pagseguro-card-installments-field {
-        width: 100%;
-    }
-    .card-in-use {
-        margin-left: 0;
-    }
-    .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods label,
-    .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods label {
-      min-width: 80px;
-    }
-    .card-loaded#pagseguro-payment #pagseguro-card-installments-field {
+  #virt-pagseguro-payment .pix-desc,
+  #virt-pagseguro-payment .ticket-text {
+      display: block;
       max-width: 100%;
-    }
-    .woocommerce-checkout .checkout #pagseguro-payment .form-row-first,
-    .woocommerce-checkout .checkout #pagseguro-payment .form-row-last {
-      width: 100%;
-      clear: both;
-    }
-    #pagseguro-payment .pix-desc,
-    #pagseguro-payment .ticket-text {
-        display: block;
-        max-width: 100%;
-    }
   }
-  @media only screen and (max-width: 479px) {
-    #pagseguro-load-card {
-      text-align: right;
-      margin-top: 15px;
-    }
-    .card-in-use {
-        float: none;
-        display: table;
-    }
-    .woocommerce #payment ul.payment_methods li #pagseguro-payment-methods label,
-    .woocommerce-page #payment ul.payment_methods li #pagseguro-payment-methods label {
-      min-width: 50px;
-    }
+}
+@media only screen and (max-width: 479px) {
+  #pagseguro-load-card {
+    text-align: right;
+    margin-top: 15px;
   }
+  .card-in-use {
+      float: none;
+      display: table;
+  }
+  .woocommerce #payment ul.payment_methods li #virt-pagseguro-payment-methods label,
+  .woocommerce-page #payment ul.payment_methods li #virt-pagseguro-payment-methods label {
+    min-width: 50px;
+  }
+}

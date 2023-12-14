@@ -1,8 +1,8 @@
-.pagseguro-method-form {
+#virt-pagseguro-payment:not(.card-loaded) .virt-pagseguro-method-form {
     min-height: 400px;
 }
 @media only screen and (max-width: 1024px) {
-    .pagseguro-method-form {
+    #virt-pagseguro-payment:not(.card-loaded) .virt-pagseguro-method-form {
         min-height: auto;
     }
 }

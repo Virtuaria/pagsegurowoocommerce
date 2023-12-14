@@ -1,0 +1,37 @@
+.virt-pagseguro-method-form {
+    display: block !important;
+    min-height: inherit;
+    font-size: 15px;
+}
+label[for="payment_method_virt_pagseguro_pix"] {
+    display: flex;
+    flex-wrap: wrap;
+}
+.payment_method_virt_pagseguro_pix label img {
+    margin-left: 10px;
+}
+li.payment_method_virt_pagseguro_credit  .input-text,
+li.payment_method_virt_pagseguro_pix .input-text,
+li.payment_method_virt_pagseguro_ticket .input-text {
+    font-size: 16px !important;
+    height: 45px;
+}
+.payment_method_virt_pagseguro_credit .payment_box > p, 
+.payment_method_virt_pagseguro_pix .payment_box > p,
+.payment_method_virt_pagseguro_ticket .payment_box > p {
+    font-size: 14px;
+}
+.pix-discount {
+    margin-left: 40px;
+    color: green;
+    order: 2;
+}
+#pagseguro-payment-virt_pagseguro_credit.card-loaded {
+    display: block;
+}
+#pagseguro-payment-virt_pagseguro_credit,
+#pagseguro-payment-virt_pagseguro_pix,
+#pagseguro-payment-virt_pagseguro_ticket {
+    border-color: #e5e5e5;
+    border-width: 1px;
+}

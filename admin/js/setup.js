@@ -6,12 +6,20 @@ function getUrlParameter(name) {
 }
 jQuery(document).ready(function($) {
     $('#woocommerce_virt_pagseguro_environment').on('change', function() {
-        $('.woocommerce-save-button').click();
+        if ( confirm('Ao mudar o ambiente, as configurações serão salvas automaticamente. Deseja continuar?') ) {
+            $('.woocommerce-save-button').click();
+        } else {
+            return false;
+        }
     });
 
     $('#woocommerce_virt_pagseguro_fee_setup').on('change', function() {
-        $('#mainform').append('<input type="hidden" name="fee_setup_updated" value="yes" />');
-        $('.woocommerce-save-button').click();
+        if ( confirm('Alterar as taxas exige que o plugin seja reconectado ao PagSeguro. Deseja continuar?') ) {
+            $('#mainform').append('<input type="hidden" name="fee_setup_updated" value="yes" />');
+            $('.woocommerce-save-button').click();
+        } else {
+            return false;
+        }
     });
 
     let connected = $('.forminp-auth > .connected' ).length > 0;
@@ -30,3 +38,9 @@ jQuery(document).ready(function($) {
         }
     });
 });
+
+(function($){
+    if ( navigation ) {
+        $('.form-table:first-of-type').before(navigation);
+    }
+})(jQuery);

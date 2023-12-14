@@ -2,8 +2,8 @@
 Contributors: tecnologiavirtuaria
 Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito, pagamento
 Requires at least: 4.7
-Tested up to: 6.4.1
-Stable tag: 2.7.0
+Tested up to: 6.4.2
+Stable tag: 3.0.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -14,7 +14,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Fácil de instalar e configurar, permite pagamentos no cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce, com confirmação automática do pagamento nos 3 métodos. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
 
-### ⭐ **Virtuaria & PagSeguro: Parceiros em Excelência** ⭐
+### ⭐ **VIRTUARIA & PAGBANK: PARCEIROS EM EXCELÊNCIA** ⭐
 
 A qualidade do nosso plugin chamou a atenção do próprio PagSeguro, resultando em uma parceria da qual nos orgulhamos muito. Esta união não só fortalece a confiabilidade e eficiência do nosso plugin, mas também traz benefícios exclusivos, como **taxas especiais**, para todos os usuários que optem pelo nosso plugin. 
 ![Pareceria Virtuaria e PagSeguro](https://teravirt.s3-accelerate.amazonaws.com/uploads/sites/107/2023/09/pagSeguro-virtuaria-1.jpg)
@@ -27,7 +27,11 @@ Desfrute de **taxas com desconto** no PagSeguro. É simples ativar essa oferta: 
 - **Negociada PagSeguro**: Caso já tenha negociado com o PagSeguro uma taxa personalizada melhor;
 - **Padrão do PagSeguro**: Taxas padrão da plataforma PagSeguro.
 
-*Obs.: Caso já esteja usando o plugin, é preciso refazer a conexão para ativar o desconto.*  
+*Obs.: Caso já esteja usando o plugin, é preciso refazer a conexão para ativar o desconto.*
+  
+#### **Suporte PagBank🤝:**
+Deseja negociar taxas? Use este link para ser atendido por um especialista do PagBank:
+[**Solicitar Contato do PagBank**](https://pagseguro.uol.com.br/campanhas/contato/?parceiro=virtuaria#rmcl).
 
 ### ✅ **Funcionalidades Principais:**
 * **Múltiplos métodos de pagamento**: Suporte a Crédito, Pix e Boleto Bancário;
@@ -45,23 +49,20 @@ Desfrute de **taxas com desconto** no PagSeguro. É simples ativar essa oferta: 
 - **Use a mesma conta PagSeguro**: Em múltiplas lojas virtuais;
 * **Status pagamento confirmado**: Permite definir via configuração, qual status identifica o pagamento confirmado;
 - **Consulta status no PagSeguro**: Permite consultar o status atual da transação no PagSeguro a qualquer momento;
-- **Exibição do Parcelamento**: Permite, via configuração, exibir o parcelamento na página do produto e listagens como catálogo e pesquisa.
-
-[youtube https://www.youtube.com/watch?v=8l3zYtAgG_s&ab_channel=Virtuaria]
-
-
+- **Exibição do Parcelamento**: Permite, via configuração, exibir o parcelamento na página do produto e listagens como catálogo e pesquisa;
+- **Modo de funcionamento**: Permite, via configuração, separar Crédito, Pix e Boleto como métodos de pagamento independentes. Esta opção oferece maior flexibilidade e facilita a integração com sistemas externos e com outros plugins.
 ## ✨ Ativação
 Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
 
 ## 🌟 **Suporte Premium**
 
 Embora o plugin Virtuaria PagSeguro seja **gratuito e de código aberto**, entendemos que, às vezes, os usuários podem precisar de assistência especializada. Por isso, oferecemos nosso Suporte Premium.
-- **Instalação e configuração completa:** R$ 290,00
+- **Instalação e configuração completa:** R$ 260,00
     - Inclui treinamento geral e homologação do funcionamento do plugin na sua loja virtual;
     - Duração: até 1 hora (Google Meet);
 - **Suporte Avançado:**
     - Se durante a instalação e configuração, identificarmos problemas em códigos de terceiros, nossa equipe está preparada para auxiliar. Faremos uma análise e lhe explicaremos o escopo do problema.
-    - Investimento: R$ 190,00 por hora.
+    - Investimento: R$ 160,00 por hora.
 
 💌 **Interessado?** 
 Não hesite! Contate-nos diretamente em [tecnologia@virtuaria.com.br](mailto:tecnologia@virtuaria.com.br) e garanta uma solução sob medida para suas necessidades.
@@ -81,11 +82,14 @@ Não hesite! Contate-nos diretamente em [tecnologia@virtuaria.com.br](mailto:tec
 
 ⚠️ Atenção:  É obrigatório que exista uma chave Pix cadastrada na sua conta de vendedor no painel do PagSeguro. Qualquer chave Pix, não precisa criar uma exclusiva para este plugin. [Mais informações](https://blog.pagseguro.uol.com.br/passo-a-passo-para-cadastrar-sua-chave-aleatoria-e-vender-com-pix-nas-maquininhas-pagseguro/)
 
+### 🖥️ **Modo de funcionamento**
+A partir da versão 3.0,  nosso plugin oferece uma nova configuração que permite tratar Crédito, Pix e Boleto como métodos de pagamento independentes no painel do WooCommerce e Checkout. Este recurso facilita a identificação das formas de pagamento em integrações com sistemas externos (CRM, ERP, etc), facilitando o gerenciamento financeiro. Além disso, métodos separados tornam possível que plugins de terceiros realizem ações específicas em cada forma de pagamento, como a aplicação de descontos, por exemplo. 
+Continuamos a oferecer a opção de operar com formas de pagamento unificadas para simplicidade e conveniência dos usuários que preferem este formato. Isto garante total compatibilidade para quem usa versões anteriores do plugin e deseja atualizar.
 
-### 🔒 **Salvar Método de Pagamento**
+### 💳 **Salvar Método de Pagamento**
 Para compras futuras mais ágeis, o plugin permite uma configuração para ativar o “Salvar Método de Pagamento”. Este recurso não armazena os dados do cartão de crédito do comprador, mas sim um código (token) de compra do cartão, o que é suficiente para o cliente realizar compras futuras sem precisar digitar os dados do cartão novamente. 
 
-### 💳 **Cobrança Extra**
+### 💰 **Cobrança Extra**
 O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um valor extra em pedidos feitos com cartão de crédito. Esta função pode ser útil, por exemplo, para vendas de produtos no peso, pois neste caso o valor final quase sempre é diferente do inicialmente solicitado, algo muito comum em supermercados. Também é útil para os casos onde o cliente solicita a inclusão de novos itens no pedido. Para realizar cobranças extras, é necessário que a função de armazenar dados do pagamento esteja ativa.
 
 ### ⚡ **Otimização do Checkout**
@@ -269,25 +273,40 @@ Atualmente temos as seguintes opções:
 == Screenshots ==
 
 1. Configurações do plugin;
-2. Checkout transparente com crédito;
-3. Checkout transparente com boleto;
-4. Checkout transparente com pix;
-5. Reembolso;
-6. Reembolso bem sucedido;
-7. Armazenamento dos dados de pagamento;
-8. Cobrança adicional;
-9. Boleto bancário;
-10. Boleto bancário no e-mail de novo pedido;
-11. Pagamento com Pix;
-12. Segunda via do Pix no e-mail de novo pedido;
-13. Consulta de status de pagamento;
-14. Parcelamento na página do produto.
+2. Configurações de cartão de crédito - separado;
+3. Configurações de pix - separado;
+4. Configurações de boleto bancário - separado;
+5. Configurações de cartão de crédito, pix e boleto - unificado;
+6. Checkout transparente com crédito;
+7. Checkout transparente com boleto;
+8. Checkout transparente com pix;
+9. Reembolso;
+10. Reembolso bem sucedido;
+11. Armazenamento dos dados de pagamento;
+12. Cobrança adicional;
+13. Boleto bancário;
+14. Boleto bancário no e-mail de novo pedido;
+15. Pagamento com Pix;
+16. Segunda via do Pix no e-mail de novo pedido;
+17. Consulta de status de pagamento;
+18. Parcelamento na página do produto;
+19. Layout de finalização em linhas - Crédito;
+20. Layout de finalização em linhas - Pix;
+21. Layout de finalização com métodos separados.
 
 
 == Upgrade Notice ==
 Nenhuma atualização disponível
 
 == Changelog ==
+= 3.0.0 2023-12-14 =
+* Novo menu para gerenciar configurações do plugin;
+* Nova tela de configuração;
+* Configuração para modo de funcionamento que permite o uso separado dos métodos de pagamento;
+* Ajuste na exibição do parcelamento em produtos variáveis;
+* Melhoria das legendas de configuração;
+* Adição da marca do PagBank ao checkout;
+* Compatibilidade com Wordpress 6.4.2.
 = 2.7.0 2023-11-10 =
 * Novo layout de exibição das formas de pagamento na tela de checkout;
 * Opção para remoção de todos os "Cartões" (tokens de pagamento) armazenados pelo plugin;

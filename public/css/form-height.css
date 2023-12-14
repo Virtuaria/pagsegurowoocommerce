@@ -1,4 +1,4 @@
-.payment_box .card-loaded .pagseguro-method-form,
-.payment_box .pagseguro-method-form {
+.payment_box .card-loaded .virt-pagseguro-method-form,
+.payment_box .virt-pagseguro-method-form {
     min-height: 125px;
 }

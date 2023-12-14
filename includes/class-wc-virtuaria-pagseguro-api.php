@@ -34,6 +34,20 @@ class WC_Virtuaria_PagSeguro_API {
 	private const TIMEOUT = 25;
 
 	/**
+	 * Log identifier.
+	 *
+	 * @var string
+	 */
+	private $tag;
+
+	/**
+	 * Enable log.
+	 *
+	 * @var string
+	 */
+	private $debug_on;
+
+	/**
 	 * Initialize class.
 	 *
 	 * @param WC_Pagseguro_Virt_Gateway $gateway the instance from gateway.
@@ -41,14 +55,16 @@ class WC_Virtuaria_PagSeguro_API {
 	public function __construct( $gateway ) {
 		$this->gateway = $gateway;
 
-		if ( 'sandbox' === $this->gateway->environment ) {
+		if ( isset( $this->gateway->global_settings['environment'] )
+			&& 'sandbox' === $this->gateway->global_settings['environment'] ) {
 			$this->endpoint = 'https://sandbox.api.pagseguro.com/';
 		} else {
 			$this->endpoint = 'https://api.pagseguro.com/';
 		}
 
-		$this->tag      = $this->gateway->id;
-		$this->debug_on = 'yes' === $this->gateway->get_option( 'debug' );
+		$this->tag      = 'virtuaria-pagseguro';
+		$this->debug_on = isset( $this->gateway->global_settings['debug'] )
+			&& 'yes' === $this->gateway->global_settings['debug'];
 	}
 
 	/**
@@ -59,10 +75,10 @@ class WC_Virtuaria_PagSeguro_API {
 	 */
 	public function new_charge( $order, $posted ) {
 		if ( 'credit' === $posted['payment_mode']
-			&& $this->gateway->fee_from <= intval( $posted['pagseguro_installments'] ) ) {
+			&& $this->gateway->fee_from <= intval( $posted['virt_pagseguro_installments'] ) ) {
 			$total = $this->gateway->get_installment_value(
 				$order->get_total(),
-				intval( $posted['pagseguro_installments'] )
+				intval( $posted['virt_pagseguro_installments'] )
 			);
 		} else {
 			$total = $order->get_total();
@@ -183,7 +199,7 @@ class WC_Virtuaria_PagSeguro_API {
 			);
 
 			if ( 'CREDIT_CARD' === $data['body']['charges'][0]['payment_method']['type'] ) {
-				$data['body']['charges'][0]['payment_method']['installments']    = intval( $posted['pagseguro_installments'] );
+				$data['body']['charges'][0]['payment_method']['installments']    = intval( $posted['virt_pagseguro_installments'] );
 				$data['body']['charges'][0]['payment_method']['capture']         = true;
 				$data['body']['charges'][0]['payment_method']['soft_descriptor'] = $this->gateway->soft_descriptor;
 
@@ -191,12 +207,15 @@ class WC_Virtuaria_PagSeguro_API {
 					$pagseguro_card_info = get_user_meta( get_current_user_id(), '_pagseguro_credit_info_store_' . get_current_blog_id(), true );
 				}
 
-				if ( isset( $pagseguro_card_info['token'] ) && ! $posted['pagseguro_use_other_card'] && $posted['pagseguro_save_hash_card'] ) {
+				if ( isset( $pagseguro_card_info['token'] )
+					&& ! $posted['virt_pagseguro_use_other_card']
+					&& $posted['virt_pagseguro_save_hash_card'] ) {
 					$data['body']['charges'][0]['payment_method']['card']['id'] = $pagseguro_card_info['token'];
 				} else {
-					if ( isset( $posted['pagseguro_encrypted_card'] ) && ! empty( $posted['pagseguro_encrypted_card'] ) ) {
+					if ( isset( $posted['virt_pagseguro_encrypted_card'] )
+						&& ! empty( $posted['virt_pagseguro_encrypted_card'] ) ) {
 						$data['body']['charges'][0]['payment_method']['card'] = array(
-							'encrypted' => sanitize_text_field( wp_unslash( $posted['pagseguro_encrypted_card'] ) ),
+							'encrypted' => sanitize_text_field( wp_unslash( $posted['virt_pagseguro_encrypted_card'] ) ),
 						);
 					} else {
 						if ( $this->debug_on ) {
@@ -210,7 +229,7 @@ class WC_Virtuaria_PagSeguro_API {
 						return array( 'error' => 'Dados do cartão inválidos, verifique os dados informados e tente novamente.' );
 					}
 
-					if ( $posted['pagseguro_save_hash_card'] ) {
+					if ( $posted['virt_pagseguro_save_hash_card'] ) {
 						$data['body']['charges'][0]['payment_method']['card']['store'] = true;
 					}
 				}

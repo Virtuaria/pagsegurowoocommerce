@@ -32,7 +32,7 @@
     padding: 20px;
     display: block;
 }
-.woocommerce_page_wc-settings h3.wc-settings-sub-title {
+h3.wc-settings-sub-title {
     background-color: white;
     padding: 20px;
     margin: 0;
@@ -72,7 +72,228 @@ label[for="woocommerce_virt_pagseguro_layout_checkout"]:after {
     display: inline-block;
     vertical-align: middle;
 }
+.main-setting .form-table {
+    margin: 0px 0 40px;
+}
+.main-setting select,
+.main-setting .input-text {
+    max-width: 350px;
+    width: 100%;
+    font-size: 15px;
+}
+p.review-us {
+    margin-top: 20px;
+}
+div#wpfooter {
+    position: static;
+}
+#wpbody-content {
+    padding-bottom: 10px;
+}
+div#message {
+    margin-left: 0;
+}
+span.read-more {
+    line-height: 27px;
+    display: inline-block;
+    text-decoration: underline;
+    font-weight: bold;
+    color: #08270e;
+    cursor: pointer;
+}
+.read-more + .tip-desc:hover,
+.read-more:hover + .tip-desc {
+    display: block !important;
+    position: absolute;
+    max-width: 70%;
+    background-color: black;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+}
+#wpfooter h4,
+#wpfooter p {
+    font-size: 16px;
+}
+#wpfooter p {
+    margin-bottom: 10px;
+}
+#wpfooter h4 {
+    margin: 0;
+}
+.navigation-tab {
+    display: flex;
+}
+.navigation-tab .tablinks {
+    text-decoration: none;
+    padding: 15px;
+    width: 80px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 16px;
+    border-right: 1px solid;
+    border-top: 1px solid;
+    border-color: #d1d1d1;
+    border-left: none;
+    color: #000;
+    background-color: #f5f5f5;
+}
+.navigation-tab .tablinks:hover,
+.navigation-tab .tablinks.active {
+    background-color: #e3e3e3;
+}
+.main-title + #mainform .navigation-tab {
+    max-width: initial;
+}
+#mainform .navigation-tab {
+    max-width: calc(100% - 20px);
+}
+h1.main-title {
+    margin-bottom: 30px;
+}
+.main-title,
+#mainform > h2 {
+    font-size: 2em;
+    color: #0073aa;
+}
+.woocommerce table.form-table th label {
+    font-weight: bold;
+}
+.main-setting input[type=email],
+.main-setting input[type=number],
+.main-setting input[type=tel],
+.main-setting input[type=text],
+.main-setting select,
+.main-setting textarea {
+    border-color: #b2b4b7;
+}
+.wp-core-ui select {
+    padding: 3px 24px 3px 8px;
+}
+.main-title + #mainform {
+    background-color: #fff;
+    max-width: calc(100% - 20px);
+}
+#mainform table.form-table,
+#mainform {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+.main-title + #mainform .button-primary.woocommerce-save-button {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+#mainform .button-primary.woocommerce-save-button {
+    padding: 10px 16px;
+    border-radius: 6px;
+}
 
+
+.navigation-tab .tablinks {
+    background-color: inherit;
+    float: left;
+    border: 1px solid #ccc;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 16px;
+    position: relative;
+    min-width: 130px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    text-align: center;
+  }
+.navigation-tab .tablinks:not(:last-child) {
+    border-right: 1px solid #ccc;
+}
+.navigation-tab .tablinks:hover {
+    background-color: #ddd;
+}
+.navigation-tab .tablinks.active {
+    background-color: #ccc;
+    border-bottom-color: transparent;
+}
+/**** FIM CSS ABAS *****/
+  
+#wpbody {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin-top: 20px;
+    width: calc(100% - 60px); 
+}
+/* #wpbody #wpbody-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+#wpbody .form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#wpbody .form-table tr {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+#wpbody .form-table tr:last-child {
+    border-bottom: none;
+}
+#wpbody .form-table th {
+    text-align: left;
+    font-weight: bold;
+}
+#wpbody .input-text,
+#wpbody select {
+    width: 100%;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+#wpbody .button-primary {
+    background-color: #0073aa;
+    border-color: #0073aa;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#wpbody .button-primary:hover {
+    background-color: #005177;
+}
+#wpbody .description {
+    font-size: 0.9em;
+    color: #666;
+}
+#mainform > h2,
+#wpbody .main-title {
+    color: #0073aa;
+    font-size: 25px;
+    margin-bottom: 20px;
+}
+#wpbody .wc-settings-sub-title {
+    color: #333;
+    font-size: 1.2em;
+}
+#wpbody .notice {
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+#wpbody .notice-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+#wpbody .notice-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+} */
 @media only screen and (max-width: 767px) {
     .auto-fold #wpfooter {
         position: static;

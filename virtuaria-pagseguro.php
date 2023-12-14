@@ -5,7 +5,7 @@
  * Description: Adiciona o método de pagamento PagSeguro a sua loja virtual.
  * Author: Virtuaria
  * Author URI: https://virtuaria.com.br/
- * Version: 2.7.0
+ * Version: 3.0.0
  * License: GPLv2 or later
  *
  * @package virtuaria
@@ -28,6 +28,13 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		protected static $instance = null;
 
 		/**
+		 * Settings.
+		 *
+		 * @var array
+		 */
+		private $settings;
+
+		/**
 		 * Return an instance of this class.
 		 *
 		 * @return object A single instance of this class.
@@ -47,11 +54,6 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		 * @throws Exception Corrupted plugin.
 		 */
 		private function __construct() {
-			if ( class_exists( 'WC_PagSeguro' ) ) {
-				add_action( 'admin_notices', array( $this, 'conflict_module' ) );
-				return;
-			}
-
 			if ( ! class_exists( 'Extra_Checkout_Fields_For_Brazil' ) ) {
 				add_action( 'admin_notices', array( $this, 'missing_extra_checkout_fields' ) );
 				return;
@@ -59,14 +61,9 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 
 			add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 			if ( class_exists( 'WC_Payment_Gateway' ) ) {
+				$this->settings = get_option( 'woocommerce_virt_pagseguro_settings' );
 				$this->load_dependecys();
 				add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateway' ) );
-				add_action( 'admin_menu', array( $this, 'add_submenu_pagseguro' ) );
-				add_action( 'init', array( $this, 'register_endpoint' ) );
-				add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
-				add_action( 'template_include', array( $this, 'redirect_to_homolog_page' ) );
-				add_action( 'in_admin_footer', array( $this, 'display_review_info' ) );
-				add_action( 'init', array( $this, 'initialize_payment_gateway' ), 20 );
 			} else {
 				add_action( 'admin_notices', array( $this, 'missing_dependency' ) );
 			}
@@ -98,8 +95,24 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		 * Load file dependencys.
 		 */
 		private function load_dependecys() {
-			require_once 'includes/class-wc-virtuaria-pagseguro-gateway.php';
+			require_once 'includes/traits/trait-virtuaria-pagseguro-common.php';
+			require_once 'includes/traits/trait-virtuaria-pagseguro-credit.php';
+			require_once 'includes/traits/trait-virtuaria-pagseguro-pix.php';
+			require_once 'includes/traits/trait-virtuaria-pagseguro-ticket.php';
+
+			if ( isset( $this->settings['payment_form'] )
+				&& 'separated' === $this->settings['payment_form'] ) {
+				require_once 'includes/class-wc-virtuaria-pagseguro-gateway-credit.php';
+				require_once 'includes/class-wc-virtuaria-pagseguro-gateway-pix.php';
+				require_once 'includes/class-wc-virtuaria-pagseguro-gateway-ticket.php';
+			} else {
+				require_once 'includes/class-wc-virtuaria-pagseguro-gateway.php';
+			}
+
+			require_once 'includes/class-virtuaria-pagseguro-handle-notifications.php';
 			require_once 'includes/class-wc-virtuaria-pagseguro-api.php';
+			require_once 'includes/class-virtuaria-pagseguro-settings.php';
+			require_once 'includes/class-virtuaria-pagseguro-events.php';
 
 			if ( ! function_exists( 'get_plugin_data' )
 				&& file_exists( ABSPATH . '/wp-admin/includes/plugin.php' ) ) {
@@ -115,7 +128,14 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		 * @param array $methods the current methods.
 		 */
 		public function add_gateway( $methods ) {
-			$methods[] = 'WC_Virtuaria_PagSeguro_Gateway';
+			if ( isset( $this->settings['payment_form'] )
+				&& 'separated' === $this->settings['payment_form'] ) {
+				$methods[] = 'WC_Virtuaria_PagSeguro_Gateway_Credit';
+				$methods[] = 'WC_Virtuaria_PagSeguro_Gateway_Pix';
+				$methods[] = 'WC_Virtuaria_PagSeguro_Gateway_Ticket';
+			} else {
+				$methods[] = 'WC_Virtuaria_PagSeguro_Gateway';
+			}
 			return $methods;
 		}
 
@@ -126,19 +146,6 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		 */
 		public static function get_templates_path() {
 			return plugin_dir_path( __FILE__ ) . 'templates/';
-		}
-
-		/**
-		 * Add submenu pagseguro.
-		 */
-		public function add_submenu_pagseguro() {
-			add_submenu_page(
-				'pagamentos',
-				'Pagseguro',
-				'Pagseguro',
-				'remove_users',
-				'admin.php?page=wc-settings&tab=checkout&section=virt_pagseguro'
-			);
 		}
 
 		/**
@@ -190,7 +197,7 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 					<?php
 					echo wp_kses_post(
 						sprintf(
-							/* translators %s: plugin link */
+							/* translators: %s: plugin link */
 							__(
 								'Virtuaria PagSeguro precisa do plugin Brazilian Market on WooCommerce 3.7 ou superior para funcionar! O plugin pode ser obtido clicando <a href="%s" target="_blank">aqui</a>.',
 								'virtuaria-pagseguro'
@@ -202,21 +209,6 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 				</p>
 			</div>
 			<?php
-		}
-
-		/**
-		 * Review info.
-		 */
-		public function display_review_info() {
-			global $hook_suffix;
-
-			if ( 'woocommerce_page_wc-settings' === $hook_suffix
-				&& isset( $_GET['section'] )
-				&& 'virt_pagseguro' === $_GET['section'] ) {
-				echo '<style>#wpfooter{display: block;}</style>';
-				echo '<p class="review-us">Apoie o nosso trabalho. Se gostou do plugin, deixe uma avaliação positiva clicando <a href="https://wordpress.org/support/plugin/virtuaria-pagseguro/reviews?rate=5#new-post " target="_blank">aqui</a>. Desde já, nossos agradecimentos.</p>';
-				echo '<p>Email e domínio do site serão armazenados durante o processo de autorização para contato e suporte, caso necessário.</p>';
-			}
 		}
 
 		/**

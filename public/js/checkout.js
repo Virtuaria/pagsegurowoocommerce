@@ -1,9 +1,9 @@
 jQuery(document).ready(function ($) {
 	displayPaymentMethod();
-	$(document).on("click", "#pagseguro-payment-methods li label", function (e) {
-		$("#pagseguro-payment-methods li").removeClass("active");
+	$(document).on("click", "#virt-pagseguro-payment-methods li label", function (e) {
+		$("#virt-pagseguro-payment-methods li").removeClass("active");
 		$(this).parent().addClass("active");
-		$('#pagseguro-payment-methods input[name="payment_mode"]').removeAttr(
+		$('#virt-pagseguro-payment-methods input[name="payment_mode"]').removeAttr(
 			"checked"
 		);
 		$(this).find('input[name="payment_mode"]').prop("checked", true);
@@ -14,20 +14,20 @@ jQuery(document).ready(function ($) {
 		displayPaymentMethod();
 	});
 
-	$(document).on("click", "#pagseguro-use-other-card", function () {
+	$(document).on("click", "#virt-pagseguro-use-other-card", function () {
 		if ($(this).prop("checked")) {
-			$("#pagseguro-credit-card-form .form-row").removeClass("card-loaded");
+			$("#virt-pagseguro-credit-card-form .form-row").removeClass("card-loaded");
 			$(".card-in-use").hide("fast");
-			$("#pagseguro-payment").removeClass("card-loaded");
+			$("#pagseguro-payment-virt_pagseguro_credit").removeClass("card-loaded");
 		} else {
-			$("#pagseguro-credit-card-form .form-row").addClass("card-loaded");
+			$("#virt-pagseguro-credit-card-form .form-row").addClass("card-loaded");
 			$(".card-in-use").show("fast");
-			$("#pagseguro-card-installments-field").removeClass("card-loaded");
-			$("#pagseguro-payment").addClass("card-loaded");
+			$("#virt-pagseguro-card-installments-field").removeClass("card-loaded");
+			$("#pagseguro-payment-virt_pagseguro_credit").addClass("card-loaded");
 		}
 	});
 
-	$(document).on("keyup", "#pagseguro-card-expiry", function () {
+	$(document).on("keyup", "#virt-pagseguro-card-expiry", function () {
 		var v = $(this).val().replace(/\D/g, "");
 
 		v = v.replace(/(\d{2})(\d)/, "$1 / $2");
@@ -37,24 +37,25 @@ jQuery(document).ready(function ($) {
 
 	$(document).on("click", "#place_order", function () {
 		if (
-			encriptation &&
-			$("#credit-card").prop("checked") &&
-			!$("#pagseguro-card-number-field").hasClass("card-loaded")
+			encriptation
+			&& ( $("#credit-card").prop("checked")
+				|| ( is_separated ) && $('#payment_method_virt_pagseguro_credit').prop('checked') )
+			&& !$("#virt-pagseguro-card-number-field").hasClass("card-loaded")
 		) {
-			var expire = $("#pagseguro-card-expiry").val().split(" / ");
+			var expire = $("#virt-pagseguro-card-expiry").val().split(" / ");
 			var card = PagSeguro.encryptCard({
 				publicKey: encriptation.pub_key,
-				holder: $("#pagseguro-card-holder-name").val(),
-				number: $("#pagseguro-card-number").val().replace(/ /g, ""),
+				holder: $("#virt-pagseguro-card-holder-name").val(),
+				number: $("#virt-pagseguro-card-number").val().replace(/ /g, ""),
 				expMonth: expire[0],
 				expYear: expire[1],
-				securityCode: $("#pagseguro-card-cvc").val(),
+				securityCode: $("#virt-pagseguro-card-cvc").val(),
 			});
-			$("#pagseguro_encrypted_card").val(card.encryptedCard);
+			$("#virt_pagseguro_encrypted_card").val(card.encryptedCard);
 		}
 	});
 
-	$(document).on('focusout', '#pagseguro-card-expiry', function() {
+	$(document).on('focusout', '#virt-pagseguro-card-expiry', function() {
 		if ( $(this).val().length == 7 ) {
 			var v = $(this).val().replace(/\D/g, "");
 
@@ -65,7 +66,7 @@ jQuery(document).ready(function ($) {
 		}
 	});
 
-	$(document).on('keyup', '#pagseguro-card-number', function() {
+	$(document).on('keyup', '#virt-pagseguro-card-number', function() {
 		if ( $(this).val().length > 0 ) {
 			let flag = getCardFlag( $(this).val() );
 
@@ -81,32 +82,41 @@ jQuery(document).ready(function ($) {
 			}
 		}
 	});
+
+	$(document).on("click", "#place_order", function () {
+		if ( $('#payment_method_virt_pagseguro:checked').length > 0
+			&& $('#virt-pagseguro-payment .payment-methods input[name="payment_mode"]:checked').length == 0
+			&& $('#virt-pagseguro-payment #virt-pagseguro-payment-methods input[name="payment_mode"]:checked').length == 0) {
+			alert('PagSeguro: Selecione um método de pagamento!');
+			return false;
+		}
+	});
 });
 
 function displayPaymentMethod() {
-	jQuery(".pagseguro-method-form").hide();
+	jQuery(".virt-pagseguro-method-form").hide();
 	var method = jQuery(
-		'#pagseguro-payment-methods input[name="payment_mode"]:checked'
+		'#virt-pagseguro-payment-methods input[name="payment_mode"]:checked'
 	).val();
 
 	var active_id = jQuery(
-		'#pagseguro-payment-methods input[name="payment_mode"]:checked'
+		'#virt-pagseguro-payment-methods input[name="payment_mode"]:checked'
 	).attr('id');
 	if ( ! method ) {
-		jQuery( '#pagseguro-payment-methods li:first-child' ).addClass('active');
-		jQuery( '#pagseguro-payment-methods li:first-child input[type="radio"]').prop('checked', true);
-		method    = jQuery( '#pagseguro-payment-methods li:first-child input[type="radio"]').val();
-		active_id = jQuery( '#pagseguro-payment-methods li:first-child input[type="radio"]').attr('id');
+		jQuery( '#virt-pagseguro-payment-methods li:first-child' ).addClass('active');
+		jQuery( '#virt-pagseguro-payment-methods li:first-child input[type="radio"]').prop('checked', true);
+		method    = jQuery( '#virt-pagseguro-payment-methods li:first-child input[type="radio"]').val();
+		active_id = jQuery( '#virt-pagseguro-payment-methods li:first-child input[type="radio"]').attr('id');
 	}
 
-	jQuery( '#pagseguro-payment-methods li' ).removeClass('active');
-	jQuery( '#pagseguro-payment-methods #' + active_id ).parent().parent().addClass('active');
+	jQuery( '#virt-pagseguro-payment-methods li' ).removeClass('active');
+	jQuery( '#virt-pagseguro-payment-methods #' + active_id ).parent().parent().addClass('active');
 	if (method == "credit") {
-		jQuery("#pagseguro-credit-card-form").show();
+		jQuery("#virt-pagseguro-credit-card-form").show();
 	} else if (method == "ticket") {
-		jQuery("#pagseguro-banking-ticket-form").show();
-	} else {
-		jQuery("#pagseguro-banking-pix-form").show();
+		jQuery("#virt-pagseguro-banking-ticket-form").show();
+	} else if (method == 'pix'){
+		jQuery("#virt-pagseguro-banking-pix-form").show();
 	}
 }
 
