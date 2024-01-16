@@ -1,9 +1,9 @@
 === Virtuaria - PagSeguro Crédito, Pix e Boleto ===
 Contributors: tecnologiavirtuaria
-Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito, pagamento
+Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito, pagamento, pagbank
 Requires at least: 4.7
 Tested up to: 6.4.2
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -16,7 +16,7 @@ Fácil de instalar e configurar, permite pagamentos no cartão de Crédito, Pix 
 
 ### ⭐ **VIRTUARIA & PAGBANK: PARCEIROS EM EXCELÊNCIA** ⭐
 
-A qualidade do nosso plugin chamou a atenção do próprio PagSeguro, resultando em uma parceria da qual nos orgulhamos muito. Esta união não só fortalece a confiabilidade e eficiência do nosso plugin, mas também traz benefícios exclusivos, como **taxas especiais**, para todos os usuários que optem pelo nosso plugin. 
+A qualidade do nosso plugin chamou a atenção do próprio PagSeguro, resultando em uma parceria da qual nos orgulhamos muito. Esta união, não só fortalece a confiabilidade e eficiência do nosso plugin, mas também traz benefícios exclusivos, como **taxas especiais** para todos os usuários que optem pelo nosso plugin. 
 ![Pareceria Virtuaria e PagSeguro](https://teravirt.s3-accelerate.amazonaws.com/uploads/sites/107/2023/09/pagSeguro-virtuaria-1.jpg)
 
 Desfrute de **taxas com desconto** no PagSeguro. É simples ativar essa oferta: Basta escolher a taxa especial desejada no painel de configuração do plugin.  
@@ -52,17 +52,22 @@ Deseja negociar taxas? Use este link para ser atendido por um especialista do Pa
 - **Exibição do Parcelamento**: Permite, via configuração, exibir o parcelamento na página do produto e listagens como catálogo e pesquisa;
 - **Modo de funcionamento**: Permite, via configuração, separar Crédito, Pix e Boleto como métodos de pagamento independentes. Esta opção oferece maior flexibilidade e facilita a integração com sistemas externos e com outros plugins.
 ## ✨ Ativação
-Este plugin, utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel ou chamado junto ao PagSeguro.
+Este plugin utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel do PagSeguro ou abrir chamados.
+
+## 👨🏾‍🎓 Dúvidas & Suporte
+
+**- Veja a nossa lista de dúvidas frequentes em nossa sessão de [FAQ](https://wordpress.org/plugins/virtuaria-pagseguro/#faq);**
+**- Acesse o [fórum do plugin](https://wordpress.org/support/plugin/virtuaria-pagseguro/);**
 
 ## 🌟 **Suporte Premium**
 
 Embora o plugin Virtuaria PagSeguro seja **gratuito e de código aberto**, entendemos que, às vezes, os usuários podem precisar de assistência especializada. Por isso, oferecemos nosso Suporte Premium.
-- **Instalação e configuração completa:** R$ 260,00
+- **Instalação e configuração completa:** R$ 160,00
     - Inclui treinamento geral e homologação do funcionamento do plugin na sua loja virtual;
     - Duração: até 1 hora (Google Meet);
 - **Suporte Avançado:**
     - Se durante a instalação e configuração, identificarmos problemas em códigos de terceiros, nossa equipe está preparada para auxiliar. Faremos uma análise e lhe explicaremos o escopo do problema.
-    - Investimento: R$ 160,00 por hora.
+    - Investimento: R$ 120,00 por hora.
 
 💌 **Interessado?** 
 Não hesite! Contate-nos diretamente em [tecnologia@virtuaria.com.br](mailto:tecnologia@virtuaria.com.br) e garanta uma solução sob medida para suas necessidades.
@@ -101,7 +106,6 @@ O plugin possui uma configuração para ativar o modo de processamento assíncro
 - [PagSeguro](https://pagseguro.uol.com.br/) é uma plataforma de pagamento brasileira desenvolvida pela UOL. Este plugin foi desenvolvido sem nenhum incentivo do PagSeguro ou da UOL, a partir da [documentação oficial do PagSeguro] e utiliza a última versão ( 4.0 ) da API de cobranças. Nenhum dos desenvolvedores deste plugin possui vínculos com o Pagseguro ou UOL.
 - Os prints foram feitos em um painel wordpress/woocommerce personalizado pela Virtuaria objetivando otimizar o uso em lojas virtuais, por isso o fundo verde, mas o plugin é 100% compatível com o painel padrão do Wordpress.  
 - **Para mais informações, acesse** [virtuaria.com.br - desenvolvimento de plugins, criação e hospedagem de lojas virtuais](https://virtuaria.com.br/) ou envie um email para tecnologia@virtuaria.com.br
-
 
 = Compatibilidade =
 
@@ -299,6 +303,10 @@ Atualmente temos as seguintes opções:
 Nenhuma atualização disponível
 
 == Changelog ==
+= 3.0.1 2024-01-16 =
+* Correção na exibição do código copia e cola e QR code pix;
+* Correção no envio do endereço de entrega;
+* Melhoria no texto do desconto pix.
 = 3.0.0 2023-12-14 =
 * Novo menu para gerenciar configurações do plugin;
 * Nova tela de configuração;

@@ -257,6 +257,9 @@ trait Virtuaria_PagSeguro_Common {
 		if ( isset( $fields['billing_neighborhood'] ) ) {
 			$fields['billing_neighborhood']['required'] = true;
 		}
+		if ( isset( $fields['shipping_neighborhood'] ) ) {
+			$fields['shipping_neighborhood']['required'] = true;
+		}
 		return $fields;
 	}
 

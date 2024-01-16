@@ -4,7 +4,7 @@
     font-size: 15px;
 }
 label[for="payment_method_virt_pagseguro_pix"] {
-    display: flex;
+    display: inline-flex;
     flex-wrap: wrap;
 }
 .payment_method_virt_pagseguro_pix label img {
@@ -22,7 +22,7 @@ li.payment_method_virt_pagseguro_ticket .input-text {
     font-size: 14px;
 }
 .pix-discount {
-    margin-left: 40px;
+    margin-left: 10px;
     color: green;
     order: 2;
 }
@@ -34,4 +34,10 @@ li.payment_method_virt_pagseguro_ticket .input-text {
 #pagseguro-payment-virt_pagseguro_ticket {
     border-color: #e5e5e5;
     border-width: 1px;
+}
+
+@media only screen and (max-width: 479px) {
+    label[for=payment_method_virt_pagseguro_pix] {
+        display: inline;
+    }
 }

@@ -413,7 +413,14 @@ trait Virtuaria_PagSeguro_Pix {
 			&& $this->pix_discount > 0
 			&& $this->id === $gateway_id
 			&& ( ! $this->pix_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 ) ) {
-			$title .= '<span class="pix-discount">(desconto de <span class="percentage">' . str_replace( '.', ',', $this->pix_discount ) . '%</span>)</span>';
+			$title .= '<span class="pix-discount">(desconto de <span class="percentage">' . str_replace( '.', ',', $this->pix_discount ) . '%</span>)';
+			if ( isset( $this->global_settings['payment_form'] )
+				&& 'unified' === $this->global_settings['payment_form']
+				&& isset( $this->global_settings['layout_checkout'] )
+				&& 'tabs' === $this->global_settings['layout_checkout'] ) {
+				$title .= ' no Pix';
+			}
+			$title .= '</span>';
 		}
 		return $title;
 	}
@@ -467,7 +474,11 @@ trait Virtuaria_PagSeguro_Pix {
 	 * @param wc_order $order the order.
 	 */
 	public function check_payment_pix( $order ) {
-		$qr_code = $order->get_meta( '_pagseguro_qrcode' );
+		$qr_code = get_post_meta(
+			$order->get_id(),
+			'_pagseguro_qrcode',
+			true
+		);
 		if ( $qr_code ) {
 			$this->add_qrcode_in_note( $order, $qr_code );
 

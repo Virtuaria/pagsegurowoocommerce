@@ -109,14 +109,52 @@ class WC_Virtuaria_PagSeguro_API {
 				'items'             => array(),
 				'shipping'          => array(
 					'address' => array(
-						'street'      => substr( $order->get_billing_address_1(), 0, 159 ),
-						'number'      => substr( $order->get_meta( '_billing_number' ), 0, 19 ),
-						'complement'  => substr( $order->get_billing_address_2(), 0, 40 ),
-						'locality'    => substr( $order->get_meta( '_billing_neighborhood' ), 0, 60 ),
-						'city'        => substr( $order->get_billing_city(), 0, 90 ),
-						'region_code' => $order->get_billing_state(),
+						'street'      => substr(
+							isset( $posted['ship_to_different_address'] )
+								? $order->get_shipping_address_1()
+								: $order->get_billing_address_1(),
+							0,
+							159
+						),
+						'number'      => substr(
+							isset( $posted['ship_to_different_address'] )
+								? $order->get_meta( '_shipping_number' )
+								: $order->get_meta( '_billing_number' ),
+							0,
+							19
+						),
+						'complement'  => substr(
+							isset( $posted['ship_to_different_address'] )
+								? $order->get_shipping_address_2()
+								: $order->get_billing_address_2(),
+							0,
+							40
+						),
+						'locality'    => substr(
+							isset( $posted['ship_to_different_address'] )
+								? $order->get_meta( '_shipping_neighborhood' )
+								: $order->get_meta( '_billing_neighborhood' ),
+							0,
+							60
+						),
+						'city'        => substr(
+							isset( $posted['ship_to_different_address'] )
+								? $order->get_shipping_city()
+								: $order->get_billing_city(),
+							0,
+							90
+						),
+						'region_code' => isset( $posted['ship_to_different_address'] )
+							? $order->get_shipping_state()
+							: $order->get_billing_state(),
 						'country'     => 'BRA',
-						'postal_code' => preg_replace( '/\D/', '', $order->get_billing_postcode() ),
+						'postal_code' => preg_replace(
+							'/\D/',
+							'',
+							isset( $posted['ship_to_different_address'] )
+								? $order->get_shipping_postcode()
+								: $order->get_billing_postcode()
+						),
 					),
 				),
 				'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
@@ -124,7 +162,10 @@ class WC_Virtuaria_PagSeguro_API {
 			'timeout' => self::TIMEOUT,
 		);
 
-		if ( ! $order->get_billing_address_2() ) {
+		if ( ( isset( $posted['ship_to_different_address'] )
+			&& ! $order->get_shipping_address_2() )
+			|| ( ! isset( $posted['ship_to_different_address'] )
+			&& ! $order->get_billing_address_2() ) ) {
 			unset( $data['body']['shipping']['address']['complement'] );
 		}
 
@@ -398,33 +439,33 @@ class WC_Virtuaria_PagSeguro_API {
 			update_post_meta( $order->get_id(), '_charge_id', $response['charges'][0]['id'] );
 			return 'PAID' === $response['charges'][0]['status'];
 		} else {
-			$order->add_meta_data(
+			update_post_meta(
+				$order->get_id(),
 				'_payment_mode',
-				'PIX',
-				true
+				'PIX'
 			);
-			$order->add_meta_data(
+			update_post_meta(
+				$order->get_id(),
 				'_pagseguro_order_id',
-				$response['id'],
-				true
+				$response['id']
 			);
 
-			$order->add_meta_data(
+			update_post_meta(
+				$order->get_id(),
 				'_pagseguro_qrcode',
-				$response['qr_codes'][0]['text'],
-				true
+				$response['qr_codes'][0]['text']
 			);
 
-			$order->add_meta_data(
+			update_post_meta(
+				$order->get_id(),
 				'_qrcode_id',
-				$response['qr_codes'][0]['id'],
-				true
+				$response['qr_codes'][0]['id']
 			);
 
-			$order->add_meta_data(
+			update_post_meta(
+				$order->get_id(),
 				'_pagseguro_qrcode_png',
-				$response['qr_codes'][0]['links'][0]['href'],
-				true
+				$response['qr_codes'][0]['links'][0]['href']
 			);
 
 			$order->set_transaction_id( $response['id'] );
@@ -690,20 +731,91 @@ class WC_Virtuaria_PagSeguro_API {
 				),
 				'shipping'          => array(
 					'address' => array(
-						'street'      => substr( $order->get_billing_address_1(), 0, 159 ),
-						'number'      => substr( $order->get_meta( '_billing_number' ), 0, 19 ),
-						'complement'  => substr( $order->get_billing_address_2(), 0, 40 ),
-						'locality'    => substr( $order->get_meta( '_billing_neighborhood' ), 0, 60 ),
-						'city'        => substr( $order->get_billing_city(), 0, 90 ),
-						'region_code' => $order->get_billing_state(),
+						'street'      => substr(
+							$order->get_shipping_address_1(),
+							0,
+							159
+						),
+						'number'      => substr(
+							$order->get_meta( '_shipping_number' ),
+							0,
+							19
+						),
+						'complement'  => substr(
+							$order->get_shipping_address_2(),
+							0,
+							40
+						),
+						'locality'    => substr(
+							$order->get_meta( '_shipping_neighborhood' ),
+							0,
+							60
+						),
+						'city'        => substr(
+							$order->get_shipping_city(),
+							0,
+							90
+						),
+						'region_code' => $order->get_shipping_state(),
 						'country'     => 'BRA',
-						'postal_code' => preg_replace( '/\D/', '', $order->get_billing_postcode() ),
+						'postal_code' => preg_replace(
+							'/\D/',
+							'',
+							$order->get_shipping_postcode()
+						),
 					),
 				),
 				'notification_urls' => array( home_url( 'wc-api/WC_Virtuaria_PagSeguro_Gateway' ) ),
 			),
 			'timeout' => self::TIMEOUT,
 		);
+
+		if ( ! $order->get_shipping_address_2() ) {
+			unset( $data['body']['shipping']['address']['complement'] );
+		}
+
+		if ( ! $order->has_shipping_address()
+			|| ! $order->get_shipping_city()
+			|| ! $order->get_shipping_postcode() ) {
+			$data['body']['shipping']['address'] = array(
+				'street'      => substr(
+					$order->get_billing_address_1(),
+					0,
+					159
+				),
+				'number'      => substr(
+					$order->get_meta( '_billing_number' ),
+					0,
+					19
+				),
+				'complement'  => substr(
+					$order->get_billing_address_2(),
+					0,
+					40
+				),
+				'locality'    => substr(
+					$order->get_meta( '_billing_neighborhood' ),
+					0,
+					60
+				),
+				'city'        => substr(
+					$order->get_billing_city(),
+					0,
+					90
+				),
+				'region_code' => $order->get_billing_state(),
+				'country'     => 'BRA',
+				'postal_code' => preg_replace(
+					'/\D/',
+					'',
+					$order->get_billing_postcode()
+				),
+			);
+
+			if ( ! $order->get_billing_address_2() ) {
+				unset( $data['body']['shipping']['address']['complement'] );
+			}
+		}
 
 		if ( 'PIX' === $mode ) {
 			$expiration = new DateTime(
