@@ -1,9 +1,9 @@
-=== Virtuaria - PagSeguro Crédito, Pix e Boleto ===
+=== Virtuaria PagSeguro Crédito, Pix e Boleto ===
 Contributors: tecnologiavirtuaria
-Tags: payment, payment method, pagseguro, woocommerce, gateway, pix, boleto, crédito, pagamento, pagbank
+Tags: pagamento, woocommerce, gateway, pagbank, pagseguro, crédito, payment, pix, boleto, payment method,
 Requires at least: 4.7
-Tested up to: 6.4.2
-Stable tag: 3.0.1
+Tested up to: 6.4.3
+Stable tag: 3.2.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -13,6 +13,26 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 **Adiciona o PagSeguro como método de pagamento para seu ecommerce Woocommerce de forma fácil e segura. Taxas especiais para usuários do plugin.**
 
 Fácil de instalar e configurar, permite pagamentos no cartão de Crédito, Pix e Boleto na sua loja virtual Woocommerce, com confirmação automática do pagamento nos 3 métodos. Suporta disparo de cobranças extras, além de reembolso total e parcial. Também permite armazenar método de pagamento para agilizar compras recorrentes.
+
+###🌟 **NOVIDADE: Split de Pagamento PagBank para WooCommerce** 🌟
+
+Apresentamos nosso novo recurso. Ideal para lojas virtuais com múltiplos vendedores, esta solução GRATUITA permite que o valor total de uma compra seja automaticamente dividido(Split) entre diversas contas do PagBank. Uma solução de fácil adoção que, na grande maioria das vezes, não necessita de nenhuma alteração no tema para habilitar um checkout multilojas eficaz.
+
+Compatível com pagamentos via Cartão de Crédito, Pix ou Boleto, essa funcionalidade oferece flexibilidade e eficiência. Perfeito para uma variedade de modelos de negócios como marketplaces, dropshipping e franquias, o Virtuaria PagBank Split é a solução ideal para otimizar suas vendas e pagamentos multivendedor.
+
+[**Assista o vídeo sobre o Split de Pagamentos**](https://youtu.be/enk46WlUDsM)
+
+Principais Recursos:
+
+* **🔄 Flexibilidade de Taxas**: Personalize as taxas de split globalmente para todos os vendedores (sellers) ou personalizada para sellers específicos;
+* **🏷️ Identificação do vendedor (seller)**: Exibe informações do seller que está vendendo o produto. A forma de exibição pode ser personalizada via configuração;
+* **📈 Relatórios Detalhados em Gráficos e Tabelas**;
+- **🔏 Informações dos Clientes**: Controle detalhadamente quais informações os Sellers podem ou não ver dos clientes nos pedidos;
+* **🖥️ Painel do Seller**;
+* **🖼️ Página do Seller;**
+* **⭐ Avaliações de Sellers;**
+
+**Atenção:** A funcionalidade de Split de Pagamento é um recurso adicional, disponível através da instalação de um plugin complementar também desenvolvido pela Virtuaria. Isso significa que você tem total flexibilidade para ativar o Split, apenas se for útil para seu negócio.
 
 ### ⭐ **VIRTUARIA & PAGBANK: PARCEIROS EM EXCELÊNCIA** ⭐
 
@@ -40,7 +60,7 @@ Deseja negociar taxas? Use este link para ser atendido por um especialista do Pa
 - **Reembolso fácil**: Seja total ou parcial, crédito ou Pix;
 - **Otimize o checkout**: Modos síncrono e assíncrono;
 - **Salvar método de pagamento**: Para acelerar as próximas compras (sem armazenar dados do cartão);
-- **Boleto**: Com prazo de validade configurável;
+- **Boleto**: Com prazo de validade configurável, também permitir aplicação de descontos percentuais e exclusão de descontos para categorias específicas ou cupons;
 - **Atualizações de status**: Mudança automática dos status dos pedidos (aprovado, negado, cancelado, etc) em tempo real, via Webhook;
 - **Checkout transparente**: Permite fazer o pagamento sem sair da tela de sua loja virtual;
 - **Log detalhado**: Para consulta a detalhes de transações, incluindo erros;
@@ -51,6 +71,8 @@ Deseja negociar taxas? Use este link para ser atendido por um especialista do Pa
 - **Consulta status no PagSeguro**: Permite consultar o status atual da transação no PagSeguro a qualquer momento;
 - **Exibição do Parcelamento**: Permite, via configuração, exibir o parcelamento na página do produto e listagens como catálogo e pesquisa;
 - **Modo de funcionamento**: Permite, via configuração, separar Crédito, Pix e Boleto como métodos de pagamento independentes. Esta opção oferece maior flexibilidade e facilita a integração com sistemas externos e com outros plugins.
+- **Autenticação 3DS** Aumenta a segurança nas transações online com cartão de crédito, reduzindo significativamente os chargebacks ao transferir a responsabilidade para o banco emissor. 
+
 ## ✨ Ativação
 Este plugin utiliza a API mais moderna Order/Connect de cobrança disponibilizada pelo pagseguro, o que permite configuração e ativação muito mais simples e segura, sem necessidade de gerar chaves via painel do PagSeguro ou abrir chamados.
 
@@ -99,6 +121,11 @@ O plugin conta com a funcionalidade “Cobrança Extra” que permite cobrar um 
 
 ### ⚡ **Otimização do Checkout**
 O plugin possui uma configuração para ativar o modo de processamento assíncrono do pedido. Isso permite que algumas das atualizações de status que ocorrem durante a finalização da compra, sejam feitas em segundo plano e de forma assíncrona, acelerando significativamente o checkout. Recomendamos ativar somente se seus clientes costumam comprar muitos itens de uma vez e isto esteja deixando o seu checkout lento.
+
+### ⚡ **Autenticação 3DS**
+O Protocolo 3D Secure (3DS) é um mecanismo de autenticação para transações de e-commerce que busca aumentar a segurança e confiabilidade, beneficiando tanto vendedores quanto consumidores, reduzindo fraudes e chargebacks. Ao finalizar a compra, a autenticação 3DS é ativada automaticamente, podendo ser direta ou exigir validação adicional, como SMS ou app do banco/cartão.
+A principal vantagem do 3DS é a redução de chargebacks, pois ao autenticar uma transação, a responsabilidade por chargebacks é transferida para o banco emissor do cartão.
+O plugin permite configuração para ativar ou não o 3DS, além de ser possível especificar um valor mínimo do pedido, para sua aplicação. Também existe a possibilidade de permitir compras mesmo via cartões sem suporte ao 3DS, garantindo uma maior taxa de conversão.
 
 
 ## Observações:
@@ -271,6 +298,10 @@ Atualmente temos as seguintes opções:
 
 **Observação:** As taxas podem ser alteradas a critério do PagSeguro.
 
+= 20 - Ao utilizar o 3DS, minha loja estará livre de disputas no PagBank?
+O uso da autenticação 3DS não garante a prevenção de disputas em sua loja online. O programa de proteção ao comprador permanece ativo, exigindo que você mantenha registros de entrega em nome do titular do cartão para contestar possíveis reclamações. No entanto, quando uma transação é autenticada, o banco emissor assume a responsabilidade por chargebacks fraudulentos (Liability shift), proporcionando maior segurança. Além disso, a autenticação 3DS aumenta a taxa de aprovação, reduzindo suspeitas de compras não autorizadas. Importante notar que o 3DS aborda apenas casos de fraude, não questões relacionadas à entrega ou direitos do consumidor, como qualidade do produto/serviço.
+
+
 
 
 
@@ -296,13 +327,29 @@ Atualmente temos as seguintes opções:
 18. Parcelamento na página do produto;
 19. Layout de finalização em linhas - Crédito;
 20. Layout de finalização em linhas - Pix;
-21. Layout de finalização com métodos separados.
+21. Layout de finalização com métodos separados;
+22. Transações (Virtuaria PagBank Split);
+23. Sellers (Virtuaria PagBank Split).
+24. Autenticação 3DS em ação.
 
 
 == Upgrade Notice ==
 Nenhuma atualização disponível
 
 == Changelog ==
+= 3.2.0 2024-02-20 =
+* Autenticação 3D Secure com opção de valor mínimo e permitir compras para cartões que não suportem a tecnologia;
+* Nova configuração para esconder o logo do PagBank(antigo PagSeguro) no checkout;
+* Nova configuração para adicionar linhas de instrução de pagamento no boleto bancário;
+* Novas configurações para descontos percentuais no Boleto bancário.
+= 3.1.0 2024-02-05 =
+* Suporte a divisão de pagamento (Split) através do plugin “Virtuaria PagBank Split”;
+* Registro de código de barras e link para o PDF do boleto no histórico(notas) do pedido;
+* Correção de bug ao ignorar categorias no desconto Pix;
+* Logs de transações e notificações unificado;
+* Ajuste na exibição das observações de pagamento com cartão de crédito;
+* Correção no envio do endereço de entrega para novos pedidos e cobranças adicionais;
+* Melhoria na exibição do logo no pix, quando no modo separado.
 = 3.0.1 2024-01-16 =
 * Correção na exibição do código copia e cola e QR code pix;
 * Correção no envio do endereço de entrega;

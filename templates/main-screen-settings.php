@@ -138,21 +138,32 @@ if ( ! isset( $options['payment_form'] ) ) {
 
 					$auth  = 'https://connect.' . $auth . 'pagseguro.uol.com.br/oauth2/authorize';
 					$auth .= '?response_type=code&client_id=' . $app_id . '&redirect_uri=' . $app_url;
-					$auth .= '&scope=payments.read+payments.create+payments.refund+accounts.read&state=' . $origin;
+					$auth .= '&scope=payments.read+payments.create+payments.refund+accounts.read';
+					if ( class_exists( 'Virtuaria_PagBank_Split' ) ) {
+						$auth .= '+payments.split.read';
+					}
+					$auth .= '&state=' . $origin;
 					if ( $fee_setup ) {
 						$auth .= '--' . $fee_setup;
 					}
-					$auth .= '--' . str_replace( '@', 'aN', $options['email'] );
+					$mail = str_replace( '@', 'aN', $options['email'] );
+
+					if ( class_exists( 'Virtuaria_PagBank_Split' )
+						&& isset( $options['split_enabled'] )
+						&& 'yes' === $options['split_enabled'] ) {
+						$mail .= 'aNmanagesplittt';
+					}
+					$auth .= '--' . $mail;
 
 					if ( $token ) {
-						$revoke_url = $app_revoke . '?state=' . $origin . ( $fee_setup ? '--' . $fee_setup : '' ) . '--' . str_replace( '@', 'aN', $options['email'] );
+						$revoke_url = $app_revoke . '?state=' . $origin . ( $fee_setup ? '--' . $fee_setup : '' ) . '--' . $mail . ( isset( $options['marketplace'] ) ?  $options['marketplace'] : '' );
 						echo '<span class="connected"><strong>Status: <span class="status">Conectado.</span></strong></span>';
 						echo '<a href="' . esc_url( $revoke_url ) . '" class="auth button-primary">Desconectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectado.svg" alt="Desconectar" /></a>';
 					} else {
 						echo '<span class="disconnected"><strong>Status: <span class="status">Desconectado.</span></strong></span>';
 						echo '<a href="' . esc_url( $auth ) . '" class="auth button-primary">Conectar com PagSeguro <img src="' . esc_url( VIRTUARIA_PAGSEGURO_URL ) . 'public/images/conectar.png" alt="Conectar" /></a>';
 					}
-					echo '<span class="expire-info">A conexão tem duração <strong>média de 1 ano</strong>. Após esse período, é necessário reconectar para atualizar as permissões junto ao PagSeguro. O plugin exibirá um alerta, caso ocorra algum problema recorrente com a conexão.</span>';
+					echo '<span class="expire-info">A conexão é válida por tempo indefinido. O plugin exibirá um alerta, caso ocorra algum problema recorrente com a conexão.</span>';
 					?>
 				</td>
 			</tr>
@@ -241,20 +252,37 @@ if ( ! isset( $options['payment_form'] ) ) {
 			endif;
 			?>
 			<tr valign="top">
-			<th scope="row" class="titledesc">
-				<label for="woocommerce_virt_pagseguro_debug">Log de depuração </label>
-			</th>
-			<td class="forminp">
-				<fieldset>
-					<legend class="screen-reader-text"><span>Log de depuração</span></legend>
-					<label for="woocommerce_virt_pagseguro_debug">
-					<input type="checkbox" name="woocommerce_virt_pagseguro_debug" id="woocommerce_virt_pagseguro_debug" value="yes" <?php checked( 'yes', $options['debug'] ); ?>> Habilitar registro de log</label><br>
-					<p class="description">
-						Registra eventos de comunição com a API e erros. Para visualizar clique <a href="https://modateste.virtuaria.net/wp-admin/admin.php?page=wc-status&amp;tab=logs&amp;source=virt_pagseguro">aqui</a>.
-					</p>
-				</fieldset>
-			</td>
-		</tr>
+				<th scope="row" class="titledesc">
+					<label for="woocommerce_virt_pagseguro_logo">Marca PagSeguro(PagBank)</label>
+				</th>
+				<td class="forminp">
+					<fieldset>
+						<legend class="screen-reader-text"><span>Marca PagSeguro(PagBank)</span></legend>
+						<select name="woocommerce_virt_pagseguro_logo" id="woocommerce_virt_pagseguro_logo">
+							<option <?php selected( 'title_logo', $options['logo'] ); ?> value="title_logo">Exibe título e marca do método de pagamento</option>
+							<option <?php selected( 'only_title', $options['logo'] ); ?> value="only_title">Exibe apenas título do método de pagamento</option>
+						</select><br>
+						<p class="description">
+							Define o padrão visual utilizado na página de finalização das compras.
+						</p>
+					</fieldset>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row" class="titledesc">
+					<label for="woocommerce_virt_pagseguro_debug">Log de depuração </label>
+				</th>
+				<td class="forminp">
+					<fieldset>
+						<legend class="screen-reader-text"><span>Log de depuração</span></legend>
+						<label for="woocommerce_virt_pagseguro_debug">
+						<input type="checkbox" name="woocommerce_virt_pagseguro_debug" id="woocommerce_virt_pagseguro_debug" value="yes" <?php checked( 'yes', $options['debug'] ); ?>> Habilitar registro de log</label><br>
+						<p class="description">
+							Registra eventos de comunição com a API e erros. Para visualizar clique <a href="https://modateste.virtuaria.net/wp-admin/admin.php?page=wc-status&amp;tab=logs&amp;source=virt_pagseguro">aqui</a>.
+						</p>
+					</fieldset>
+				</td>
+			</tr>
 		</tbody>
 	</table>
 

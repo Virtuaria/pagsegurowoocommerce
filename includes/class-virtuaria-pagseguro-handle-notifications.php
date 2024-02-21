@@ -45,7 +45,7 @@ class Virtuaria_PagSeguro_Handle_Notifications {
 				$this->log = new WC_Logger();
 			}
 
-			$this->tag = 'virt_pagseguro';
+			$this->tag = 'virtuaria-pagseguro';
 		}
 		add_action(
 			'woocommerce_api_wc_virtuaria_pagseguro_gateway',

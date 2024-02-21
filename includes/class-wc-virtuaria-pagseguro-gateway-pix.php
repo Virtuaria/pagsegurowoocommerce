@@ -188,17 +188,22 @@ class WC_Virtuaria_PagSeguro_Gateway_Pix extends WC_Payment_Gateway {
 			'virtuaria_pagseguro_disable_discount',
 			array( $this, 'disable_discount_by_product_categoria' ),
 			10,
-			2
+			3
 		);
 		add_filter(
 			'woocommerce_gateway_title',
-			array( $this, 'discount_pix_text' ),
+			array( $this, 'discount_text' ),
 			10,
 			2
 		);
 		add_action(
 			'after_virtuaria_pix_validate_text',
-			array( $this, 'info_about_categories' )
+			array( $this, 'display_total_discounted' )
+		);
+		add_action(
+			'after_virtuaria_pix_validate_text',
+			array( $this, 'info_about_categories' ),
+			20
 		);
 
 		// Fetch order status.

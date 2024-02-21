@@ -85,6 +85,23 @@ class WC_Virtuaria_PagSeguro_API {
 		}
 		$total = number_format( $total, 2, '', '' );
 
+		$min_value_to_3ds = floatval(
+			str_replace(
+				',',
+				'.',
+				$this->gateway->get_option( '3ds_min_value' )
+			)
+		);
+
+		if ( 'credit' === $posted['payment_mode']
+			&& 'yes' === $this->gateway->get_option( '3ds' )
+			&& ( ! $min_value_to_3ds || ( $total / 100 ) >= $min_value_to_3ds )
+			&& ( ! isset( $posted['virt_pagseguro_auth_3ds'] )
+			|| ! $posted['virt_pagseguro_auth_3ds'] )
+			&& 'no' === $this->gateway->get_option( 'confirm_sell' ) ) {
+			return array( 'error' => __( 'Falha na autenticaçaõ 3DS, não autorizado!', 'virtuaria-pagseguro' ) );
+		}
+
 		$phone = $order->get_billing_phone();
 		$phone = explode( ' ', $phone );
 
@@ -200,24 +217,17 @@ class WC_Virtuaria_PagSeguro_API {
 				new DateTimeZone( 'America/Sao_Paulo' )
 			);
 
-			if ( floatval( $this->gateway->pix_discount ) > 0 && $this->discount_enable( $order ) ) {
-				$discount  = $total / 100;
-				$discount -= $order->get_shipping_total();
-
-				$discount_reduce = 0;
-
-				foreach ( $order->get_items() as $item ) {
-					$product = wc_get_product( $item['product_id'] );
-					if ( $product && apply_filters( 'virtuaria_pagseguro_disable_discount', false, $product ) ) {
-						$discount_reduce += $item->get_total();
-					}
-				}
-
-				$discount -= $discount_reduce;
-				$total    /= 100;
-				$total    -= $discount * ( floatval( $this->gateway->pix_discount ) / 100 );
-				$total     = number_format( $total, 2, '', '' );
+			$total_discounted = 0;
+			if ( floatval( $this->gateway->pix_discount ) > 0
+				&& $this->discount_enable( $order, 'pix' ) ) {
+				$total_discounted = $this->get_total_after_discount(
+					$order,
+					$total,
+					'pix'
+				);
 			}
+
+			$total = 0 !== $total_discounted ? $total_discounted : $total;
 
 			$data['body']['qr_codes'][] = array(
 				'amount'          => array(
@@ -274,6 +284,15 @@ class WC_Virtuaria_PagSeguro_API {
 						$data['body']['charges'][0]['payment_method']['card']['store'] = true;
 					}
 				}
+				if ( 'yes' === $this->gateway->get_option( '3ds' )
+					&& ( ! $min_value_to_3ds || ( $total / 100 ) >= $min_value_to_3ds )
+					&& isset( $posted['virt_pagseguro_auth_3ds'] )
+					&& $posted['virt_pagseguro_auth_3ds'] ) {
+					$data['body']['charges'][0]['payment_method']['authentication_method'] = array(
+						'type' => 'THREEDS',
+						'id'   => sanitize_text_field( wp_unslash( $posted['virt_pagseguro_auth_3ds'] ) ),
+					);
+				}
 			} else {
 				if ( ! $order->get_meta( '_billing_cpf' ) || 2 == $order->get_meta( '_billing_persontype' ) ) {
 					$tax_id = preg_replace( '/\D/', '', $order->get_meta( '_billing_cnpj' ) );
@@ -301,8 +320,48 @@ class WC_Virtuaria_PagSeguro_API {
 					),
 				);
 
+				$line_address_1 = $this->gateway->get_option( 'instruction_line_1' );
+				$line_address_2 = $this->gateway->get_option( 'instruction_line_2' );
+
+				if ( $line_address_1 ) {
+					$data['body']['charges'][0]['payment_method']['boleto']['instruction_lines']['line_1'] = $line_address_1;
+				}
+
+				if ( $line_address_2 ) {
+					$data['body']['charges'][0]['payment_method']['boleto']['instruction_lines']['line_2'] = $line_address_2;
+				}
+
 				if ( ! $order->get_billing_address_2() ) {
 					unset( $data['body']['charges'][0]['payment_method']['boleto']['holder']['address']['complement'] );
+				}
+
+				if ( floatval( $this->gateway->ticket_discount ) > 0
+					&& $this->discount_enable( $order, 'ticket' ) ) {
+					$total_discounted = $this->get_total_after_discount(
+						$order,
+						$total,
+						'ticket'
+					);
+					$total = 0 !== $total_discounted ? $total_discounted : $total;
+
+					$data['body']['charges'][0]['amount']['value'] = $total;
+				}
+			}
+		}
+
+		if ( class_exists( 'Virtuaria_PagBank_Split' ) ) {
+			$split = apply_filters(
+				'virtuaria_pagseguro_split_charges',
+				false,
+				$order,
+				$total
+			);
+
+			if ( $split ) {
+				if ( 'pix' === $posted['payment_mode'] ) {
+					$data['body']['qr_codes'][0]['splits'] = $split;
+				} else {
+					$data['body']['charges'][0]['splits'] = $split;
 				}
 			}
 		}
@@ -365,6 +424,14 @@ class WC_Virtuaria_PagSeguro_API {
 
 		$response  = json_decode( wp_remote_retrieve_body( $request ), true );
 		$resp_code = intval( wp_remote_retrieve_response_code( $request ) );
+
+		do_action(
+			'virtuaria_pagseguro_succesfull_create_order',
+			201 === $resp_code && 'DECLINED' !== $response['charges'][0]['status'],
+			$order,
+			$response['error_messages'][0]['description']
+		);
+
 		if ( 201 !== $resp_code ) {
 			if ( 401 === $resp_code ) {
 				if ( isset( $response['error_messages'][0]['description'] )
@@ -404,6 +471,17 @@ class WC_Virtuaria_PagSeguro_API {
 							number_format( $response['charges'][0]['amount']['value'] / 100, 2, ',', '.' )
 						)
 					);
+
+					if ( isset( $response['charges'][0]['payment_method']['authentication_method']['status'] ) ) {
+						$order->add_order_note(
+							sprintf(
+								/* translators: %s: autentication status */
+								__( 'Autenticação 3DS aplicada com sucesso. Status: <b>%s</b>', 'virtuaria-pagseguro' ),
+								$response['charges'][0]['payment_method']['authentication_method']['status']
+							)
+						);
+					}
+
 					if ( isset( $response['charges'][0]['payment_method']['card']['id'] ) ) {
 						$month = str_pad( sanitize_text_field( wp_unslash( $response['charges'][0]['payment_method']['card']['exp_month'] ) ), 2, '0', STR_PAD_LEFT );
 						$year  = sanitize_text_field( wp_unslash( $response['charges'][0]['payment_method']['card']['exp_year'] ) );
@@ -432,6 +510,10 @@ class WC_Virtuaria_PagSeguro_API {
 						number_format( $response['charges'][0]['amount']['value'] / 100, 2, ',', '.' )
 					)
 				);
+
+				if ( floatval( $this->gateway->ticket_discount ) > 0 && $this->discount_enable( $order, 'ticket' ) ) {
+					$this->apply_discount_fee( $order, 'ticket' );
+				}
 			}
 			$order->set_transaction_id( $response['id'] );
 			$order->save();
@@ -470,37 +552,91 @@ class WC_Virtuaria_PagSeguro_API {
 
 			$order->set_transaction_id( $response['id'] );
 
-			if ( floatval( $this->gateway->pix_discount ) > 0 && $this->discount_enable( $order ) ) {
-				$fee = new WC_Order_Item_Fee();
-				$fee->set_name(
-					__(
-						'Desconto do Pix',
-						'virtuaria-pagseguro'
-					)
-				);
-
-				$discountable_total = $order->get_total() - $order->get_shipping_total();
-				$discount_reduce    = 0;
-
-				foreach ( $order->get_items() as $item ) {
-					$product = wc_get_product( $item['product_id'] );
-					if ( $product && apply_filters( 'virtuaria_pagseguro_disable_discount', false, $product ) ) {
-						$discount_reduce += $item->get_total();
-					}
-				}
-
-				$discountable_total -= $discount_reduce;
-				if ( $discountable_total > 0 ) {
-					$fee->set_total( - $discountable_total * ( floatval( $this->gateway->pix_discount ) / 100 ) );
-
-					$order->add_item( $fee );
-					$order->calculate_totals();
-				}
+			if ( floatval( $this->gateway->pix_discount ) > 0 && $this->discount_enable( $order, 'pix' ) ) {
+				$this->apply_discount_fee( $order, 'pix' );
 			}
 
 			$order->save();
 		}
 		return false;
+	}
+
+	/**
+	 * Apply discount fee to the order.
+	 *
+	 * @param wc_order $order  The order object.
+	 * @param string   $method The payment method.
+	 */
+	private function apply_discount_fee( $order, $method ) {
+		$fee = new WC_Order_Item_Fee();
+		$fee->set_name(
+			sprintf(
+				/* translators: %s: payment method */
+				__(
+					'Desconto do %s',
+					'virtuaria-pagseguro'
+				),
+				'pix' === $method ? 'Pix' : 'Boleto'
+			)
+		);
+
+		$discountable_total = $order->get_total() - $order->get_shipping_total();
+		$discount_reduce    = 0;
+
+		foreach ( $order->get_items() as $item ) {
+			$product = wc_get_product( $item['product_id'] );
+			if ( $product && apply_filters( 'virtuaria_pagseguro_disable_discount', false, $product, $method ) ) {
+				$discount_reduce += $item->get_total();
+			}
+		}
+
+		if ( 'pix' === $method ) {
+			$percentual = ( floatval( $this->gateway->pix_discount ) / 100 );
+		} else {
+			$percentual = ( floatval( $this->gateway->ticket_discount ) / 100 );
+		}
+
+		$discountable_total -= $discount_reduce;
+		if ( $discountable_total > 0 ) {
+			$fee->set_total( - $discountable_total * $percentual );
+
+			$order->add_item( $fee );
+			$order->calculate_totals();
+		}
+	}
+
+	/**
+	 * A function to calculate the total after applying a discount.
+	 *
+	 * @param wc_order $order  the order object.
+	 * @param int      $total  the total amount before discount.
+	 * @param string   $method the method of discount application.
+	 * @return int the total after discount applied
+	 */
+	private function get_total_after_discount( $order, $total, $method ) {
+		$discount  = $total / 100;
+		$discount -= $order->get_shipping_total();
+
+		$discount_reduce = 0;
+
+		foreach ( $order->get_items() as $item ) {
+			$product = wc_get_product( $item['product_id'] );
+			if ( $product && apply_filters( 'virtuaria_pagseguro_disable_discount', false, $product, $method ) ) {
+				$discount_reduce += $item->get_total();
+			}
+		}
+
+		$percentual = ( floatval( $this->gateway->pix_discount ) / 100 );
+		if ( 'ticket' === $method ) {
+			$percentual = ( floatval( $this->gateway->ticket_discount ) / 100 );
+		}
+
+		$discount -= $discount_reduce;
+		$total    /= 100;
+		$total    -= $discount * $percentual;
+		$total     = number_format( $total, 2, '', '' );
+
+		return $total;
 	}
 
 	/**
@@ -1032,12 +1168,19 @@ class WC_Virtuaria_PagSeguro_API {
 	}
 
 	/**
-	 * Check if pix discount is enable.
+	 * Check if discount is enable.
 	 *
-	 * @param wc_order $order   the order.
+	 * @param wc_order $order  the order.
+	 * @param string   $method the payment method.
 	 */
-	private function discount_enable( $order ) {
-		return ( ! $this->gateway->pix_discount_coupon || count( $order->get_coupon_codes() ) === 0 );
+	private function discount_enable( $order, $method ) {
+		if ( 'pix' === $method ) {
+			$allow_discount = ( ! $this->gateway->pix_discount_coupon || count( $order->get_coupon_codes() ) === 0 );
+		} elseif ( 'ticket' === $method ) {
+			$allow_discount = ( ! $this->gateway->ticket_discount_coupon || count( $order->get_coupon_codes() ) === 0 );
+		}
+		return ! apply_filters( 'virtuaria_pagseguro_disable_discount_by_cart', false, WC()->cart )
+			&& $allow_discount;
 	}
 
 	/**
@@ -1078,5 +1221,52 @@ class WC_Virtuaria_PagSeguro_API {
 		}
 
 		return json_decode( wp_remote_retrieve_body( $request ), true )['status'];
+	}
+
+	/**
+	 * Get the 3DS session from the server.
+	 *
+	 * @param bool $retry Whether to retry if the session retrieval fails.
+	 * @return mixed The 3DS session if retrieval is successful, false otherwise.
+	 */
+	public function get_3ds_session( $retry = true ) {
+		$request = wp_remote_post(
+			$this->endpoint . 'checkout-sdk/sessions',
+			array(
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $this->gateway->token,
+					'Content-Type'  => 'application/json',
+				),
+			)
+		);
+
+		if ( is_wp_error( $request ) ) {
+			if ( $this->debug_on ) {
+				$this->gateway->log->add(
+					$this->tag,
+					'Falha ao obter sessão 3DS: ' . $request->get_error_message(),
+					WC_Log_Levels::ERROR
+				);
+			}
+			return false;
+		}
+
+		if ( $this->debug_on ) {
+			$this->gateway->log->add(
+				$this->tag,
+				'Resposta do servidor ao tentar obter sessão 3DS: ' . wp_json_encode( $request ),
+				WC_Log_Levels::INFO
+			);
+		}
+
+		$resp_code = wp_remote_retrieve_response_code( $request );
+		$response  = json_decode( $request['body'], true );
+		if ( in_array( $resp_code, array( 200, 201 ), true ) ) {
+			return $response['session'];
+		} elseif ( $retry ) {
+			return $this->get_3ds_session( false );
+		}
+
+		return false;
 	}
 }

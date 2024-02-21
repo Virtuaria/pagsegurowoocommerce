@@ -61,8 +61,23 @@ h3#woocommerce_virt_pagseguro_tecvirtuaria + .form-table {
 .woocommerce table.form-table th label {
     font-weight: 400;
 }
-label[for="woocommerce_virt_pagseguro_erase_cards"]:after,
-label[for="woocommerce_virt_pagseguro_layout_checkout"]:after {
+th label[for="woocommerce_virt_pagseguro_credit_3ds"]:after,
+th label[for="woocommerce_virt_pagseguro_3ds"]:after,
+th label[for="woocommerce_virt_pagseguro_confirm_sell"]:after,
+th label[for="woocommerce_virt_pagseguro_credit_confirm_sell"]:after,
+th label[for="woocommerce_virt_pagseguro_credit_3ds_min_value"]:after,
+th label[for="woocommerce_virt_pagseguro_3ds_min_value"]:after,
+label[for="woocommerce_virt_pagseguro_logo"]:after,
+th label[for="woocommerce_virt_pagseguro_instruction_line_1"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_instruction_line_1"]:after,
+th label[for="woocommerce_virt_pagseguro_instruction_line_2"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_instruction_line_2"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_discount"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_ticket_discount"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_ticket_discount_coupon"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_discount_coupon"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_ticket_discount_ignore"]:after,
+th label[for="woocommerce_virt_pagseguro_ticket_discount_ignore"]:after {
     content: '';
     background-size: contain;
     background-image: url(../images/giphy.gif);
@@ -124,20 +139,6 @@ span.read-more {
 .navigation-tab {
     display: flex;
 }
-.navigation-tab .tablinks {
-    text-decoration: none;
-    padding: 15px;
-    width: 80px;
-    font-weight: bold;
-    text-align: center;
-    font-size: 16px;
-    border-right: 1px solid;
-    border-top: 1px solid;
-    border-color: #d1d1d1;
-    border-left: none;
-    color: #000;
-    background-color: #f5f5f5;
-}
 .navigation-tab .tablinks:hover,
 .navigation-tab .tablinks.active {
     background-color: #e3e3e3;
@@ -187,10 +188,8 @@ h1.main-title {
     padding: 10px 16px;
     border-radius: 6px;
 }
-
-
 .navigation-tab .tablinks {
-    background-color: inherit;
+    background-color: #fff;
     float: left;
     border: 1px solid #ccc;
     outline: none;
@@ -224,6 +223,9 @@ h1.main-title {
     color: #333;
     margin-top: 20px;
     width: calc(100% - 60px); 
+}
+#woocommerce_virt_pagseguro_seller_identifier::placeholder {
+    color: rgb(128 128 128 / 61%);
 }
 /* #wpbody #wpbody-content {
     background-color: #fff;
@@ -294,6 +296,44 @@ h1.main-title {
     background-color: #d1ecf1;
     border-color: #bee5eb;
 } */
+#product_cat-all {
+    background-color: #fff;
+    max-width: 400px;
+}
+#product_cat-all .categorychecklist {
+    margin: 10px;
+    max-height: 145px;
+    overflow: auto;
+}
+#product_cat-all .children {
+    margin-left: 20px;
+}
+.split-image {
+    display: inline-block;
+    max-width: 350px;
+    vertical-align: middle;
+}
+.split-install td > p {
+    display: inline-block;
+    vertical-align: top;
+    max-width: calc(100% - 380px);
+    margin-right: 20px;
+    color: #333;
+}
+.split-install a {
+    font-weight: bold;
+    color: #00b749;
+    font-size: 18px;
+}
+.navigation-tab .split:after {
+    content: "(novo)";
+    font-size: 9px;
+    background-position-y: 13px;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 3px;
+    color: #27cf54;
+}
 @media only screen and (max-width: 767px) {
     .auto-fold #wpfooter {
         position: static;
@@ -301,6 +341,23 @@ h1.main-title {
     }
     #wpbody-content {
         padding-bottom: 0px;
+    }
+    .split-image {
+        margin-bottom: 30px;
+    }
+    .split-install td > p {
+        margin-right: 0;
+    }
+    .split-install td > p,
+    .split-image {
+        max-width: 100%;
+        display: block;
+    }
+    .navigation-tab .tablinks {
+        width: 100%;
+    }
+    .navigation-tab {
+        flex-wrap: wrap;
     }
 }
 @media only screen and (max-width: 479px) {

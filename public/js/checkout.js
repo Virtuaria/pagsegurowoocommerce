@@ -43,14 +43,50 @@ jQuery(document).ready(function ($) {
 			&& !$("#virt-pagseguro-card-number-field").hasClass("card-loaded")
 		) {
 			var expire = $("#virt-pagseguro-card-expiry").val().split(" / ");
-			var card = PagSeguro.encryptCard({
-				publicKey: encriptation.pub_key,
-				holder: $("#virt-pagseguro-card-holder-name").val(),
-				number: $("#virt-pagseguro-card-number").val().replace(/ /g, ""),
-				expMonth: expire[0],
-				expYear: expire[1],
-				securityCode: $("#virt-pagseguro-card-cvc").val(),
-			});
+			try {
+				var card = PagSeguro.encryptCard({
+					publicKey: encriptation.pub_key,
+					holder: $("#virt-pagseguro-card-holder-name").val(),
+					number: $("#virt-pagseguro-card-number").val().replace(/ /g, ""),
+					expMonth: expire[0],
+					expYear: expire[1],
+					securityCode: $("#virt-pagseguro-card-cvc").val(),
+				});
+			} catch (e) {
+				alert("Dados do cartão inválidos.\nVerifique se os dados digitados estão corretos.");
+				return false;
+			}
+
+			if (card.hasErrors) {
+				let error_codes = [
+					{code: 'INVALID_NUMBER', message: 'Número do cartão inválido'},
+					{
+						code: 'INVALID_SECURITY_CODE',
+						message: 'CVV Inválido. Você deve passar um valor com 3, 4 ou mais dígitos.'
+					},
+					{
+						code: 'INVALID_EXPIRATION_MONTH',
+						message: 'Mês de expiração incorreto. Passe um valor entre 1 e 12.'
+					},
+					{code: 'INVALID_EXPIRATION_YEAR', message: 'Ano de expiração inválido.'},
+					{code: 'INVALID_PUBLIC_KEY', message: 'Chave Pública inválida.'},
+					{code: 'INVALID_HOLDER', message: 'Nome do titular do cartão inválido.'},
+				]
+				//extract error message
+				let error = '';
+				for (let i = 0; i < card.errors.length; i++) {
+					//loop through error codes to find the message
+					for (let j = 0; j < error_codes.length; j++) {
+						if (error_codes[j].code === card.errors[i].code) {
+							error += error_codes[j].message + '\n';
+							break;
+						}
+					}
+				}
+				alert('Erro ao criptografar cartão.\n' + error);
+				return false;
+			}
+
 			$("#virt_pagseguro_encrypted_card").val(card.encryptedCard);
 		}
 	});

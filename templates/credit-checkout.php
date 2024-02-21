@@ -138,4 +138,5 @@ defined( 'ABSPATH' ) || exit;
 	endif;
 	?>
 	<input type="hidden" name="virt_pagseguro_encrypted_card" id="virt_pagseguro_encrypted_card" />
+	<input type="hidden" name="virt_pagseguro_auth_3ds" id="virt_pagseguro_auth_3ds" />
 </div>

@@ -165,6 +165,20 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 	public $comments;
 
 	/**
+	 * Percentage from ticket discount.
+	 *
+	 * @var float
+	 */
+	public $ticket_discount;
+
+	/**
+	 * True if ticket discount is disabled together coupons.
+	 *
+	 * @var bool
+	 */
+	public $ticket_discount_coupon;
+
+	/**
 	 * Constructor for the gateway.
 	 */
 	public function __construct() {
@@ -201,6 +215,9 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 		$this->pix_discount_coupon = 'yes' === $this->get_option( 'pix_discount_coupon' );
 		$this->save_card_info      = $this->get_option( 'save_card_info' );
 		$this->comments            = $this->get_option( 'comments' );
+
+		$this->ticket_discount        = $this->get_option( 'ticket_discount' );
+		$this->ticket_discount_coupon = 'yes' === $this->get_option( 'ticket_discount_coupon' );
 
 		$this->global_settings = get_option( 'woocommerce_virt_pagseguro_settings' );
 		$this->invoice_prefix  = $this->get_invoice_prefix();
@@ -290,20 +307,36 @@ class WC_Virtuaria_PagSeguro_Gateway extends WC_Payment_Gateway {
 			'virtuaria_pagseguro_disable_discount',
 			array( $this, 'disable_discount_by_product_categoria' ),
 			10,
-			2
+			3
 		);
 		if ( isset( $this->global_settings['layout_checkout'] )
 			&& 'tabs' === $this->global_settings['layout_checkout'] ) {
 			add_filter(
 				'woocommerce_gateway_title',
-				array( $this, 'discount_pix_text' ),
+				array( $this, 'discount_text' ),
 				10,
 				2
 			);
 		}
 		add_action(
 			'after_virtuaria_pix_validate_text',
-			array( $this, 'info_about_categories' )
+			array( $this, 'display_total_discounted' )
+		);
+		add_action(
+			'after_virtuaria_ticket_text',
+			array( $this, 'display_total_discounted' )
+		);
+		add_action(
+			'after_virtuaria_pix_validate_text',
+			array( $this, 'info_about_categories' ),
+			20,
+			2
+		);
+		add_action(
+			'after_virtuaria_ticket_text',
+			array( $this, 'info_about_categories' ),
+			20,
+			2
 		);
 
 		// Fetch order status.

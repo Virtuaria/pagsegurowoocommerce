@@ -5,7 +5,7 @@
  * Description: Adiciona o método de pagamento PagSeguro a sua loja virtual.
  * Author: Virtuaria
  * Author URI: https://virtuaria.com.br/
- * Version: 3.0.1
+ * Version: 3.2.0
  * License: GPLv2 or later
  *
  * @package virtuaria
@@ -60,10 +60,12 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 			}
 
 			add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
+			// add_action( 'before_woocommerce_init', array( $this, 'declare_cart_checkout_blocks_compatibility' ) );
 			if ( class_exists( 'WC_Payment_Gateway' ) ) {
 				$this->settings = get_option( 'woocommerce_virt_pagseguro_settings' );
 				$this->load_dependecys();
 				add_filter( 'woocommerce_payment_gateways', array( $this, 'add_gateway' ) );
+				// add_action( 'woocommerce_blocks_loaded', array( $this, 'virtuaria_pagseguro_woocommerce_block_support' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'missing_dependency' ) );
 			}
@@ -212,10 +214,43 @@ if ( ! class_exists( 'Virtuaria_Pagseguro' ) ) :
 		}
 
 		/**
-		 * Init Payment gateway instance.
+		 * Creates support for the Virtuaria PagSeguro blocks in WooCommerce.
+		 *
+		 * @return void
 		 */
-		public function initialize_payment_gateway() {
-			WC()->payment_gateways();
+		public function virtuaria_pagseguro_woocommerce_block_support() {
+			if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+				require_once 'includes/blocks/class-virtuaria-pagseguro-abstract-block.php';
+				if ( isset( $this->settings['payment_form'] )
+					&& 'separated' === $this->settings['payment_form'] ) {
+					require_once 'includes/blocks/class-virtuaria-pagseguro-credit-block.php';
+				} else {
+					require_once 'includes/blocks/class-virtuaria-pagseguro-unified-block.php';
+				}
+
+				add_action(
+					'woocommerce_blocks_payment_method_type_registration',
+					function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+						if ( isset( $this->settings['payment_form'] )
+							&& 'separated' === $this->settings['payment_form'] ) {
+							$payment_method_registry->register( new Virtuaria_PagSeguro_Credit_Block() );
+						} else {
+							$payment_method_registry->register( new Virtuaria_PagSeguro_Unified_Block() );
+						}
+					}
+				);
+			}
+		}
+
+		/**
+		 * Custom function to declare compatibility with cart_checkout_blocks feature.
+		 */
+		public function declare_cart_checkout_blocks_compatibility() {
+			// Check if the required class exists.
+			if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+				// Declare compatibility for 'cart_checkout_blocks'.
+				\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
+			}
 		}
 	}
 

@@ -42,6 +42,7 @@
 }
 #virt-pagseguro-payment .form-row {
   min-height: 82px;
+  width: 100%;
 }
 #virt-pagseguro-payment .clear {
   clear: both;
@@ -56,7 +57,7 @@ label[for="payment_method_virt_pagseguro"] img {
   font-size: 11px;
 }
 .woocommerce-checkout
-  #payment
+  #payment  
   div.payment_method_virt_pagseguro
   .pagseguro-info {
   display: block;
@@ -161,6 +162,7 @@ label[for="payment_method_virt_pagseguro"] img {
   display: inline-block;
   max-width: calc(100% - 101px);
 }
+.ticket-text > span,
 .pix-desc > span {
     display: block;
     margin-bottom: 5px;
@@ -211,10 +213,11 @@ input#virt-pagseguro-save-hash-card {
   font-weight: bold;
   color: #000;
 }
-.payment_method_pagseguro .pagseguro-info {
-  font-size: 14px;
+.payment_method_virt_pagseguro_credit .pagseguro-info {
+  font-size: 12px;
   display: block;
-  margin: 0px 0 20px;
+  font-style: italic;
+  margin-bottom: 20px;
 }
 .card-in-use {
   font-size: 14px;
@@ -246,8 +249,9 @@ input#virt-pagseguro-save-hash-card {
 .card-loaded #virt-pagseguro-card-installments {
   min-height: 40px;
   font-size: 0.94em !important;
-}.card-loaded #pagseguro-load-card {
-    float: left;
+}
+.card-loaded #pagseguro-load-card {
+  float: left;
 }
 .woocommerce-checkout #payment ul.payment_methods li .card-brand > img {
   margin-left: 0;
@@ -260,10 +264,12 @@ input#virt-pagseguro-save-hash-card {
   margin-left: 5px;
   font-style: italic;
 }
+.ticket-text > .discount,
 .pix-desc > .discount {
   margin-top: 20px;
   margin-bottom: 20px;
 }
+#virt-pagseguro-banking-ticket-form .info-category,
 #virt-pagseguro-banking-pix-form .info-category {
   font-style: italic;
   font-size: 13px;

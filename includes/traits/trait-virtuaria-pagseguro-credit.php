@@ -95,6 +95,42 @@ trait Virtuaria_PagSeguro_Credit {
 					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/new-checkout.css' )
 				);
 			}
+
+			$min_value_to_3ds = $this->get_option( '3ds_min_value' );
+			if ( 'yes' === $this->get_option( '3ds' )
+				&& ( ! $min_value_to_3ds || $this->get_order_total() >= $min_value_to_3ds ) ) {
+				wp_enqueue_script(
+					'3ds-autentication',
+					VIRTUARIA_PAGSEGURO_URL . 'public/js/3ds.js',
+					array( 'jquery' ),
+					filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/js/3ds.js' ),
+					true
+				);
+
+				$session_3d          = $this->api->get_3ds_session();
+				$confirm_sell_no_3ds = $this->get_option( 'confirm_sell', 'no' );
+				wp_localize_script(
+					'3ds-autentication',
+					'auth_3ds',
+					array(
+						'order_total' => $this->get_order_total() * 100,
+						'session'     => $session_3d,
+						'allow_sell'  => $confirm_sell_no_3ds,
+						'environment' => ( isset( $this->global_settings['environment'] )
+							&& 'sandbox' === $this->global_settings['environment'] )
+							? 'SANDBOX'
+							: 'PROD',
+						'card_id'     => $this->get_card_id(),
+					)
+				);
+
+				if ( ! $session_3d && 'yes' !== $confirm_sell_no_3ds ) {
+					wc_add_notice(
+						__( 'Ocorreu uma falha na comunicação com o PagBank. Pagamento com cartão de crédito foi desativado. Por favor recarregue a página.', 'virtuaria-pagseguro' ),
+						'error'
+					);
+				}
+			}
 		}
 
 		wp_enqueue_style(
@@ -212,6 +248,43 @@ trait Virtuaria_PagSeguro_Credit {
 				'title'       => __( 'Limpar cartões (tokens)', 'virtuaria-pagseguro' ),
 				'type'        => 'erase_cards',
 				'description' => __( 'Remove os métodos de pagamento armazenados. <b>Atenção:</b> É recomendada a criação de um backup, pois, essa opção não pode ser desfeita.', 'virtuaria-pagseguro' ),
+			),
+			'3ds'                 => array(
+				'title'       => __( 'Autenticação 3DS', 'virtuaria-pagseguro' ),
+				'label'       => __( 'Habilitar autenticação 3DS', 'virtuaria-pagseguro' ),
+				'type'        => 'checkbox',
+				'description' => __(
+					'Ative a autenticação 3D Secure para transações de cartão de crédito,
+					implementando um protocolo de segurança avançado que reforça a proteção em compras online.
+					Este mecanismo previne chargebacks resultantes de transações não autorizadas, protegendo o lojista contra possíveis fraudes. Para detalhes adicionais, consulte a <a href="https://dev.pagbank.uol.com.br/reference/criar-pagar-pedido-com-3ds-validacao-pagbank" target="_blank">documentação</a>.',
+					'virtuaria-pagseguro'
+				),
+				'default'     => 'no',
+			),
+			'confirm_sell'        => array(
+				'title'       => __( 'Permitir a venda quando o 3DS não for suportado?', 'virtuaria-pagseguro' ),
+				'label'       => __( 'Habilite a conclusão da venda em casos de incompatibilidade com o 3DS', 'virtuaria-pagseguro' ),
+				'type'        => 'checkbox',
+				'description' => __(
+					'Alguns cartões não oferecem suporte à autenticação 3DS, por isso, recomendamos ativar esta configuração para não perder vendas.
+					Ao selecionar esta opção, o cliente terá a possibilidade de finalizar a compra,
+					mesmo que o cartão não suporte esse recurso ou se a obtenção da sessão 3D Secure junto ao PagBank não for bem-sucedida.',
+					'virtuaria-pagseguro'
+				),
+				'default'     => 'no',
+			),
+			'3ds_min_value'       => array(
+				'title'             => __( 'Valor mínimo (R$) do pedido para que a autenticação 3DS seja aplicada', 'virtuaria-pagseguro' ),
+				'label'             => __( 'Informe o valor mínimo do carrinho para que autenticação 3DS seja utilizada.', 'virtuaria-pagseguro' ),
+				'type'              => 'number',
+				'description'       => __(
+					'Use para evitar uma etapa extra na finalização da compra de pedidos de menor valor. Deixe o campo em branco para desativar esta verificação e aplicar 3DS a pedidos de qualquer valor.',
+					'virtuaria-pagseguro'
+				),
+				'custom_attributes' => array(
+					'step' => '0.01',
+				),
+				'default'           => '',
 			),
 		);
 
@@ -411,14 +484,14 @@ trait Virtuaria_PagSeguro_Credit {
 		return sprintf(
 			'<div class="virt-pagseguro-installments">Em <span class="installment">%dx</span> de <span class="subtotal">R$%s</span> <span class="notax">%s</span></div>',
 			esc_html( $installment ),
-			esc_html(
+			floatval( $subtotal ) > 0 ? esc_html(
 				number_format(
 					$subtotal,
 					2,
 					',',
 					'.'
 				)
-			),
+			) : '0,00',
 			$tax_applied ? '' : 'sem juros'
 		);
 	}
@@ -490,5 +563,27 @@ trait Virtuaria_PagSeguro_Credit {
 			$order->calculate_totals();
 			$order->save();
 		}
+	}
+
+	/**
+	 * Get the card ID if the user is logged in and the card info should be stored.
+	 *
+	 * @return mixed false if user is not logged in or card info should not be stored, otherwise the card ID token.
+	 */
+	public function get_card_id() {
+		if ( ! is_user_logged_in() || 'do_not_store' === $this->save_card_info ) {
+			return false;
+		}
+
+		$pagseguro_card_info = get_user_meta(
+			get_current_user_id(),
+			'_pagseguro_credit_info_store_' . get_current_blog_id(),
+			true
+		);
+		if ( isset( $pagseguro_card_info['token'] ) ) {
+			return $pagseguro_card_info['token'];
+		}
+
+		return false;
 	}
 }

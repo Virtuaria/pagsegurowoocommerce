@@ -24,6 +24,7 @@ class Virtuaria_PagSeguro_Settings {
 		add_action( 'admin_init', array( $this, 'save_store_token' ) );
 		add_action( 'admin_notices', array( $this, 'virtuaria_pagseguro_not_authorized' ) );
 		add_action( 'admin_init', array( $this, 'fee_setup_update' ), 20 );
+		add_filter( 'woocommerce_pagseguro_virt_icon', array( $this, 'remove_gateway_icon' ) );
 	}
 
 	/**
@@ -79,6 +80,17 @@ class Virtuaria_PagSeguro_Settings {
 				admin_url( 'admin.php?page=wc-settings&tab=checkout&section=virt_pagseguro' )
 			);
 		}
+
+		if ( ! class_exists( 'Virtuaria_PagBank_Split' ) ) {
+			add_submenu_page(
+				'virtuaria_pagseguro',
+				'Split',
+				'Split',
+				'remove_users',
+				'virtuaria_pagbank_split',
+				array( $this, 'split_settings' )
+			);
+		}
 	}
 
 	/**
@@ -86,6 +98,33 @@ class Virtuaria_PagSeguro_Settings {
 	 */
 	public function main_setting_screen() {
 		require_once Virtuaria_PagSeguro::get_templates_path() . 'main-screen-settings.php';
+	}
+
+	/**
+	 * Template main screen.
+	 */
+	public function split_settings() {
+		?>
+		<h1 class="main-title">Virtuaria PagSeguro Split</h1>
+		<form action="" method="post" id="mainform" class="main-setting">
+			<table class="form-table">
+				<tbody>
+					<tr class="split-install" valign="top">
+						<td>
+							<p>
+								Split de Pagamento é uma forma de pagamento em que o valor total da compra é dividido de maneira automática entre duas ou mais contas do PagBank (PagSeguro).<br><br>
+								É uma solução que pode ser usada para marketplaces, dropshipping, franquias, delivery, entre outros. Ou seja, qualquer modelo de negócio que exige a distribuição de uma parcela do valor da venda entre diferentes contas PagBank.<br><br>
+								O diferencial do nosso plugin de Split de Pagamento reside em sua facilidade de adoção quando comparado a outras soluções do mercado. Trabalhamos duro para desenvolver uma solução inovadora que garante uma integração suave com lojas virtuais baseadas em WooCommerce.<br><br>
+								Na grande maioria das vezes, não será necessário realizar ajustes no tema para habilitar um checkout multilojas eficaz. Isto permite que clientes realizem pagamentos em uma única transação de produtos de vários vendedores (sellers). Esta inovação representa um avanço significativo no mercado de e-commerce, pois é ao mesmo tempo eficiente e extremamente fácil de usar. Ao adotar nosso plugin, os lojistas podem ampliar suas operações de vendas multivendedor com o mínimo esforço técnico.<br><br>
+								Os pagamentos podem ser realizados de forma flexível e segura, utilizando Cartão de Crédito, Pix ou Boleto. <b>Para utilizar este recurso, instale a última versão do plugin Virtuaria PagSeguro Split clicando</b> <a href="https://virtuaria.com.br/pagbank-split-woocommerce-plugin" target="_blank">aqui</a>.
+							</p>
+							<img src="<?php echo esc_url( VIRTUARIA_PAGSEGURO_URL ); ?>admin/images/split.jpg" alt="Split" class="split-image" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+		<?php
 	}
 
 	/**
@@ -110,6 +149,14 @@ class Virtuaria_PagSeguro_Settings {
 				array(),
 				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'admin/css/pix-code.css' )
 			);
+
+			wp_enqueue_script(
+				'copy-barcode',
+				VIRTUARIA_PAGSEGURO_URL . 'admin/js/copy-barcode.js',
+				array( 'jquery' ),
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'admin/js/copy-barcode.js' ),
+				true
+			);
 		}
 
 		$allowed_screens = array(
@@ -118,7 +165,14 @@ class Virtuaria_PagSeguro_Settings {
 			'virt_pagseguro_pix',
 			'virt_pagseguro_ticket',
 		);
-		if ( 'toplevel_page_virtuaria_pagseguro' === $page
+
+		$allowed_pages = array(
+			'toplevel_page_virtuaria_pagseguro',
+			'virtuaria-pagseguro_page_virtuaria_pagbank_split',
+			'toplevel_page_virtuaria_pagbank_split',
+		);
+
+		if ( in_array( $page, $allowed_pages, true )
 			|| ( 'woocommerce_page_wc-settings' === $page
 			&& isset( $_GET['section'] )
 			&& in_array( $_GET['section'], $allowed_screens, true ) ) ) {
@@ -148,7 +202,8 @@ class Virtuaria_PagSeguro_Settings {
 				: '';
 
 			if ( ( 'virtuaria_pagseguro' === $page
-					|| 'virt_pagseguro' !== $_GET['section'] )
+				|| 'virtuaria_pagbank_split' === $page
+				|| 'virt_pagseguro' !== $_GET['section'] )
 				&& isset( $options['payment_form'] )
 				&& 'separated' === $options['payment_form'] ) {
 				wp_localize_script(
@@ -160,6 +215,7 @@ class Virtuaria_PagSeguro_Settings {
 							<a class="tablinks ' . ( 'virt_pagseguro_credit' === $section ? 'active' : '' ) . '" href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=virt_pagseguro_credit' ) . '">Crédito</a>
 							<a class="tablinks ' . ( 'virt_pagseguro_pix' === $section ? 'active' : '' ) . '" href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=virt_pagseguro_pix' ) . '">Pix</a>
 							<a class="tablinks ' . ( 'virt_pagseguro_ticket' === $section ? 'active' : '' ) . '" href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=virt_pagseguro_ticket' ) . '">Boleto</a>
+							<a class="tablinks split ' . ( 'virtuaria_pagbank_split' === $page ? 'active' : '' ) . '" href="' . admin_url( 'admin.php?page=virtuaria_pagbank_split' ) . '">Split</a>
 						</div>',
 					)
 				);
@@ -171,10 +227,20 @@ class Virtuaria_PagSeguro_Settings {
 						'<div class="navigation-tab">
 							<a class="tablinks ' . ( 'virtuaria_pagseguro' === $page ? 'active' : '' ) . '" href="' . admin_url( 'admin.php?page=virtuaria_pagseguro' ) . '">Integração</a>
 							<a class="tablinks ' . ( 'virt_pagseguro' === $section ? 'active' : '' ) . '" href="' . admin_url( 'admin.php?page=wc-settings&tab=checkout&section=virt_pagseguro' ) . '">Pagamento</a>
+							<a class="tablinks split ' . ( 'virtuaria_pagbank_split' === $page ? 'active' : '' ) . '" href="' . admin_url( 'admin.php?page=virtuaria_pagbank_split' ) . '">Split</a>
 						</div>',
 					)
 				);
 			}
+		}
+
+		if ( ! class_exists( 'Virtuaria_PagBank_Split' ) ) {
+			wp_enqueue_style(
+				'hide-split-submenu',
+				VIRTUARIA_PAGSEGURO_URL . 'admin/css/hide-split-submenu.css',
+				array(),
+				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'admin/css/hide-split-submenu.css' )
+			);
 		}
 	}
 
@@ -191,7 +257,13 @@ class Virtuaria_PagSeguro_Settings {
 			'virt_pagseguro_ticket',
 		);
 
-		if ( 'toplevel_page_virtuaria_pagseguro' === $hook_suffix
+		$pages = array(
+			'toplevel_page_virtuaria_pagseguro',
+			'virtuaria-pagseguro_page_virtuaria_pagbank_split',
+			'toplevel_page_virtuaria_pagbank_split',
+		);
+
+		if ( in_array( $hook_suffix, $pages, true )
 			|| ( 'woocommerce_page_wc-settings' === $hook_suffix
 			&& isset( $_GET['section'] )
 			&& in_array( $_GET['section'], $methods, true ) ) ) {
@@ -422,6 +494,23 @@ class Virtuaria_PagSeguro_Settings {
 				filemtime( VIRTUARIA_PAGSEGURO_DIR . 'public/css/separated-methods.css' )
 			);
 		}
+	}
+
+	/**
+	 * Remove the gateway icon if the logo setting is set to 'only_title'.
+	 *
+	 * @param string $icon_url The URL of the gateway icon.
+	 * @return string The modified or null gateway icon URL
+	 */
+	public function remove_gateway_icon( $icon_url ) {
+		$settings = get_option(
+			'woocommerce_virt_pagseguro_settings'
+		);
+		if ( isset( $settings['logo'] )
+			&& 'only_title' === $settings['logo'] ) {
+			$icon_url = null;
+		}
+		return $icon_url;
 	}
 }
 

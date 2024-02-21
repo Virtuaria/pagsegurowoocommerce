@@ -43,7 +43,7 @@ trait Virtuaria_PagSeguro_Common {
 					'title'       => __( 'Observações', 'virtuaria-pagseguro' ),
 					'type'        => 'textarea',
 					'description' => __( 'Exibe suas observações logo abaixo da descrição na tela de finalização da compra.', 'virtuaria-pagseguro' ),
-					'default'     => __( 'Na área "Detalhes de Faturamento", recomendamos inserir os dados do titular do cartão. Caso a compra seja para outra pessoa, escolha "Entregar para um endereço diferente".', 'virtuaria-pagseguro' ),
+					'default'     => '',
 				),
 			);
 		}
@@ -429,8 +429,9 @@ trait Virtuaria_PagSeguro_Common {
 	/**
 	 * Process the payment and return the result.
 	 *
-	 * @param  int $order_id Order ID.
+	 * @param int $order_id Order ID.
 	 * @return array
+	 * @throws Exception Exception in block.
 	 */
 	public function process_payment( $order_id ) {
 		if ( $this->signup_checkout
@@ -481,6 +482,10 @@ trait Virtuaria_PagSeguro_Common {
 						$this->check_payment_pix( $order );
 					}
 
+					if ( method_exists( $this, 'register_pdf_link_note' ) ) {
+						$this->register_pdf_link_note( $order );
+					}
+
 					if ( isset( $this->global_settings['process_mode'] )
 						&& 'async' === $this->global_settings['process_mode'] ) {
 						$args = array( $order_id, 'on-hold' );
@@ -526,14 +531,26 @@ trait Virtuaria_PagSeguro_Common {
 					'redirect' => $this->get_return_url( $order ),
 				);
 			} else {
-				wc_add_notice(
-					sprintf(
-						/* translators: %s: error */
-						__( 'Pagseguro: %s', 'virtuaria-pagseguro' ),
-						$paid['error']
-					),
-					'error'
-				);
+				if ( isset( $_POST['is_block'] )
+					&& 'yes' === $_POST['is_block'] ) {
+					throw new Exception(
+						sprintf(
+							/* translators: %s: error */
+							__( 'PagSeguro: %s', 'virtuaria-pagseguro' ),
+							$paid['error']
+						),
+						401
+					);
+				} else {
+					wc_add_notice(
+						sprintf(
+							/* translators: %s: error */
+							__( 'PagSeguro: %s', 'virtuaria-pagseguro' ),
+							$paid['error']
+						),
+						'error'
+					);
+				}
 
 				return array(
 					'result'   => 'fail',
@@ -541,13 +558,24 @@ trait Virtuaria_PagSeguro_Common {
 				);
 			}
 		} else {
-			wc_add_notice(
-				__(
-					'Não foi possível processar a sua compra. Por favor, tente novamente mais tarde.',
-					'virtuaria-pagseguro'
-				),
-				'error'
-			);
+			if ( isset( $_POST['is_block'] )
+				&& 'yes' === $_POST['is_block'] ) {
+				throw new Exception(
+					__(
+						'Não foi possível processar a sua compra. Por favor, tente novamente mais tarde.',
+						'virtuaria-pagseguro'
+					),
+					401
+				);
+			} else {
+				wc_add_notice(
+					__(
+						'Não foi possível processar a sua compra. Por favor, tente novamente mais tarde.',
+						'virtuaria-pagseguro'
+					),
+					'error'
+				);
+			}
 
 			return array(
 				'result'   => 'fail',
@@ -575,6 +603,7 @@ trait Virtuaria_PagSeguro_Common {
 
 		if ( $amount
 			&& $amount >= 1
+			&& apply_filters( 'virtuaria_pagseguro_allow_refund', true, $order, $amount )
 			&& in_array( $order->get_status(), $refundable_status, true )
 			&& 'BOLETO' !== $order->get_meta( '_payment_mode' ) ) {
 			if ( $this->api->refund_order( $order_id, $amount ) ) {
@@ -644,8 +673,10 @@ trait Virtuaria_PagSeguro_Common {
 			}
 		}
 
-		$disable_discount = $this->pix_discount_coupon
-			&& count( WC()->cart->get_applied_coupons() ) > 0;
+		$disable_discount = ( $this->pix_discount_coupon
+			&& WC()->cart
+			&& count( WC()->cart->get_applied_coupons() ) > 0 )
+			|| apply_filters( 'virtuaria_pagseguro_disable_discount_by_cart', false, WC()->cart );
 
 		$card_loaded = false;
 		if ( is_user_logged_in()
@@ -686,12 +717,18 @@ trait Virtuaria_PagSeguro_Common {
 				&& ! $disable_discount
 					? $this->pix_discount / 100
 					: 0,
-			'pix_offer_text'  => method_exists( $this, 'discount_pix_text' )
-				? $this->discount_pix_text(
+			'pix_offer_text'  => method_exists( $this, 'discount_text' )
+				? $this->discount_text(
 					'PIX',
 					$this->id
 				)
 				: '',
+			'ticket_offer_text'  => method_exists( $this, 'discount_text' )
+				? $this->discount_text(
+					'Boleto',
+					$this->id
+				)
+			: '',
 			'card_loaded'     => $card_loaded,
 			'instance'        => $this,
 			'save_card_info'  => $this->save_card_info,
@@ -792,5 +829,273 @@ trait Virtuaria_PagSeguro_Common {
 		}
 
 		return $class;
+	}
+
+	/**
+	 * Display ignore discount field.
+	 *
+	 * @param string $key  the name from field.
+	 * @param array  $data the data.
+	 */
+	public function generate_ignore_discount_html( $key, $data ) {
+		$field_key = $this->get_field_key( $key );
+
+		$this->save_categories_ignored_in_discount( $key );
+
+		$selected_cats = $this->get_option( $key );
+
+		$selected_cats = is_array( $selected_cats )
+			? $selected_cats
+			: explode( ',', $selected_cats );
+
+		ob_start();
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr( $field_key ); ?>">
+					<?php echo esc_html( $data['title'] ); ?>
+					<span class="woocommerce-help-tip" data-tip="<?php echo esc_html( $data['description'] ); ?>"></span>
+				</label>
+			</th>
+			<td class="forminp forminp-<?php echo esc_attr( $data['type'] ); ?>">
+				<input type="hidden" name="<?php echo esc_attr( $field_key ); ?>" id="<?php echo esc_attr( $field_key ); ?>" />
+				<div id="product_cat-all" class="tabs-panel">
+					<ul id="product_catchecklist" data-wp-lists="list:product_cat" class="categorychecklist form-no-clear">
+						<?php
+						wp_terms_checklist(
+							0,
+							array(
+								'taxonomy'      => 'product_cat',
+								'selected_cats' => $selected_cats,
+							)
+						);
+						?>
+					</ul>
+				</div>
+			</td>
+		</tr>
+		<script>
+			jQuery(document).ready(function($){
+				$('.woocommerce-save-button').on('click', function() {
+					let selected_cats = [];
+					$('#<?php echo esc_attr( $field_key ); ?> + #product_cat-all #product_catchecklist input[type="checkbox"]:checked').each(function(i, v){
+						selected_cats.push($(v).val());
+					});
+					$('#<?php echo esc_attr( $field_key ); ?>').val(selected_cats);
+				})
+			});
+		</script>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Save categories ignored in discount.
+	 *
+	 * @param string $key option key.
+	 */
+	private function save_categories_ignored_in_discount( $key ) {
+		if ( isset( $_POST[ 'woocommerce_virt_pagseguro_' . $key ] ) ) {
+			$ignored = sanitize_text_field( wp_unslash( $_POST[ 'woocommerce_virt_pagseguro_' . $key ] ) );
+			$ignored = explode( ',', $ignored );
+			$this->update_option(
+				$key,
+				$ignored
+			);
+		}
+	}
+
+	/**
+	 * Ignore product from categorie to discount.
+	 *
+	 * @param boolean    $disable true if disable item otherwise false.
+	 * @param wc_product $product the itens.
+	 * @param string     $method  the method.
+	 */
+	public function disable_discount_by_product_categoria( $disable, $product, $method ) {
+		$to_categories = $this->get_option( $method . '_discount_ignore', '' );
+
+		$ignored_categories = is_array( $to_categories )
+			? $to_categories
+			: explode(
+				',',
+				$to_categories
+			);
+
+		if ( $ignored_categories
+			&& is_array( $ignored_categories )
+			&& count( $product->get_category_ids() ) > 0 ) {
+			foreach ( $product->get_category_ids() as $category_id ) {
+				if ( in_array( $category_id, $ignored_categories ) ) {
+					$disable = true;
+					break;
+				}
+			}
+		}
+		return $disable;
+	}
+
+	/**
+	 * Display discount pix text.
+	 *
+	 * @param string $title      the gateway title.
+	 * @param string $gateway_id the gateway id.
+	 */
+	public function discount_text( $title, $gateway_id ) {
+		if ( is_checkout()
+			&& isset( $_REQUEST['wc-ajax'] )
+			&& 'update_order_review' === $_REQUEST['wc-ajax']
+			&& ! apply_filters( 'virtuaria_pagseguro_disable_discount_by_cart', false, WC()->cart )
+			&& $this->id === $gateway_id ) {
+
+			if ( 'virt_pagseguro_pix' === $gateway_id ) {
+				$has_discount = 'yes' === $this->pix_enable
+				&& $this->pix_discount > 0
+				&& ( ! $this->pix_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 );
+			} elseif ( 'virt_pagseguro_ticket' === $gateway_id ) {
+				$has_discount = 'yes' === $this->ticket_enable
+				&& $this->ticket_discount > 0
+				&& ( ! $this->ticket_discount_coupon || count( WC()->cart->get_applied_coupons() ) === 0 );
+			} else {
+				$has_discount = false;
+			}
+
+			if ( ! $has_discount ) {
+				return $title;
+			}
+
+			$discount = 'virt_pagseguro_pix' === $gateway_id
+				? $this->pix_discount
+				: $this->ticket_discount;
+
+			$title .= '<span class="pix-discount">(desconto de <span class="percentage">'
+				. str_replace( '.', ',', $discount ) . '%</span>)';
+
+			if ( isset( $this->global_settings['payment_form'] )
+				&& 'unified' === $this->global_settings['payment_form']
+				&& isset( $this->global_settings['layout_checkout'] )
+				&& 'tabs' === $this->global_settings['layout_checkout'] ) {
+				$title .= 'virt_pagseguro_pix' === $gateway_id
+					? ' no Pix'
+					: ' no Boleto';
+			}
+			$title .= '</span>';
+		}
+		return $title;
+	}
+
+	/**
+	 * Text about categories disable to pix discount.
+	 *
+	 * @param array $itens the cart itens.
+	 */
+	public function info_about_categories( $itens ) {
+		$method = 'after_virtuaria_pix_validate_text' === current_action()
+			? 'pix'
+			: 'ticket';
+
+		$ignored_categories = $this->get_option( $method . '_discount_ignore', '' );
+
+		if ( is_array( $ignored_categories ) ) {
+			$ignored_categories = array_filter( $ignored_categories );
+		}
+
+		if ( 'pix' === $method ) {
+			$enabled = 'yes' === $this->pix_enable
+				&& $this->pix_discount > 0;
+		} elseif ( 'ticket' === $method ) {
+			$enabled = 'yes' === $this->ticket_enable
+				&& $this->ticket_discount > 0;
+		} else {
+			$enabled = false;
+		}
+
+		if ( $enabled
+			&& is_array( $ignored_categories )
+			&& $ignored_categories ) {
+
+			$category_disabled = array();
+			foreach ( $ignored_categories as $index => $category ) {
+				$term = get_term( $category );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$category_disabled[] = ucwords( mb_strtolower( $term->name ) );
+				}
+			}
+
+			if ( $category_disabled ) {
+				echo '<div class="info-category">' . wp_kses_post(
+					sprintf(
+						/* translators: %s: categories */
+						_nx(
+							'O desconto do %1$s não é válido para produtos da categoria <span class="categories">%2$s</span>.',
+							'O desconto do %1$s não é válido para produtos das categorias <span class="categories">%2$s</span>.',
+							count( $category_disabled ),
+							'Checkout',
+							'virtuaria-pagseguro'
+						),
+						'pix' === $method ? 'Pix' : 'Boleto',
+						implode( ', ', $category_disabled )
+					)
+				) . '</div>';
+			}
+		}
+	}
+
+	public function display_total_discounted() {
+		if ( 'after_virtuaria_pix_validate_text' === current_action() ) {
+			$disabled_with_coupon = $this->pix_discount_coupon;
+			$discount_percentual  = $this->pix_discount
+				? $this->pix_discount / 100
+				: 0;
+			$method                = 'pix';
+		} elseif ( 'after_virtuaria_ticket_text' === current_action() ) {
+			$disabled_with_coupon = $this->ticket_discount_coupon;
+			$discount_percentual  = $this->ticket_discount
+				? $this->ticket_discount / 100
+				: 0;
+			$method               = 'ticket';
+		} else {
+			$disabled_with_coupon = false;
+			$discount_percentual  = 0;
+		}
+
+		if ( ( $disabled_with_coupon
+			&& WC()->cart
+			&& count( WC()->cart->get_applied_coupons() ) > 0 )
+			|| apply_filters( 'virtuaria_pagseguro_disable_discount_by_cart', false, WC()->cart ) ) {
+			return;
+		}
+
+		if ( $discount_percentual > 0 ) {
+			$shipping = 0;
+			if ( isset( WC()->cart ) && WC()->cart->get_shipping_total() > 0 ) {
+				$shipping = WC()->cart->get_shipping_total();
+			}
+
+			$cart_total      = $this->get_order_total();
+			$discount_reduce = 0;
+			$discount        = ( $cart_total - $shipping );
+			foreach ( WC()->cart->get_cart() as $item ) {
+				$product = wc_get_product( $item['product_id'] );
+				if ( $product && apply_filters(
+					'virtuaria_pagseguro_disable_discount',
+					false,
+					$product,
+					$method
+				) ) {
+					$discount_reduce += $product->get_price() * $item['quantity'];
+				}
+			}
+			$discount -= $discount_reduce;
+			$discount  = $discount * $discount_percentual;
+			if ( $discount > 0 ) {
+				echo '<span class="discount">Desconto: <b style="color:green;">R$ '
+				. esc_html( number_format( $discount, 2, ',', '.' ) )
+				. '</b></span>';
+				echo '<span class="total">Novo total: <b style="color:green">R$ '
+				. esc_html( number_format( $cart_total - $discount, 2, ',', '.' ) )
+				. '</b></span>';
+			}
+		}
 	}
 }
